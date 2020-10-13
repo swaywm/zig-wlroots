@@ -12,3 +12,5 @@ const DataDeviceManager = @import("src/data_device.zig").DataDeviceManager;
 const Box = @import("src/box.zig").Box;
 
 const OutputLayout = @import("src/output_layout.zig");
+
+const Output = @import("src/output.zig");
