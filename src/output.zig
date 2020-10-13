@@ -24,14 +24,14 @@ pub const Output = extern struct {
 
     pub const State = extern struct {
         pub const field = struct {
-            const buffer = 1 << 0;
-            const damage = 1 << 1;
-            const mode = 1 << 2;
-            const enabled = 1 << 3;
-            const scale = 1 << 4;
-            const transform = 1 << 5;
-            const adaptive_sync_enabled = 1 << 6;
-            const gamma_lut = 1 << 7;
+            pub const buffer = 1 << 0;
+            pub const damage = 1 << 1;
+            pub const mode = 1 << 2;
+            pub const enabled = 1 << 3;
+            pub const scale = 1 << 4;
+            pub const transform = 1 << 5;
+            pub const adaptive_sync_enabled = 1 << 6;
+            pub const gamma_lut = 1 << 7;
         };
 
         pub const BufferType = extern enum {
