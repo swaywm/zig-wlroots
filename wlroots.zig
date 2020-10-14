@@ -1,6 +1,7 @@
 pub const Backend = @import("src/backend.zig").Backend;
 
 pub const Renderer = @import("src/renderer.zig").Renderer;
+pub const DmabufAttributes = @import("src/dmabuf.zig").DmabufAttributes;
 
 pub const Egl = @import("src/egl.zig").Egl;
 
