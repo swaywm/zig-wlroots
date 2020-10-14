@@ -16,3 +16,4 @@ pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 pub const Subcompositor = @import("types/compositor.zig").Subcompositor;
 pub const Subsurface = @import("types/surface.zig").Subsurface;
 pub const Surface = @import("types/surface.zig").Surface;
+pub const matrix = @import("types/matrix.zig");
