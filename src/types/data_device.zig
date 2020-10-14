@@ -1,5 +1,3 @@
-const wlr = @import("wlroots.zig");
-
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
