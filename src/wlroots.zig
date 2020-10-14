@@ -7,6 +7,7 @@ pub const Texture = @import("render/texture.zig").Texture;
 
 pub const Box = @import("types/box.zig").Box;
 pub const Compositor = @import("types/compositor.zig").Compositor;
+pub const Cursor = @import("types/cursor.zig").Cursor;
 pub const DataDeviceManager = @import("types/data_device.zig").DataDeviceManager;
 pub const Output = @import("types/output.zig").Output;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
