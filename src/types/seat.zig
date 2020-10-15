@@ -444,4 +444,22 @@ pub const Seat = extern struct {
 
     extern fn wlr_seat_validate_touch_grab_serial(seat: *Seat, origin: ?*wlr.Surface, serial: u32, point_ptr: *?*TouchPoint) bool;
     pub const validateTouchGrabSerial = wlr_seat_validate_touch_grab_serial;
+
+    extern fn wlr_seat_request_set_selection(seat: *Seat, client: ?*Seat.Client, source: ?*wlr.DataSource, serial: u32) void;
+    pub const requestSetSelection = wlr_seat_request_set_selection;
+
+    extern fn wlr_seat_set_selection(seat: *Seat, source: ?*wlr.DataSource, serial: u32) void;
+    pub const setSelection = wlr_seat_set_selection;
+
+    extern fn wlr_seat_request_start_drag(seat: *Seat, drag: *wlr.Drag, origin: *wlr.Surface, serial: u32) void;
+    pub const requestStartDrag = wlr_seat_request_start_drag;
+
+    extern fn wlr_seat_start_drag(seat: *Seat, drag: *wlr.Drag, serial: u32) void;
+    pub const startDrag = wlr_seat_start_drag;
+
+    extern fn wlr_seat_start_pointer_drag(seat: *Seat, drag: *wlr.Drag, serial: u32) void;
+    pub const startPointerDrag = wlr_seat_start_pointer_drag;
+
+    extern fn wlr_seat_start_touch_drag(seat: *Seat, drag: *wlr.Drag, serial: u32, point: *TouchPoint) void;
+    pub const startTouchDrag = wlr_seat_start_touch_drag;
 };

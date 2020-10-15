@@ -1,2 +1,2 @@
 // TODO: fill in this definition
-const Egl = opaque {};
+pub const Egl = opaque {};
