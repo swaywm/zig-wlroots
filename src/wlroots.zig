@@ -35,5 +35,11 @@ pub const Drag = @import("types/data_device.zig").Drag;
 pub const Output = @import("types/output.zig").Output;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 
+pub const XCursorImage = @import("xcursor.zig").XCursorImage;
+pub const XCursor = @import("xcursor.zig").XCursor;
+pub const XCursorTheme = @import("xcursor.zig").XCursorTheme;
+
 pub const XCursorManager = @import("types/xcursor_manager.zig").XCursorManager;
 pub const XCursorManagerTheme = @import("types/xcursor_manager.zig").XCursorManagerTheme;
+
+pub const Edges = @import("util/edges.zig").Edges;
