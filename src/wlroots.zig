@@ -13,6 +13,7 @@ pub const DataDeviceManager = @import("types/data_device.zig").DataDeviceManager
 pub const InputDevice = @import("types/input_device.zig").InputDevice;
 pub const Output = @import("types/output.zig").Output;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
+pub const Pointer = @import("types/pointer.zig").Pointer;
 pub const Subcompositor = @import("types/compositor.zig").Subcompositor;
 pub const Subsurface = @import("types/surface.zig").Subsurface;
 pub const Surface = @import("types/surface.zig").Surface;
