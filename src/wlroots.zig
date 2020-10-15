@@ -5,6 +5,8 @@ pub const Egl = @import("render/egl.zig").Egl;
 pub const Renderer = @import("render/renderer.zig").Renderer;
 pub const Texture = @import("render/texture.zig").Texture;
 
+pub const AxisOrientation = @import("types/pointer.zig").AxisOrientation;
+pub const AxisSource = @import("types/pointer.zig").AxisSource;
 pub const Box = @import("types/box.zig").Box;
 pub const ButtonState = @import("types/input_device.zig").ButtonState;
 pub const Compositor = @import("types/compositor.zig").Compositor;
