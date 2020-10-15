@@ -56,6 +56,18 @@ pub const Seat = extern struct {
         },
 
         serials: SerialRingset,
+
+        extern fn wlr_seat_client_next_serial(client: *Client) u32;
+        pub const nextSerial = wlr_seat_client_next_serial;
+
+        extern fn wlr_seat_client_validate_event_serial(client: *Client, serial: u32) bool;
+        pub const validateEventSerial = wlr_seat_client_validate_event_serial;
+
+        extern fn wlr_seat_client_from_resource(seat: *wl.Seat) ?*Client;
+        pub const fromWlSeat = wlr_seat_client_from_resource;
+
+        extern fn wlr_seat_client_from_pointer_resource(pointer: *wl.Pointer) ?*Client;
+        pub const fromWlPointer = wlr_seat_client_from_pointer_resource;
     };
 
     pub const PointerGrab = extern struct {
@@ -279,4 +291,157 @@ pub const Seat = extern struct {
     },
 
     data: ?*c_void,
+
+    extern fn wlr_seat_create(server: *wl.Server, name: [*:0]const u8) ?*Seat;
+    pub const create = wlr_seat_create;
+
+    extern fn wlr_seat_destroy(seat: *Seat) void;
+    pub const destroy = wlr_seat_destroy;
+
+    extern fn wlr_seat_client_for_wl_client(seat: *Seat, wl_client: *wl.Client) ?*Seat.Client;
+    pub const clientForWlClient = wlr_seat_client_for_wl_client;
+
+    extern fn wlr_seat_set_capabilities(seat: *Seat, capabilities: u32) void;
+    pub const setCapabilities = wlr_seat_set_capabilities;
+
+    extern fn wlr_seat_set_name(seat: *Seat, name: [*:0]const u8) void;
+    pub const setName = wlr_seat_set_name;
+
+    extern fn wlr_seat_pointer_surface_has_focus(seat: *Seat, surface: *wlr.Surface) bool;
+    pub const pointerSurfaceHasFocus = wlr_seat_pointer_surface_has_focus;
+
+    extern fn wlr_seat_pointer_enter(seat: *Seat, surface: ?*wlr.Surface, sx: f64, sy: f64) void;
+    pub const pointerEnter = wlr_seat_pointer_enter;
+
+    extern fn wlr_seat_pointer_clear_focus(seat: *Seat) void;
+    pub const pointerClearFocus = wlr_seat_pointer_clear_focus;
+
+    extern fn wlr_seat_pointer_send_motion(seat: *Seat, time_msec: u32, sx: f64, sy: f64) void;
+    pub const pointerSendMotion = wlr_seat_pointer_send_motion;
+
+    extern fn wlr_seat_pointer_send_button(seat: *Seat, time_msec: u32, button: u32, state: wlr.ButtonState) u32;
+    pub const pointerSendButton = wlr_seat_pointer_send_button;
+
+    extern fn wlr_seat_pointer_send_axis(seat: *Seat, time_msec: u32, orientation: wlr.AxisOrientation, value: f64, value_discrete: i32, source: wlr.AxisSource) void;
+    pub const pointerSendAxis = wlr_seat_pointer_send_axis;
+
+    extern fn wlr_seat_pointer_send_frame(seat: *Seat) void;
+    pub const pointerSendFrame = wlr_seat_pointer_send_frame;
+
+    extern fn wlr_seat_pointer_notify_enter(seat: *Seat, surface: *wlr.Surface, sx: f64, sy: f64) void;
+    pub const pointerNotifyEnter = wlr_seat_pointer_notify_enter;
+
+    extern fn wlr_seat_pointer_notify_clear_focus(seat: *Seat) void;
+    pub const pointerNotifyClearFocus = wlr_seat_pointer_notify_clear_focus;
+
+    extern fn wlr_seat_pointer_warp(seat: *Seat, sx: f64, sy: f64) void;
+    pub const pointerWarp = wlr_seat_pointer_warp;
+
+    extern fn wlr_seat_pointer_notify_motion(seat: *Seat, time_msec: u32, sx: f64, sy: f64) void;
+    pub const pointerNotifyMotion = wlr_seat_pointer_notify_motion;
+
+    extern fn wlr_seat_pointer_notify_button(seat: *Seat, time_msec: u32, button: u32, state: wlr.ButtonState) u32;
+    pub const pointerNotifyButton = wlr_seat_pointer_notify_button;
+
+    extern fn wlr_seat_pointer_notify_axis(seat: *Seat, time_msec: u32, orientation: wlr.AxisOrientation, value: f64, value_discrete: i32, source: wlr.AxisSource) void;
+    pub const pointerNotifyAxis = wlr_seat_pointer_notify_axis;
+
+    extern fn wlr_seat_pointer_notify_frame(seat: *Seat) void;
+    pub const pointerNotifyFrame = wlr_seat_pointer_notify_frame;
+
+    extern fn wlr_seat_pointer_start_grab(seat: *Seat, grab: ?*PointerGrab) void;
+    pub const pointerStartGrab = wlr_seat_pointer_start_grab;
+
+    extern fn wlr_seat_pointer_end_grab(seat: *Seat) void;
+    pub const pointerEndGrab = wlr_seat_pointer_end_grab;
+
+    extern fn wlr_seat_pointer_has_grab(seat: *Seat) bool;
+    pub const pointerHasGrab = wlr_seat_pointer_has_grab;
+
+    extern fn wlr_seat_set_keyboard(seat: *Seat, dev: ?*wlr.InputDevice) void;
+    pub const setKeyboard = wlr_seat_set_keyboard;
+
+    extern fn wlr_seat_get_keyboard(seat: *Seat) ?*wlr.Keyboard;
+    pub const getKeyboard = wlr_seat_get_keyboard;
+
+    extern fn wlr_seat_keyboard_send_key(seat: *Seat, time_msec: u32, key: u32, state: u32) void;
+    pub const keyboardSendKey = wlr_seat_keyboard_send_key;
+
+    extern fn wlr_seat_keyboard_send_modifiers(seat: *Seat, modifiers: *wlr.Keyboard.Modifiers) void;
+    pub const keyboardSendModifiers = wlr_seat_keyboard_send_modifiers;
+
+    extern fn wlr_seat_keyboard_enter(seat: *Seat, surface: ?*wlr.Surface, keycodes: [*]u32, num_keycodes: usize, modifiers: *wlr.Keyboard.Modifiers) void;
+    pub const keyboardEnter = wlr_seat_keyboard_enter;
+
+    extern fn wlr_seat_keyboard_clear_focus(seat: *Seat) void;
+    pub const keyboardClearFocus = wlr_seat_keyboard_clear_focus;
+
+    extern fn wlr_seat_keyboard_notify_key(seat: *Seat, time_msec: u32, key: u32, state: u32) void;
+    pub const keyboardNotifyKey = wlr_seat_keyboard_notify_key;
+
+    extern fn wlr_seat_keyboard_notify_modifiers(seat: *Seat, modifiers: *wlr.Keyboard.Modifiers) void;
+    pub const keyboardNotifyModifiers = wlr_seat_keyboard_notify_modifiers;
+
+    extern fn wlr_seat_keyboard_notify_enter(seat: *Seat, surface: *wlr.Surface, keycodes: [*]u32, num_keycodes: usize, modifiers: *wlr.Keyboard.Modifiers) void;
+    pub const keyboardNotifyEnter = wlr_seat_keyboard_notify_enter;
+
+    extern fn wlr_seat_keyboard_notify_clear_focus(seat: *Seat) void;
+    pub const keyboardNotifyClearFocus = wlr_seat_keyboard_notify_clear_focus;
+
+    extern fn wlr_seat_keyboard_start_grab(seat: *Seat, grab: *KeyboardGrab) void;
+    pub const keyboardStartGrab = wlr_seat_keyboard_start_grab;
+
+    extern fn wlr_seat_keyboard_end_grab(seat: *Seat) void;
+    pub const keyboardEndGrab = wlr_seat_keyboard_end_grab;
+
+    extern fn wlr_seat_keyboard_has_grab(seat: *Seat) bool;
+    pub const keyboardHasGrab = wlr_seat_keyboard_has_grab;
+
+    extern fn wlr_seat_touch_get_point(seat: *Seat, touch_id: i32) ?*TouchPoint;
+    pub const touchGetPoint = wlr_seat_touch_get_point;
+
+    extern fn wlr_seat_touch_point_focus(seat: *Seat, surface: *wlr.Surface, time_msec: u32, touch_id: i32, sx: f64, sy: f64) void;
+    pub const touchPointFocus = wlr_seat_touch_point_focus;
+
+    extern fn wlr_seat_touch_point_clear_focus(seat: *Seat, time_msec: u32, touch_id: i32) void;
+    pub const touchPointClearFocus = wlr_seat_touch_point_clear_focus;
+
+    extern fn wlr_seat_touch_send_down(seat: *Seat, surface: *wlr.Surface, time_msec: u32, touch_id: i32, sx: f64, sy: f64) u32;
+    pub const touchSendDown = wlr_seat_touch_send_down;
+
+    extern fn wlr_seat_touch_send_up(seat: *Seat, time_msec: u32, touch_id: i32) void;
+    pub const touchSendUp = wlr_seat_touch_send_up;
+
+    extern fn wlr_seat_touch_send_motion(seat: *Seat, time_msec: u32, touch_id: i32, sx: f64, sy: f64) void;
+    pub const touchSendMotion = wlr_seat_touch_send_motion;
+
+    extern fn wlr_seat_touch_notify_down(seat: *Seat, surface: *wlr.Surface, time_msec: u32, touch_id: i32, sx: f64, sy: f64) u32;
+    pub const touchNotifyDown = wlr_seat_touch_notify_down;
+
+    extern fn wlr_seat_touch_notify_up(seat: *Seat, time_msec: u32, touch_id: i32) void;
+    pub const touchNotifyUp = wlr_seat_touch_notify_up;
+
+    extern fn wlr_seat_touch_notify_motion(seat: *Seat, time_msec: u32, touch_id: i32, sx: f64, sy: f64) void;
+    pub const touchNotifyMotion = wlr_seat_touch_notify_motion;
+
+    extern fn wlr_seat_touch_num_points(seat: *Seat) c_int;
+    pub const touchNumPoints = wlr_seat_touch_num_points;
+
+    extern fn wlr_seat_touch_start_grab(seat: *Seat, grab: *TouchGrab) void;
+    pub const touchStartGrab = wlr_seat_touch_start_grab;
+
+    extern fn wlr_seat_touch_end_grab(seat: *Seat) void;
+    pub const touchEndGrab = wlr_seat_touch_end_grab;
+
+    extern fn wlr_seat_touch_has_grab(seat: *Seat) bool;
+    pub const touchHasGrab = wlr_seat_touch_has_grab;
+
+    extern fn wlr_seat_validate_grab_serial(seat: *Seat, serial: u32) bool;
+    pub const validateGrabSerial = wlr_seat_validate_grab_serial;
+
+    extern fn wlr_seat_validate_pointer_grab_serial(seat: *Seat, origin: ?*wlr.Surface, serial: u32) bool;
+    pub const validatePointerGrabSerial = wlr_seat_validate_pointer_grab_serial;
+
+    extern fn wlr_seat_validate_touch_grab_serial(seat: *Seat, origin: ?*wlr.Surface, serial: u32, point_ptr: *?*TouchPoint) bool;
+    pub const validateTouchGrabSerial = wlr_seat_validate_touch_grab_serial;
 };

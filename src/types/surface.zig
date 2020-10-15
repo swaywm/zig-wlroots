@@ -146,6 +146,11 @@ pub const Surface = extern struct {
 
     extern fn wlr_surface_get_buffer_source_box(surface: *Surface, box: *wlr.FBox) void;
     pub const getBufferSourceBox = wlr_surface_get_buffer_source_box;
+
+    extern fn wlr_surface_accepts_touch(seat: *wlr.Seat, surface: *Surface) bool;
+    pub fn acceptsTouch(surface: *Surface, seat: *wlr.Seat) bool {
+        return wlr_surface_accepts_touch(seat, surface);
+    }
 };
 
 pub const Subsurface = extern struct {
