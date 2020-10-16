@@ -43,3 +43,4 @@ pub const XCursorManager = @import("types/xcursor_manager.zig").XCursorManager;
 pub const XCursorManagerTheme = @import("types/xcursor_manager.zig").XCursorManagerTheme;
 
 pub const Edges = @import("util/edges.zig").Edges;
+pub const log = @import("util/log.zig");
