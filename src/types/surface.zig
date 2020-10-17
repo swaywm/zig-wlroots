@@ -151,6 +151,9 @@ pub const Surface = extern struct {
     pub fn acceptsTouch(surface: *Surface, seat: *wlr.Seat) bool {
         return wlr_surface_accepts_touch(seat, surface);
     }
+
+    extern fn wlr_surface_is_xdg_surface(surface: *Surface) bool;
+    pub const isXdgSurface = wlr_surface_is_xdg_surface;
 };
 
 pub const Subsurface = extern struct {

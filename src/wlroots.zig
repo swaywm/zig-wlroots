@@ -14,6 +14,13 @@ pub const Subcompositor = @import("types/compositor.zig").Subcompositor;
 pub const Surface = @import("types/surface.zig").Surface;
 pub const Subsurface = @import("types/surface.zig").Subsurface;
 
+pub const XdgShell = @import("types/xdg_shell.zig").XdgShell;
+pub const XdgClient = @import("types/xdg_shell.zig").XdgClient;
+pub const XdgSurface = @import("types/xdg_shell.zig").XdgSurface;
+pub const XdgToplevel = @import("types/xdg_shell.zig").XdgToplevel;
+pub const XdgPositioner = @import("types/xdg_shell.zig").XdgPositioner;
+pub const XdgPopup = @import("types/xdg_shell.zig").XdgPopup;
+
 pub const Seat = @import("types/seat.zig").Seat;
 pub const SerialRange = @import("types/seat.zig").SerialRange;
 pub const SerialRingset = @import("types/seat.zig").SerialRingset;
