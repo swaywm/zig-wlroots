@@ -28,11 +28,10 @@ pub const Cursor = extern struct {
         touch_motion: wl.Signal(*wlr.Touch.event.Motion),
         touch_cancel: wl.Signal(*wlr.Touch.event.Cancel),
 
-        // TODO
-        tablet_tool_axis: wl.Signal(void),
-        tablet_tool_proximity: wl.Signal(void),
-        tablet_tool_tip: wl.Signal(void),
-        tablet_tool_button: wl.Signal(void),
+        tablet_tool_axis: wl.Signal(*wlr.Tablet.event.Axis),
+        tablet_tool_proximity: wl.Signal(*wlr.Tablet.event.Proximity),
+        tablet_tool_tip: wl.Signal(*wlr.Tablet.event.Tip),
+        tablet_tool_button: wl.Signal(*wlr.Tablet.event.Button),
     },
 
     data: ?*c_void,

@@ -37,7 +37,7 @@ pub const Touch = extern struct {
 
     const Impl = opaque {};
 
-    impl: *Impl,
+    impl: *const Impl,
 
     events: extern struct {
         down: wl.Signal(*event.Down),

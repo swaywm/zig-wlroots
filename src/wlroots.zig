@@ -39,6 +39,9 @@ pub const AxisSource = @import("types/pointer.zig").AxisSource;
 
 pub const Touch = @import("types/touch.zig").Touch;
 
+pub const Tablet = @import("types/tablet_tool.zig").Tablet;
+pub const TabletTool = @import("types/tablet_tool.zig").TabletTool;
+
 pub const DataDeviceManager = @import("types/data_device.zig").DataDeviceManager;
 pub const DataOffer = @import("types/data_device.zig").DataOffer;
 pub const DataSource = @import("types/data_device.zig").DataSource;
@@ -53,6 +56,8 @@ pub const XCursorTheme = @import("xcursor.zig").XCursorTheme;
 
 pub const XCursorManager = @import("types/xcursor_manager.zig").XCursorManager;
 pub const XCursorManagerTheme = @import("types/xcursor_manager.zig").XCursorManagerTheme;
+
+pub const List = @import("types/list.zig").List;
 
 pub const Edges = @import("util/edges.zig").Edges;
 pub const log = @import("util/log.zig");
