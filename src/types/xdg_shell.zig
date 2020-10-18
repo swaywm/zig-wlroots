@@ -12,11 +12,11 @@ pub const XdgShell = extern struct {
     popup_grabs: wl.List,
     ping_timeout: u32,
 
-    display_destroy: wl.Listener,
+    server_destroy: wl.Listener(*wl.Server),
 
     events: extern struct {
-        new_surface: wl.Listener, // wlr.XdgSurface
-        destroy: wl.Listener, // wlr.XdgShell
+        new_surface: wl.Signal(*wlr.XdgSurface),
+        destroy: wl.Signal(*wlr.XdgShell),
     },
 
     data: ?*c_void,
@@ -82,7 +82,7 @@ pub const XdgPopup = extern struct {
         /// XdgShell.popup_grabs
         link: wl.List,
 
-        seat_destroy: wl.Listener,
+        seat_destroy: wl.Listener(*wlr.Seat),
     };
 
     base: *wlr.XdgSurface,
@@ -126,8 +126,9 @@ pub const XdgToplevel = extern struct {
         max_height: u32,
         min_width: u32,
         min_height: u32,
+
         fullscreen_output: ?*wlr.Output,
-        fullscreen_output_destroy: wl.Listener,
+        fullscreen_output_destroy: wl.Listener(*wlr.Output),
     };
 
     pub const event = struct {
@@ -163,7 +164,7 @@ pub const XdgToplevel = extern struct {
     base: *wlr.XdgSurface,
     added: bool,
     parent: ?*wlr.XdgSurface,
-    parent_unmap: wl.Listener,
+    parent_unmap: wl.Listener(*XdgSurface),
     client_pending: State,
     server_pending: State,
     last_acked: State,
@@ -171,15 +172,15 @@ pub const XdgToplevel = extern struct {
     title: ?[*:0]u8,
     app_id: ?[*:0]u8,
     events: extern struct {
-        request_maximize: wl.Signal,
-        request_fullscreen: wl.Signal, // event.SetFullscreen
-        request_minimize: wl.Signal,
-        request_move: wl.Signal, // event.Move
-        request_resize: wl.Signal, // event.Resize
-        request_show_window_menu: wl.Signal, // event.ShowWindowMenu
-        set_parent: wl.Signal,
-        set_title: wl.Signal,
-        set_app_id: wl.Signal,
+        request_maximize: wl.Signal(*wlr.XdgSurface),
+        request_fullscreen: wl.Signal(*event.SetFullscreen),
+        request_minimize: wl.Signal(*wlr.XdgSurface),
+        request_move: wl.Signal(*event.Move),
+        request_resize: wl.Signal(*event.Resize),
+        request_show_window_menu: wl.Signal(*event.ShowWindowMenu),
+        set_parent: wl.Signal(*wlr.XdgSurface),
+        set_title: wl.Signal(*wlr.XdgSurface),
+        set_app_id: wl.Signal(*wlr.XdgSurface),
     },
 
     extern fn wlr_xdg_toplevel_set_size(surface: *wlr.XdgSurface, width: u32, height: u32) u32;
@@ -260,17 +261,17 @@ pub const XdgSurface = extern struct {
     next_geometry: wlr.Box,
     geometry: wlr.Box,
 
-    surface_destroy: wl.Listener,
-    surface_commit: wl.Listener,
+    surface_destroy: wl.Listener(*wlr.Surface),
+    surface_commit: wl.Listener(*wlr.Surface),
 
     events: extern struct {
-        destroy: wl.Signal,
-        ping_timeout: wl.Signal,
-        new_popup: wl.Signal,
-        map: wl.Signal,
-        unmap: wl.Signal,
-        configure: wl.Signal, // wlr.XdgSurface.Configure
-        ack_configure: wl.Signal, // wlr.XdgSurface.Configure
+        destroy: wl.Signal(*wlr.XdgSurface),
+        ping_timeout: wl.Signal(*wlr.XdgSurface),
+        new_popup: wl.Signal(*wlr.XdgPopup),
+        map: wl.Signal(*wlr.XdgSurface),
+        unmap: wl.Signal(*wlr.XdgSurface),
+        configure: wl.Signal(*wlr.XdgSurface.Configure),
+        ack_configure: wl.Signal(*wlr.XdgSurface.Configure),
     },
 
     data: ?*c_void,

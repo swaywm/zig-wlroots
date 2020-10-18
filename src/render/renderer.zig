@@ -17,7 +17,7 @@ pub const Renderer = extern struct {
     impl: *const Impl,
     rendering: bool,
     events: extern struct {
-        destroy: wl.Signal,
+        destroy: wl.Signal(*Renderer),
     },
 
     // TODO: int types

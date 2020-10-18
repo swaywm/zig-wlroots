@@ -60,17 +60,17 @@ pub const Keyboard = extern struct {
     num_keycodes: usize,
     modifiers: Modifiers,
 
-    repeat_info: struct {
+    repeat_info: extern struct {
         rate: i32,
         delay: i32,
     },
 
-    events: struct {
-        key: wl.Signal, // event.Key
-        modifiers: wl.Signal,
-        keymap: wl.Signal,
-        repeat_info: wl.Signal,
-        destroy: wl.Signal,
+    events: extern struct {
+        key: wl.Signal(*event.Key),
+        modifiers: wl.Signal(*Keyboard),
+        keymap: wl.Signal(*Keyboard),
+        repeat_info: wl.Signal(*Keyboard),
+        destroy: wl.Signal(*Keyboard),
     },
 
     data: ?*c_void,

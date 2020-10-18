@@ -87,11 +87,11 @@ pub const Output = extern struct {
 
         /// only when using a cursor surface
         surface: ?*wlr.Surface,
-        surface_commit: wl.Listener,
-        surface_destroy: wl.Listener,
+        surface_commit: wl.Listener(*wlr.Surface),
+        surface_destroy: wl.Listener(*wlr.Surface),
 
         events: extern struct {
-            destroy: wl.Signal,
+            destroy: wl.Signal(*Output.Cursor),
         },
 
         extern fn wlr_output_cursor_create(output: *Output) ?*Cursor;
@@ -122,11 +122,12 @@ pub const Output = extern struct {
             when: *os.timespec,
         };
 
-        pub const Commit = extern struct {
-            output: *wlr.Output,
-            /// This is a bitfield of State.field members
-            comitted: u32,
-        };
+        // TODO: added in wlroots11
+        //pub const Commit = extern struct {
+        //    output: *wlr.Output,
+        //    /// This is a bitfield of State.field members
+        //    comitted: u32,
+        //};
 
         pub const Present = extern struct {
             pub const flag = struct {
@@ -184,18 +185,19 @@ pub const Output = extern struct {
     commit_seq: u32,
 
     events: extern struct {
-        frame: wl.Signal,
-        damage: wl.Signal, // event.Damage
-        needs_frame: wl.Signal,
-        precommit: wl.Signal, // event.Precommit
-        commit: wl.Signal, // event.Commit
-        present: wl.Signal, // event.Present
-        enable: wl.Signal,
-        mode: wl.Signal,
-        scale: wl.Signal,
-        transform: wl.Signal,
-        description: wl.Signal,
-        destroy: wl.Signal,
+        frame: wl.Signal(*Output),
+        damage: wl.Signal(*event.Damage),
+        needs_frame: wl.Signal(*Output),
+        precommit: wl.Signal(*event.Precommit),
+        // TODO: event.Commit in wlroots11
+        commit: wl.Signal(*Output),
+        present: wl.Signal(*event.Present),
+        enable: wl.Signal(*Output),
+        mode: wl.Signal(*Output),
+        scale: wl.Signal(*Output),
+        transform: wl.Signal(*Output),
+        description: wl.Signal(*Output),
+        destroy: wl.Signal(*Output),
     },
 
     idle_frame: *wl.EventSource,
@@ -208,7 +210,7 @@ pub const Output = extern struct {
     hardware_cursor: *Cursor,
     software_cursor_locks: c_int,
 
-    display_destroy: wl.Listener,
+    server_destroy: wl.Listener(*wl.Server),
 
     data: ?*c_void,
 

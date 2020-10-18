@@ -6,30 +6,33 @@ const wl = wayland.server.wl;
 pub const Cursor = extern struct {
     pub const State = opaque {};
 
-    state: *state,
+    state: *State,
     x: f64,
     y: f64,
 
     events: struct {
-        motion: wl.Signal,
-        motion_absolute: wl.Signal,
-        button: wl.Signal,
-        axis: wl.Signal,
-        frame: wl.Signal,
-        swipe_begin: wl.Signal,
-        swipe_update: wl.Signal,
-        swipe_end: wl.Signal,
-        pinch_begin: wl.Signal,
-        pinch_update: wl.Signal,
-        pinch_end: wl.Signal,
-        touch_up: wl.Signal,
-        touch_down: wl.Signal,
-        touch_motion: wl.Signal,
-        touch_cancel: wl.Signal,
-        tablet_tool_axis: wl.Signal,
-        tablet_tool_proximity: wl.Signal,
-        tablet_tool_tip: wl.Signal,
-        tablet_tool_button: wl.Signal,
+        motion: wl.Signal(*wlr.Pointer.event.Motion),
+        motion_absolute: wl.Signal(*wlr.Pointer.event.MotionAbsolute),
+        button: wl.Signal(*wlr.Pointer.event.Button),
+        axis: wl.Signal(*wlr.Pointer.event.Axis),
+        frame: wl.Signal(*Cursor),
+        swipe_begin: wl.Signal(*wlr.Pointer.event.SwipeBegin),
+        swipe_update: wl.Signal(*wlr.Pointer.event.SwipeUpdate),
+        swipe_end: wl.Signal(*wlr.Pointer.event.SwipeEnd),
+        pinch_begin: wl.Signal(*wlr.Pointer.event.PinchBegin),
+        pinch_update: wl.Signal(*wlr.Pointer.event.PinchUpdate),
+        pinch_end: wl.Signal(*wlr.Pointer.event.PinchEnd),
+
+        touch_up: wl.Signal(*wlr.Touch.event.Up),
+        touch_down: wl.Signal(*wlr.Touch.event.Down),
+        touch_motion: wl.Signal(*wlr.Touch.event.Motion),
+        touch_cancel: wl.Signal(*wlr.Touch.event.Cancel),
+
+        // TODO
+        tablet_tool_axis: wl.Signal(void),
+        tablet_tool_proximity: wl.Signal(void),
+        tablet_tool_tip: wl.Signal(void),
+        tablet_tool_button: wl.Signal(void),
     },
 
     data: ?*c_void,

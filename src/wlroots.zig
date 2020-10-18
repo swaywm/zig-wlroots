@@ -28,11 +28,16 @@ pub const TouchPoint = @import("types/seat.zig").TouchPoint;
 
 pub const InputDevice = @import("types/input_device.zig").InputDevice;
 pub const ButtonState = @import("types/input_device.zig").ButtonState;
-pub const Cursor = @import("types/cursor.zig").Cursor;
 
+pub const Keyboard = @import("types/keyboard.zig").Keyboard;
+pub const KeyState = @import("types/keyboard.zig").KeyState;
+
+pub const Cursor = @import("types/cursor.zig").Cursor;
 pub const Pointer = @import("types/pointer.zig").Pointer;
 pub const AxisOrientation = @import("types/pointer.zig").AxisOrientation;
 pub const AxisSource = @import("types/pointer.zig").AxisSource;
+
+pub const Touch = @import("types/touch.zig").Touch;
 
 pub const DataDeviceManager = @import("types/data_device.zig").DataDeviceManager;
 pub const DataOffer = @import("types/data_device.zig").DataOffer;

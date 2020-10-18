@@ -24,7 +24,7 @@ pub const Surface = extern struct {
         /// This is a bitfield of State.field members
         committed: u32,
 
-        buffer_resource: ?*wl.Resource,
+        buffer_resource: ?*wl.Buffer,
         dx: i32,
         dy: i32,
         surface_damage: pixman.Region32,
@@ -48,7 +48,7 @@ pub const Surface = extern struct {
             dst_height: c_int,
         },
 
-        buffer_destroy: wl.Listener,
+        buffer_destroy: wl.Listener(*wl.Buffer),
     };
 
     pub const Role = extern struct {
@@ -76,10 +76,10 @@ pub const Surface = extern struct {
     role: ?*const Role,
     role_data: ?*c_void,
 
-    events: struct {
-        commit: wl.Signal,
-        new_subsurface: wl.Signal,
-        destroy: wl.Signal,
+    events: extern struct {
+        commit: wl.Signal(*wlr.Surface),
+        new_subsurface: wl.Signal(*wlr.Subsurface),
+        destroy: wl.Signal(*wlr.Surface),
     },
 
     /// Subsurface.parent_link
@@ -87,7 +87,7 @@ pub const Surface = extern struct {
     /// Subsurface.parent_pending_link
     subsurface_pending_list: wl.List,
 
-    renderer_destroy: wl.Listener,
+    renderer_destroy: wl.Listener(*wlr.Renderer),
 
     data: ?*c_void,
 
@@ -181,13 +181,13 @@ pub const Subsurface = extern struct {
     /// Surface.subsurface_pending_list
     parent_pending_link: wl.List,
 
-    surface_destroy: wl.Listener,
-    parent_destroy: wl.Listener,
+    surface_destroy: wl.Listener(*Surface),
+    parent_destroy: wl.Listener(*Surface),
 
-    events: struct {
-        destroy: wl.Signal,
-        map: wl.Signal,
-        unmap: wl.Signal,
+    events: extern struct {
+        destroy: wl.Signal(*Subsurface),
+        map: wl.Signal(*Subsurface),
+        unmap: wl.Signal(*Subsurface),
     },
 
     data: ?*c_void,

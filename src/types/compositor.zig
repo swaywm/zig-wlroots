@@ -13,11 +13,11 @@ pub const Compositor = extern struct {
 
     subcompositor: Subcompositor,
 
-    display_destroy: wl.Listener,
+    server_destroy: wl.Listener(*wl.Server),
 
     events: extern struct {
-        new_surface: wl.Signal,
-        destroy: wl.Signal,
+        new_surface: wl.Signal(*wlr.Surface),
+        destroy: wl.Signal(*wlr.Compositor),
     },
 
     extern fn wlr_compositor_create(server: *wl.Server, renderer: *wlr.Renderer) ?*Compositor;

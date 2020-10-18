@@ -97,16 +97,16 @@ pub const Pointer = extern struct {
     impl: *const Impl,
 
     events: extern struct {
-        motion: wl.Signal, // event.Motion
-        motion_absolute: wl.Signal, // event.MotionAbsolute
-        button: wl.Signal, // event.Button
-        axis: wl.Signal, // event.Axis
-        frame: wl.Signal,
-        swipe_begin: wl.Signal, // event.SwipeBegin
-        swipe_update: wl.Signal, // event.SwipeUpdate
-        swipe_end: wl.Signal, // event.SwipeEnd
-        pinch_begin: wl.Signal, // event.PinchBegin
-        pinch_update: wl.Signal, // event.PinchUpdate
-        pinch_end: wl.Signal, // event.PinchEnd
+        motion: wl.Signal(*event.Motion),
+        motion_absolute: wl.Signal(*event.MotionAbsolute),
+        button: wl.Signal(*event.Button),
+        axis: wl.Signal(*event.Axis),
+        frame: wl.Signal(*Pointer),
+        swipe_begin: wl.Signal(*event.SwipeBegin),
+        swipe_update: wl.Signal(*event.SwipeUpdate),
+        swipe_end: wl.Signal(*event.SwipeEnd),
+        pinch_begin: wl.Signal(*event.PinchBegin),
+        pinch_update: wl.Signal(*event.PinchUpdate),
+        pinch_end: wl.Signal(*event.PinchEnd),
     }
 };

@@ -26,12 +26,12 @@ pub const TouchPoint = extern struct {
     sx: f64,
     sy: f64,
 
-    surface_destroy: wl.Listener,
-    focus_surface_destroy: wl.Listener,
-    client_destroy: wl.Listener,
+    surface_destroy: wl.Listener(*wlr.Surface),
+    focus_surface_destroy: wl.Listener(*wlr.Surface),
+    client_destroy: wl.Listener(*Seat.Client),
 
     events: extern struct {
-        destroy: wl.Signal,
+        destroy: wl.Signal(*TouchPoint),
     },
 
     /// Seat.TouchState.touch_points
@@ -52,7 +52,7 @@ pub const Seat = extern struct {
         data_devices: wl.List,
 
         events: extern struct {
-            destroy: wl.Signal,
+            destroy: wl.Signal(*Seat.Client),
         },
 
         serials: SerialRingset,
@@ -153,10 +153,10 @@ pub const Seat = extern struct {
         grab_serial: u32,
         grab_time: u32,
 
-        surface_destroy: wl.Listener,
+        surface_destroy: wl.Listener(*wlr.Surface),
 
         events: extern struct {
-            focus_change: wl.Signal, // event.PointerFocusChange
+            focus_change: wl.Signal(*event.PointerFocusChange),
         },
     };
 
@@ -167,16 +167,17 @@ pub const Seat = extern struct {
         focused_client: ?*Seat.Client,
         focused_surface: ?*wlr.Surface,
 
-        keyboard_destroy: wl.Listener,
-        keyboard_keymap: wl.Listener,
-        keyboard_repeat_info: wl.Listener,
-        surface_destroy: wl.Listener,
+        keyboard_destroy: wl.Listener(*wlr.Keyboard),
+        keyboard_keymap: wl.Listener(*wlr.Keyboard),
+        keyboard_repeat_info: wl.Listener(*wlr.Keyboard),
+
+        surface_destroy: wl.Listener(*wlr.Surface),
 
         grab: *KeyboardGrab,
         default_grab: *KeyboardGrab,
 
         events: extern struct {
-            focus_change: wl.Signal, // event.KeyboardFocusChange
+            focus_change: wl.Signal(*event.KeyboardFocusChange),
         },
     };
 
@@ -261,33 +262,33 @@ pub const Seat = extern struct {
     keyboard_state: KeyboardState,
     touch_state: TouchState,
 
-    display_destroy: wl.Listener,
-    selection_source_destroy: wl.Listener,
-    primary_selection_source_destroy: wl.Listener,
-    drag_source_destroy: wl.Listener,
+    server_destroy: wl.Listener(*wl.Server),
+    selection_source_destroy: wl.Listener(*wlr.DataSource),
+    primary_selection_source_destroy: wl.Listener(*wlr.PrimarySelectionSource),
+    drag_source_destroy: wl.Listener(*wlr.DataSource),
 
     events: extern struct {
-        pointer_grab_begin: wl.Signal,
-        pointer_grab_end: wl.Signal,
+        pointer_grab_begin: wl.Signal(*PointerGrab),
+        pointer_grab_end: wl.Signal(*PointerGrab),
 
-        keyboard_grab_begin: wl.Signal,
-        keyboard_grab_end: wl.Signal,
+        keyboard_grab_begin: wl.Signal(*KeyboardGrab),
+        keyboard_grab_end: wl.Signal(*KeyboardGrab),
 
-        touch_grab_begin: wl.Signal,
-        touch_grab_end: wl.Signal,
+        touch_grab_begin: wl.Signal(*TouchGrab),
+        touch_grab_end: wl.Signal(*TouchGrab),
 
-        request_set_cursor: wl.Signal, // event.RequestSetCursor
+        request_set_cursor: wl.Signal(*event.RequestSetCursor),
 
-        request_set_selection: wl.Signal, // event.RequestSetSelection
-        set_selection: wl.Signal,
+        request_set_selection: wl.Signal(*event.RequestSetSelection),
+        set_selection: wl.Signal(*wlr.Seat),
 
-        request_set_primary_selection: wl.Signal, // event.RequestSetPrimarySelection
-        set_primary_selection: wl.Signal,
+        request_set_primary_selection: wl.Signal(*event.RequestSetPrimarySelection),
+        set_primary_selection: wl.Signal(*wlr.Seat),
 
-        request_start_drag: wl.Signal, // event.RequestStartDrag
-        start_drag: wl.Signal,
+        request_start_drag: wl.Signal(*event.RequestStartDrag),
+        start_drag: wl.Signal(wlr.Drag),
 
-        destroy: wl.Signal,
+        destroy: wl.Signal(*wlr.Seat),
     },
 
     data: ?*c_void,

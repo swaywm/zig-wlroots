@@ -8,9 +8,9 @@ pub const Backend = extern struct {
 
     impl: *const Impl,
     events: extern struct {
-        destroy: wl.Signal,
-        new_input: wl.Signal,
-        new_output: wl.Signal,
+        destroy: wl.Signal(*Backend),
+        new_input: wl.Signal(*wlr.InputDevice),
+        new_output: wl.Signal(*wlr.Output),
     },
 
     extern fn wlr_backend_autocreate(server: *wl.Server, create_renderer_func: ?wlr.Renderer.CreateFn) ?*Backend;

@@ -43,7 +43,7 @@ pub const InputDevice = extern struct {
     },
 
     events: extern struct {
-        destroy: wl.Signal,
+        destroy: wl.Signal(*InputDevice),
     },
 
     data: ?*c_void,

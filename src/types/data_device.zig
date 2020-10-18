@@ -7,10 +7,10 @@ pub const DataDeviceManager = extern struct {
     global: *wl.Global,
     data_sources: wl.List,
 
-    display_destroy: wl.Listener,
+    server_destroy: wl.Listener(*wl.Server),
 
     events: extern struct {
-        destroy: wl.Signal
+        destroy: wl.Signal(*DataDeviceManager)
     },
 
     data: ?*c_void,
@@ -35,7 +35,7 @@ pub const DataOffer = extern struct {
     preferred_action: wl.DataDeviceManager.DndAction,
     in_ask: bool,
 
-    source_destroy: wl.Listener,
+    source_destroy: wl.Listener(*DataSource),
 };
 
 pub const DataSource = extern struct {
@@ -59,7 +59,7 @@ pub const DataSource = extern struct {
     compositor_action: u32,
 
     events: extern struct {
-        destroy: wl.Signal,
+        destroy: wl.Signal(*DataSource),
     },
 
     extern fn wlr_data_source_init(source: *DataSource, impl: *const Impl) void;
@@ -91,12 +91,12 @@ pub const Drag = extern struct {
         mapped: bool,
 
         events: extern struct {
-            map: wl.Signal,
-            unmap: wl.Signal,
-            destroy: wl.Signal,
+            map: wl.Signal(*Drag.Icon),
+            unmap: wl.Signal(*Drag.Icon),
+            destroy: wl.Signal(*Drag.Icon),
         },
 
-        surface_destroy: wl.Listener,
+        surface_destroy: wl.Listener(*wlr.Surface),
 
         data: ?*c_void,
     };
@@ -130,7 +130,7 @@ pub const Drag = extern struct {
     seat_client: *wlr.Seat.Client,
     focus_client: ?*wlr.Seat.Client,
 
-    icon: ?*Icon,
+    icon: ?*Drag.Icon,
     focus: ?*wlr.Surface,
     source: ?*DataSource,
 
@@ -141,16 +141,17 @@ pub const Drag = extern struct {
     touch_id: i32,
 
     events: extern struct {
-        focus: wl.Signal,
-        motion: wl.Signal, // event.Motion
-        drop: wl.Signal, // event.Drop
-        destroy: wl.Signal,
+        focus: wl.Signal(*Drag),
+        motion: wl.Signal(*event.Motion),
+        drop: wl.Signal(*event.Drop),
+        destroy: wl.Signal(*Drag),
     },
 
-    point_destroy: wl.Listener,
-    source_destroy: wl.Listener,
-    seat_client_destroy: wl.Listener,
-    icon_destroy: wl.Listener,
+    // TODO: remove for wlroots11
+    _: wl.Listener(void),
+    source_destroy: wl.Listener(*DataSource),
+    seat_client_destroy: wl.Listener(*wlr.Seat.Client),
+    icon_destroy: wl.Listener(*Drag.Icon),
 
     data: ?*c_void,
 

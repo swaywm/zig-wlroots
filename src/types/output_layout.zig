@@ -14,7 +14,7 @@ pub const OutputLayout = extern struct {
         state: *State,
 
         events: extern struct {
-            destroy: wl.Signal,
+            destroy: wl.Signal(*OutputLayout.Output),
         },
     };
 
@@ -29,9 +29,9 @@ pub const OutputLayout = extern struct {
     state: *State,
 
     events: extern struct {
-        add: wl.Signal,
-        change: wl.Signal,
-        destroy: wl.Signal,
+        add: wl.Signal(*OutputLayout),
+        change: wl.Signal(*OutputLayout),
+        destroy: wl.Signal(*OutputLayout),
     },
 
     data: ?*c_void,
