@@ -103,10 +103,10 @@ pub const Tablet = extern struct {
     impl: *const Impl,
 
     events: extern struct {
-        axis: wl.Signal,
-        proximity: wl.Signal,
-        tip: wl.Signal,
-        button: wl.Signal,
+        axis: wl.Signal(*event.Axis),
+        proximity: wl.Signal(*event.Proximity),
+        tip: wl.Signal(*event.Tip),
+        button: wl.Signal(*event.Button),
     },
 
     name: [*:0]u8,
