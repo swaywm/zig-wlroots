@@ -32,4 +32,9 @@ pub const Renderer = extern struct {
 
     extern fn wlr_renderer_init_wl_display(r: *Renderer, server: *wl.Server) bool;
     pub const initServer = wlr_renderer_init_wl_display;
+
+    extern fn wlr_resource_get_buffer_size(resource: *wl.Buffer, renderer: *wlr.Renderer, width: *c_int, height: *c_int) bool;
+    pub inline fn getBufferSize(renderer: *wlr.Renderer, resource: *wl.Buffer, width: *c_int, height: *c_int) bool {
+        return wlr_resource_get_buffer_size(resource, renderer, width, height);
+    }
 };

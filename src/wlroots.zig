@@ -5,8 +5,8 @@ pub const Egl = @import("render/egl.zig").Egl;
 pub const Renderer = @import("render/renderer.zig").Renderer;
 pub const Texture = @import("render/texture.zig").Texture;
 
-pub const Box = @import("types/box.zig").Box;
-pub const matrix = @import("types/matrix.zig");
+pub const Buffer = @import("types/buffer.zig").Buffer;
+pub const ClientBuffer = @import("types/buffer.zig").ClientBuffer;
 
 pub const Compositor = @import("types/compositor.zig").Compositor;
 pub const Subcompositor = @import("types/compositor.zig").Subcompositor;
@@ -58,6 +58,8 @@ pub const XCursorManager = @import("types/xcursor_manager.zig").XCursorManager;
 pub const XCursorManagerTheme = @import("types/xcursor_manager.zig").XCursorManagerTheme;
 
 pub const List = @import("types/list.zig").List;
+pub const Box = @import("types/box.zig").Box;
+pub const matrix = @import("types/matrix.zig");
 
 pub const Edges = @import("util/edges.zig").Edges;
 pub const log = @import("util/log.zig");
