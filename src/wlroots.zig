@@ -59,6 +59,7 @@ pub const XCursorManagerTheme = @import("types/xcursor_manager.zig").XCursorMana
 
 pub const List = @import("types/list.zig").List;
 pub const Box = @import("types/box.zig").Box;
+pub const FBox = @import("types/box.zig").FBox;
 pub const matrix = @import("types/matrix.zig");
 
 pub const Edges = @import("util/edges.zig").Edges;
