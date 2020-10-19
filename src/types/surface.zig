@@ -40,7 +40,7 @@ pub const Surface = extern struct {
         buffer_width: c_int,
         buffer_height: c_int,
 
-        viewport: struct {
+        viewport: extern struct {
             has_src: bool,
             has_dst: bool,
             src: wlr.FBox,
