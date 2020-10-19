@@ -1,5 +1,7 @@
 const wlr = @import("../wlroots.zig");
 
+const wl = @import("wayland").server.wl;
+
 pub const Touch = extern struct {
     pub const event = struct {
         pub const Down = extern struct {
