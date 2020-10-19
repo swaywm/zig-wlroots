@@ -12,7 +12,7 @@ pub const Renderer = extern struct {
         remote_display: ?*c_void,
         config_attribs: *i32, // EGLint
         visual_id: i32, // EGLint
-    ) ?*Renderer;
+    ) callconv(.C) ?*Renderer;
 
     impl: *const Impl,
     rendering: bool,

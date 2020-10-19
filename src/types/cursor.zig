@@ -10,7 +10,7 @@ pub const Cursor = extern struct {
     x: f64,
     y: f64,
 
-    events: struct {
+    events: extern struct {
         motion: wl.Signal(*wlr.Pointer.event.Motion),
         motion_absolute: wl.Signal(*wlr.Pointer.event.MotionAbsolute),
         button: wl.Signal(*wlr.Pointer.event.Button),

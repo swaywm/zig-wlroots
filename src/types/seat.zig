@@ -92,7 +92,7 @@ pub const Seat = extern struct {
                 orientation: wlr.AxisOrientation,
                 value: f64,
                 value_discrete: i32,
-                source: wlr.Pointer.event.Axis.Source,
+                source: wlr.AxisSource,
             ) callconv(.C) void,
             frame: ?fn (grab: *PointerGrab) callconv(.C) void,
             cancel: ?fn (grab: *PointerGrab) callconv(.C) void,
