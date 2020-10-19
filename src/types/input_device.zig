@@ -36,10 +36,12 @@ pub const InputDevice = extern struct {
         _device: ?*c_void,
         keyboard: *wlr.Keyboard,
         pointer: *wlr.Pointer,
-        switch_device: *wlr.Switch,
+        // TODO:
+        //switch_device: *wlr.Switch,
         touch: *wlr.Touch,
         tablet: *wlr.Tablet,
-        tablet_pad: *wlr.TabletPad,
+        // TODO:
+        //tablet_pad: *wlr.TabletPad,
     },
 
     events: extern struct {
