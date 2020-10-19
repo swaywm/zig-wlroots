@@ -27,7 +27,7 @@ pub const DataOffer = extern struct {
 
     resource: *wl.DataOffer,
     source: ?*DataSource,
-    kind: Type,
+    type: Type,
     /// wlr.Seat.selection_offers, wlr.Seat.drag_offers
     link: wl.List,
 

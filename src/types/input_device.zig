@@ -10,19 +10,19 @@ pub const ButtonState = extern enum {
 
 pub const InputDevice = extern struct {
     pub const Type = extern enum {
-        Keyboard,
-        Pointer,
-        Touch,
-        TabletTool,
-        TabletPad,
-        Switch,
+        keyboard,
+        pointer,
+        touch,
+        tablet_tool,
+        tablet_pad,
+        switch_device,
     };
 
     const Impl = opaque {};
 
     impl: *const Impl,
 
-    kind: Type,
+    type: Type,
     vendor: c_uint,
     product: c_uint,
     name: [*:0]u8,
@@ -31,7 +31,7 @@ pub const InputDevice = extern struct {
     height_mm: f64,
     output_name: [*:0]u8,
 
-    /// InputDevice.kind determines which of these is active
+    /// InputDevice.type determines which of these is active
     device: extern union {
         _device: ?*c_void,
         keyboard: *wlr.Keyboard,
