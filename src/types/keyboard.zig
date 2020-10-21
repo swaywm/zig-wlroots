@@ -12,15 +12,15 @@ pub const Keyboard = extern struct {
         pub const scroll_lock = 1 << 2;
     };
 
-    pub const modifier = struct {
-        pub const shift = 1 << 0;
-        pub const caps = 1 << 1;
-        pub const ctrl = 1 << 2;
-        pub const alt = 1 << 3;
-        pub const mod2 = 1 << 4;
-        pub const mod3 = 1 << 5;
-        pub const logo = 1 << 6;
-        pub const mod5 = 1 << 7;
+    pub const ModifierMask = packed struct {
+        shift: bool = false,
+        caps: bool = false,
+        ctrl: bool = false,
+        alt: bool = false,
+        mod2: bool = false,
+        mod3: bool = false,
+        logo: bool = false,
+        mod5: bool = false,
     };
 
     pub const Modifiers = extern struct {
@@ -83,5 +83,7 @@ pub const Keyboard = extern struct {
     pub const ledUpdate = wlr_keyboard_led_update;
 
     extern fn wlr_keyboard_get_modifiers(keyboard: *Keyboard) u32;
-    pub const getModifiers = wlr_keyboard_get_modifiers;
+    pub fn getModifiers(keyboard: *Keyboard) ModifierMask {
+        return @bitCast(ModifierMask, @intCast(u8, wlr_keyboard_get_modifiers(keyboard)));
+    }
 };
