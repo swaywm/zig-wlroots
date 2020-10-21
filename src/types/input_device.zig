@@ -3,11 +3,6 @@ const wlr = @import("../wlroots.zig");
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
-pub const ButtonState = extern enum {
-    pressed,
-    released,
-};
-
 pub const InputDevice = extern struct {
     pub const Type = extern enum {
         keyboard,

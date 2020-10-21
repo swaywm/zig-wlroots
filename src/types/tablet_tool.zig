@@ -94,7 +94,7 @@ pub const Tablet = extern struct {
             time_msec: u32,
             x: f64,
             y: f64,
-            state: wlr.ButtonState,
+            state: wl.Pointer.ButtonState,
         };
     };
 

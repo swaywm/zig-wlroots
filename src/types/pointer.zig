@@ -37,7 +37,7 @@ pub const Pointer = extern struct {
             device: *wlr.InputDevice,
             time_msec: u32,
             button: u32,
-            state: wlr.ButtonState,
+            state: wl.Pointer.ButtonState,
         };
 
         pub const Axis = extern struct {

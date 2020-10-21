@@ -27,10 +27,8 @@ pub const SerialRingset = @import("types/seat.zig").SerialRingset;
 pub const TouchPoint = @import("types/seat.zig").TouchPoint;
 
 pub const InputDevice = @import("types/input_device.zig").InputDevice;
-pub const ButtonState = @import("types/input_device.zig").ButtonState;
 
 pub const Keyboard = @import("types/keyboard.zig").Keyboard;
-pub const KeyState = @import("types/keyboard.zig").KeyState;
 pub const KeyboardGroup = @import("types/keyboard_group.zig").KeyboardGroup;
 
 pub const Cursor = @import("types/cursor.zig").Cursor;

@@ -84,7 +84,7 @@ pub const Seat = extern struct {
                 grab: *PointerGrab,
                 time_msec: u32,
                 button: u32,
-                state: wlr.ButtonState,
+                state: wl.Pointer.ButtonState,
             ) callconv(.C) u32,
             axis: fn (
                 grab: *PointerGrab,
@@ -320,7 +320,7 @@ pub const Seat = extern struct {
     extern fn wlr_seat_pointer_send_motion(seat: *Seat, time_msec: u32, sx: f64, sy: f64) void;
     pub const pointerSendMotion = wlr_seat_pointer_send_motion;
 
-    extern fn wlr_seat_pointer_send_button(seat: *Seat, time_msec: u32, button: u32, state: wlr.ButtonState) u32;
+    extern fn wlr_seat_pointer_send_button(seat: *Seat, time_msec: u32, button: u32, state: wl.Pointer.ButtonState) u32;
     pub const pointerSendButton = wlr_seat_pointer_send_button;
 
     extern fn wlr_seat_pointer_send_axis(seat: *Seat, time_msec: u32, orientation: wlr.AxisOrientation, value: f64, value_discrete: i32, source: wlr.AxisSource) void;
@@ -341,7 +341,7 @@ pub const Seat = extern struct {
     extern fn wlr_seat_pointer_notify_motion(seat: *Seat, time_msec: u32, sx: f64, sy: f64) void;
     pub const pointerNotifyMotion = wlr_seat_pointer_notify_motion;
 
-    extern fn wlr_seat_pointer_notify_button(seat: *Seat, time_msec: u32, button: u32, state: wlr.ButtonState) u32;
+    extern fn wlr_seat_pointer_notify_button(seat: *Seat, time_msec: u32, button: u32, state: wl.Pointer.ButtonState) u32;
     pub const pointerNotifyButton = wlr_seat_pointer_notify_button;
 
     extern fn wlr_seat_pointer_notify_axis(seat: *Seat, time_msec: u32, orientation: wlr.AxisOrientation, value: f64, value_discrete: i32, source: wlr.AxisSource) void;
@@ -378,7 +378,9 @@ pub const Seat = extern struct {
     pub const keyboardClearFocus = wlr_seat_keyboard_clear_focus;
 
     extern fn wlr_seat_keyboard_notify_key(seat: *Seat, time_msec: u32, key: u32, state: u32) void;
-    pub const keyboardNotifyKey = wlr_seat_keyboard_notify_key;
+    pub fn keyboardNotifyKey(seat: *Seat, time_msec: u32, key: u32, state: wl.Keyboard.KeyState) void {
+        wlr_seat_keyboard_notify_key(seat, time_msec, key, @intCast(u32, @enumToInt(state)));
+    }
 
     extern fn wlr_seat_keyboard_notify_modifiers(seat: *Seat, modifiers: *wlr.Keyboard.Modifiers) void;
     pub const keyboardNotifyModifiers = wlr_seat_keyboard_notify_modifiers;

@@ -5,11 +5,6 @@ const wl = wayland.server.wl;
 
 const xkb = @import("xkbcommon");
 
-pub const KeyState = extern enum {
-    released,
-    pressed,
-};
-
 pub const Keyboard = extern struct {
     pub const led = struct {
         pub const num_lock = 1 << 0;
@@ -40,7 +35,7 @@ pub const Keyboard = extern struct {
             time_msec: u32,
             keycode: u32,
             update_state: bool,
-            state: KeyState,
+            state: wl.Keyboard.KeyState,
         };
     };
 
