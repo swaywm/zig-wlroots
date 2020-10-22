@@ -184,37 +184,37 @@ pub const XdgToplevel = extern struct {
     },
 
     extern fn wlr_xdg_toplevel_set_size(surface: *wlr.XdgSurface, width: u32, height: u32) u32;
-    pub fn setSize(toplevel: *wlr.Toplevel, width: u32, height: u32) u32 {
+    pub fn setSize(toplevel: *wlr.XdgToplevel, width: u32, height: u32) u32 {
         return wlr_xdg_toplevel_set_size(toplevel.base, width, height);
     }
 
     extern fn wlr_xdg_toplevel_set_activated(surface: *wlr.XdgSurface, activated: bool) u32;
-    pub fn setActivated(toplevel: *wlr.Toplevel, activated: bool) u32 {
+    pub fn setActivated(toplevel: *wlr.XdgToplevel, activated: bool) u32 {
         return wlr_xdg_toplevel_set_activated(toplevel.base, activated);
     }
 
     extern fn wlr_xdg_toplevel_set_maximized(surface: *wlr.XdgSurface, maximized: bool) u32;
-    pub fn setMaximized(toplevel: *wlr.Toplevel, maximized: bool) u32 {
+    pub fn setMaximized(toplevel: *wlr.XdgToplevel, maximized: bool) u32 {
         return wlr_xdg_toplevel_set_maximized(toplevel.base, maximized);
     }
 
     extern fn wlr_xdg_toplevel_set_fullscreen(surface: *wlr.XdgSurface, fullscreen: bool) u32;
-    pub fn setFullscreen(toplevel: *wlr.Toplevel, fullscreen: bool) u32 {
+    pub fn setFullscreen(toplevel: *wlr.XdgToplevel, fullscreen: bool) u32 {
         return wlr_xdg_toplevel_set_fullscreen(toplevel.base, fullscreen);
     }
 
     extern fn wlr_xdg_toplevel_set_resizing(surface: *wlr.XdgSurface, resizing: bool) u32;
-    pub fn setResizing(toplevel: *wlr.Toplevel, resizing: bool) u32 {
+    pub fn setResizing(toplevel: *wlr.XdgToplevel, resizing: bool) u32 {
         return wlr_xdg_toplevel_set_resizing(toplevel.base, resizing);
     }
 
     extern fn wlr_xdg_toplevel_set_tiled(surface: *wlr.XdgSurface, tiled_edges: u32) u32;
-    pub fn setTiled(toplevel: *wlr.Toplevel, tiled_edges: u32) u32 {
+    pub fn setTiled(toplevel: *wlr.XdgToplevel, tiled_edges: u32) u32 {
         return wlr_xdg_toplevel_set_tiled(toplevel.base, tiled_edges);
     }
 
     extern fn wlr_xdg_toplevel_send_close(surface: *wlr.XdgSurface) void;
-    pub fn sendClose(toplevel: *wlr.Toplevel) void {
+    pub fn sendClose(toplevel: *wlr.XdgToplevel) void {
         wlr_xdg_toplevel_send_close(toplevel.base);
     }
 };
@@ -299,7 +299,7 @@ pub const XdgSurface = extern struct {
 
     extern fn wlr_xdg_surface_for_each_surface(
         surface: *wlr.XdgSurface,
-        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) void,
+        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
         user_data: ?*c_void,
     ) void;
     pub fn forEachSurface(
@@ -308,7 +308,11 @@ pub const XdgSurface = extern struct {
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
         data: T,
     ) void {
-        wlr_xdg_surface_for_each_surface(surface, iterator, data);
+        wlr_xdg_surface_for_each_surface(
+            surface,
+            @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void, iterator),
+            data,
+        );
     }
 
     extern fn wlr_xdg_surface_schedule_configure(surface: *wlr.XdgSurface) u32;
@@ -316,7 +320,7 @@ pub const XdgSurface = extern struct {
 
     extern fn wlr_xdg_surface_for_each_popup(
         surface: *wlr.XdgSurface,
-        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) void,
+        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
         user_data: ?*c_void,
     ) void;
     pub fn forEachPopup(
@@ -325,6 +329,10 @@ pub const XdgSurface = extern struct {
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
         data: T,
     ) void {
-        wlr_xdg_surface_for_each_popup(surface, iterator, data);
+        wlr_xdg_surface_for_each_popup(
+            surface,
+            @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void, iterator),
+            data,
+        );
     }
 };

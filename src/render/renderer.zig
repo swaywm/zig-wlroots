@@ -37,4 +37,7 @@ pub const Renderer = extern struct {
     pub inline fn getBufferSize(renderer: *wlr.Renderer, resource: *wl.Buffer, width: *c_int, height: *c_int) bool {
         return wlr_resource_get_buffer_size(resource, renderer, width, height);
     }
+
+    extern fn wlr_render_texture_with_matrix(r: *Renderer, texture: *wlr.Texture, matrix: *const [9]f32, alpha: f32) bool;
+    pub const renderTextureWithMatrix = wlr_render_texture_with_matrix;
 };

@@ -11,9 +11,6 @@ const gpa = std.heap.c_allocator;
 pub fn main() anyerror!void {
     wlr.log.init(.debug);
 
-    var startup_cmd: ?[]const u8 = null;
-    if (os.argv.len >= 2) startup_cmd = std.mem.span(os.argv[1]);
-
     var server: Server = undefined;
     try server.init();
     defer server.deinit();
@@ -21,13 +18,13 @@ pub fn main() anyerror!void {
     var buf: [11]u8 = undefined;
     const socket = try server.wl_server.addSocketAuto(&buf);
 
-    if (startup_cmd) |cmd| {
-        const child = try std.ChildProcess.init(&[_][]const u8{ "/bin/sh", "-c", cmd }, gpa);
+    if (os.argv.len >= 2) {
+        const cmd = std.mem.span(os.argv[1]);
+        var child = try std.ChildProcess.init(&[_][]const u8{ "/bin/sh", "-c", cmd }, gpa);
         var env_map = try std.process.getEnvMap(gpa);
         try env_map.set("WAYLAND_DISPLAY", socket);
         child.env_map = &env_map;
         try child.spawn();
-        // TODO kill child
     }
 
     if (!server.backend.start()) return error.BackendStartFailed;
@@ -68,7 +65,7 @@ const Server = struct {
     grab_x: f64 = 0,
     grab_y: f64 = 0,
     grab_box: wlr.Box = undefined,
-    resize_edges: u32 = 0,
+    resize_edges: wlr.Edges = .{},
 
     fn init(server: *Server) !void {
         const wl_server = try wl.Server.create();
@@ -131,7 +128,10 @@ const Server = struct {
             if (!wlr_output.commit()) return;
         }
 
-        const node = gpa.create(std.TailQueue(Output).Node) catch @panic("out of memory");
+        const node = gpa.create(std.TailQueue(Output).Node) catch {
+            std.log.crit("failed to allocate new output", .{});
+            return;
+        };
         const output = &node.data;
 
         output.* = .{
@@ -152,7 +152,10 @@ const Server = struct {
         if (xdg_surface.role != .toplevel) return;
 
         // Don't add the view to server.views until it is mapped
-        const node = gpa.create(std.TailQueue(View).Node) catch @panic("out of memory");
+        const node = gpa.create(std.TailQueue(View).Node) catch {
+            std.log.crit("failed to allocate new view", .{});
+            return;
+        };
         const view = &node.data;
 
         view.* = .{
@@ -172,11 +175,58 @@ const Server = struct {
         xdg_surface.role_data.toplevel.events.request_resize.add(&view.request_resize);
     }
 
+    const ViewAtResult = struct {
+        view: *View,
+        surface: *wlr.Surface,
+        sx: f64,
+        sy: f64,
+    };
+
+    fn viewAt(server: *Server, lx: f64, ly: f64) ?ViewAtResult {
+        var it = server.views.first;
+        while (it) |node| : (it = node.next) {
+            const view = &node.data;
+            var sx: f64 = undefined;
+            var sy: f64 = undefined;
+            const x = lx - @intToFloat(f64, view.x);
+            const y = ly - @intToFloat(f64, view.y);
+            if (view.xdg_surface.surfaceAt(x, y, &sx, &sy)) |surface| {
+                return ViewAtResult{
+                    .view = view,
+                    .surface = surface,
+                    .sx = sx,
+                    .sy = sy,
+                };
+            }
+        }
+        return null;
+    }
+
+    fn focusView(server: *Server, view: *View, surface: *wlr.Surface) void {
+        if (server.seat.keyboard_state.focused_surface) |previous_surface| {
+            if (previous_surface == surface) return;
+            if (previous_surface.isXdgSurface()) {
+                const xdg_surface = wlr.XdgSurface.fromWlrSurface(previous_surface);
+                _ = xdg_surface.role_data.toplevel.setActivated(false);
+            }
+        }
+
+        const node = @fieldParentPtr(std.TailQueue(View).Node, "data", view);
+        server.views.remove(node);
+        server.views.prepend(node);
+
+        _ = view.xdg_surface.role_data.toplevel.setActivated(true);
+
+        const wlr_keyboard = server.seat.getKeyboard() orelse return;
+        server.seat.keyboardNotifyEnter(surface, &wlr_keyboard.keycodes, wlr_keyboard.num_keycodes, &wlr_keyboard.modifiers);
+    }
+
     fn newInput(listener: *wl.Listener(*wlr.InputDevice), device: *wlr.InputDevice) void {
         const server = @fieldParentPtr(Server, "new_input", listener);
         switch (device.type) {
-            .keyboard => {
-                Keyboard.create(server, device) catch @panic("TOOD: log and return");
+            .keyboard => Keyboard.create(server, device) catch |err| {
+                std.log.err("failed to create keyboard: {}", .{err});
+                return;
             },
             .pointer => server.cursor.attachInputDevice(device),
             else => {},
@@ -193,7 +243,8 @@ const Server = struct {
         event: *wlr.Seat.event.RequestSetCursor,
     ) void {
         const server = @fieldParentPtr(Server, "request_set_cursor", listener);
-        // TODO
+        if (event.seat_client == server.seat.pointer_state.focused_client)
+            server.cursor.setSurface(event.surface, event.hotspot_x, event.hotspot_y);
     }
 
     fn requestSetSelection(
@@ -201,50 +252,127 @@ const Server = struct {
         event: *wlr.Seat.event.RequestSetSelection,
     ) void {
         const server = @fieldParentPtr(Server, "request_set_selection", listener);
-        // TODO
+        server.seat.setSelection(event.source, event.serial);
     }
 
     fn cursorMotion(
         listener: *wl.Listener(*wlr.Pointer.event.Motion),
-        data: *wlr.Pointer.event.Motion,
+        event: *wlr.Pointer.event.Motion,
     ) void {
         const server = @fieldParentPtr(Server, "cursor_motion", listener);
-        // TODO
+        server.cursor.move(event.device, event.delta_x, event.delta_y);
+        server.processCursorMotion(event.time_msec);
     }
 
     fn cursorMotionAbsolute(
         listener: *wl.Listener(*wlr.Pointer.event.MotionAbsolute),
-        data: *wlr.Pointer.event.MotionAbsolute,
+        event: *wlr.Pointer.event.MotionAbsolute,
     ) void {
         const server = @fieldParentPtr(Server, "cursor_motion_absolute", listener);
-        // TODO
+        server.cursor.warpAbsolute(event.device, event.x, event.y);
+        server.processCursorMotion(event.time_msec);
+    }
+
+    fn processCursorMotion(server: *Server, time_msec: u32) void {
+        switch (server.cursor_mode) {
+            .passthrough => if (server.viewAt(server.cursor.x, server.cursor.y)) |res| {
+                server.seat.pointerNotifyEnter(res.surface, res.sx, res.sy);
+                server.seat.pointerNotifyMotion(time_msec, res.sx, res.sy);
+            } else {
+                server.cursor_mgr.setCursorImage("left_ptr", server.cursor);
+                server.seat.pointerClearFocus();
+            },
+            .move => {
+                server.grabbed_view.?.x = @floatToInt(i32, server.cursor.x - server.grab_x);
+                server.grabbed_view.?.y = @floatToInt(i32, server.cursor.y - server.grab_y);
+            },
+            .resize => {
+                const view = server.grabbed_view.?;
+                const border_x = @floatToInt(i32, server.cursor.x - server.grab_x);
+                const border_y = @floatToInt(i32, server.cursor.y - server.grab_y);
+
+                var new_left = server.grab_box.x;
+                var new_right = server.grab_box.x + server.grab_box.width;
+                var new_top = server.grab_box.y;
+                var new_bottom = server.grab_box.y + server.grab_box.height;
+
+                if (server.resize_edges.top) {
+                    new_top = border_y;
+                    if (new_top >= new_bottom)
+                        new_top = new_bottom - 1;
+                } else if (server.resize_edges.bottom) {
+                    new_bottom = border_y;
+                    if (new_bottom <= new_top)
+                        new_bottom = new_top + 1;
+                }
+
+                if (server.resize_edges.left) {
+                    new_left = border_x;
+                    if (new_left >= new_right)
+                        new_left = new_right - 1;
+                } else if (server.resize_edges.right) {
+                    new_right = border_x;
+                    if (new_right <= new_left)
+                        new_right = new_left + 1;
+                }
+
+                var geo_box: wlr.Box = undefined;
+                view.xdg_surface.getGeometry(&geo_box);
+                view.x = new_left - geo_box.x;
+                view.y = new_top - geo_box.y;
+
+                const new_width = @intCast(u32, new_right - new_left);
+                const new_height = @intCast(u32, new_bottom - new_top);
+                _ = view.xdg_surface.role_data.toplevel.setSize(new_width, new_height);
+            },
+        }
     }
 
     fn cursorButton(
         listener: *wl.Listener(*wlr.Pointer.event.Button),
-        data: *wlr.Pointer.event.Button,
+        event: *wlr.Pointer.event.Button,
     ) void {
         const server = @fieldParentPtr(Server, "cursor_button", listener);
-        // TODO
+        _ = server.seat.pointerNotifyButton(event.time_msec, event.button, event.state);
+        if (event.state == .released) {
+            server.cursor_mode = .passthrough;
+        } else if (server.viewAt(server.cursor.x, server.cursor.y)) |res| {
+            server.focusView(res.view, res.surface);
+        }
     }
 
     fn cursorAxis(
         listener: *wl.Listener(*wlr.Pointer.event.Axis),
-        data: *wlr.Pointer.event.Axis,
+        event: *wlr.Pointer.event.Axis,
     ) void {
         const server = @fieldParentPtr(Server, "cursor_axis", listener);
-        // TODO
+        server.seat.pointerNotifyAxis(
+            event.time_msec,
+            event.orientation,
+            event.delta,
+            event.delta_discrete,
+            event.source,
+        );
     }
 
-    fn cursorFrame(listener: *wl.Listener(*wlr.Cursor), data: *wlr.Cursor) void {
+    fn cursorFrame(listener: *wl.Listener(*wlr.Cursor), wlr_cursor: *wlr.Cursor) void {
         const server = @fieldParentPtr(Server, "cursor_frame", listener);
-        // TODO
+        server.seat.pointerNotifyFrame();
     }
 
+    /// Assumes the modifier used for compositor keybinds is pressed
+    /// Returns true if the key was handled
     fn handleKeybind(server: *Server, key: xkb.Keysym) bool {
         switch (key) {
+            // Exit the compositor
             .Escape => server.wl_server.terminate(),
-            // TODO: cycle views
+            // Focus the next view in the stack, pushing the current top to the back
+            .F1 => {
+                if (server.views.len < 2) return true;
+                server.views.append(server.views.popFirst().?);
+                const view = &server.views.first.?.data;
+                server.focusView(view, view.xdg_surface.surface);
+            },
             else => return false,
         }
         return true;
@@ -252,6 +380,13 @@ const Server = struct {
 };
 
 const Output = struct {
+    const RenderData = struct {
+        wlr_output: *wlr.Output,
+        view: *View,
+        renderer: *wlr.Renderer,
+        when: *os.timespec,
+    };
+
     server: *Server,
     wlr_output: *wlr.Output,
 
@@ -259,7 +394,67 @@ const Output = struct {
 
     fn frame(listener: *wl.Listener(*wlr.Output), wlr_output: *wlr.Output) void {
         const output = @fieldParentPtr(Output, "frame", listener);
-        // TODO
+        const server = output.server;
+
+        var now: os.timespec = undefined;
+        os.clock_gettime(os.CLOCK_MONOTONIC, &now) catch @panic("CLOCK_MONOTONIC not supported");
+
+        if (!wlr_output.attachRender(null)) return;
+
+        var width: c_int = undefined;
+        var height: c_int = undefined;
+        wlr_output.effectiveResolution(&width, &height);
+
+        server.renderer.begin(width, height);
+
+        const color = [4]f32{ 0.3, 0.3, 0.3, 1.0 };
+        server.renderer.clear(&color);
+
+        // In reverse order to render views at the front of the list on top
+        var it = server.views.last;
+        while (it) |node| : (it = node.prev) {
+            const view = &node.data;
+            var rdata = RenderData{
+                .wlr_output = wlr_output,
+                .view = view,
+                .renderer = server.renderer,
+                .when = &now,
+            };
+            view.xdg_surface.forEachSurface(*RenderData, renderSurface, &rdata);
+        }
+
+        wlr_output.renderSoftwareCursors(null);
+
+        server.renderer.end();
+
+        // Pending changes are automatically rolled back on failure
+        _ = wlr_output.commit();
+    }
+
+    fn renderSurface(surface: *wlr.Surface, sx: c_int, sy: c_int, rdata: *RenderData) callconv(.C) void {
+        const wlr_output = rdata.wlr_output;
+        const texture = surface.getTexture() orelse return;
+
+        var ox: f64 = 0;
+        var oy: f64 = 0;
+        rdata.view.server.output_layout.outputCoords(wlr_output, &ox, &oy);
+        ox += @intToFloat(f64, rdata.view.x + sx);
+        oy += @intToFloat(f64, rdata.view.y + sy);
+
+        var box = wlr.Box{
+            .x = @floatToInt(c_int, ox * wlr_output.scale),
+            .y = @floatToInt(c_int, oy * wlr_output.scale),
+            .width = @floatToInt(c_int, @intToFloat(f32, surface.current.width) * wlr_output.scale),
+            .height = @floatToInt(c_int, @intToFloat(f32, surface.current.height) * wlr_output.scale),
+        };
+
+        var matrix: [9]f32 = undefined;
+        const transform = wlr.Output.transformInvert(surface.current.transform);
+        wlr.matrix.projectBox(&matrix, &box, transform, 0, &wlr_output.transform_matrix);
+
+        // wlroots will log an error for us
+        _ = rdata.renderer.renderTextureWithMatrix(texture, &matrix, 1);
+        surface.sendFrameDone(rdata.when);
     }
 };
 
@@ -279,8 +474,10 @@ const View = struct {
     fn map(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "map", listener);
         const node = @fieldParentPtr(std.TailQueue(View).Node, "data", view);
-        view.server.views.append(node);
-        // TODO: focus view
+        view.server.views.prepend(node);
+        view.x -= xdg_surface.geometry.x;
+        view.y -= xdg_surface.geometry.y;
+        view.server.focusView(view, xdg_surface.surface);
     }
 
     fn unmap(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
@@ -300,7 +497,11 @@ const View = struct {
         event: *wlr.XdgToplevel.event.Move,
     ) void {
         const view = @fieldParentPtr(View, "request_move", listener);
-        // TODO
+        const server = view.server;
+        server.grabbed_view = view;
+        server.cursor_mode = .move;
+        server.grab_x = server.cursor.x - @intToFloat(f64, view.x);
+        server.grab_y = server.cursor.y - @intToFloat(f64, view.y);
     }
 
     fn requestResize(
@@ -308,7 +509,24 @@ const View = struct {
         event: *wlr.XdgToplevel.event.Resize,
     ) void {
         const view = @fieldParentPtr(View, "request_resize", listener);
-        // TODO
+        const server = view.server;
+        const edges = @bitCast(wlr.Edges, @intCast(u4, event.edges));
+
+        server.grabbed_view = view;
+        server.cursor_mode = .resize;
+        server.resize_edges = edges;
+
+        var box: wlr.Box = undefined;
+        view.xdg_surface.getGeometry(&box);
+
+        const border_x = view.x + box.x + if (edges.right) box.width else 0;
+        const border_y = view.y + box.y + if (edges.bottom) box.height else 0;
+        server.grab_x = server.cursor.x - @intToFloat(f64, border_x);
+        server.grab_y = server.cursor.y - @intToFloat(f64, border_y);
+
+        server.grab_box = box;
+        server.grab_box.x += view.x;
+        server.grab_box.y += view.y;
     }
 };
 

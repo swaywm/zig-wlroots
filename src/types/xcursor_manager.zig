@@ -1,4 +1,4 @@
-const wlr = @import("wlroots.zig");
+const wlr = @import("../wlroots.zig");
 
 const wl = @import("wayland").server.wl;
 
