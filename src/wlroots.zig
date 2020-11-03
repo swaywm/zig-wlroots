@@ -57,6 +57,9 @@ pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 pub const ExportDmabufManagerV1 = @import("types/export_dmabuf_v1.zig").ExportDmabufManagerV1;
 pub const ExportDmabufFrameV1 = @import("types/export_dmabuf_v1.zig").ExportDmabufFrameV1;
 
+pub const GammaControlManagerV1 = @import("types/gamma_control_v1.zig").GammaControlManagerV1;
+pub const GamaControlV1 = @import("types/gamma_control_v1.zig").GamaControlV1;
+
 pub const XCursorImage = @import("xcursor.zig").XCursorImage;
 pub const XCursor = @import("xcursor.zig").XCursor;
 pub const XCursorTheme = @import("xcursor.zig").XCursorTheme;
