@@ -13,6 +13,8 @@ pub const Backend = extern struct {
         new_output: wl.Signal(*wlr.Output),
     },
 
+    // backend.h
+
     extern fn wlr_backend_autocreate(server: *wl.Server, create_renderer_func: ?wlr.Renderer.CreateFn) ?*Backend;
     pub const autocreate = wlr_backend_autocreate;
 
@@ -27,4 +29,24 @@ pub const Backend = extern struct {
 
     extern fn wlr_backend_get_session(backend: *Backend) ?*wlr.Session;
     pub const getSession = wlr_backend_get_session;
+
+    // backend/multi.h
+
+    extern fn wlr_multi_backend_create(server: *wl.Server) ?*Backend;
+    pub const createMulti = wlr_multi_backend_create;
+
+    extern fn wlr_multi_backend_add(multi: *Backend, backend: *Backend) bool;
+    pub const multiAdd = wlr_multi_backend_add;
+
+    extern fn wlr_multi_backend_remove(multi: *Backend, backend: *Backend) void;
+    pub const multiRemove = wlr_multi_backend_remove;
+
+    extern fn wlr_backend_is_multi(backend: *Backend) bool;
+    pub const isMulti = wlr_backend_is_multi;
+
+    extern fn wlr_multi_is_empty(backend: *Backend) bool;
+    pub const multiIsEmpty = wlr_multi_is_empty;
+
+    extern fn wlr_multi_for_each_backend(backend: *Backend, callback: fn (backend: *Backend, data: ?*c_void) callconv(.C) void, data: ?*c_void) void;
+    pub const multiForEachBackend = wlr_multi_for_each_backend;
 };
