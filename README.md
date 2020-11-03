@@ -22,6 +22,11 @@ of how to integrate zig-wlroots and its dependencies into your build.zig.
 
 See the C headers of wlroots for documentation.
 
+## License
+
+zig-wlroots is released under the MIT (expat) license. The contents of the tinywl directory
+are not part of zig-wlroots and are released under the Zero Clause BSD license.
+
 ## TODO
 
 - [x] Bind enough to port [tinwyl](https://github.com/swaywm/wlroots/tree/master/tinywl)

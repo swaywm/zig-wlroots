@@ -14,3 +14,6 @@ git submodule update --init
 
 Then simply run `zig build` to build tinywl.zig.
 
+## License
+
+tinywl.zig is released under the Zero Clause BSD license.
