@@ -17,7 +17,7 @@ addition the following zig bindings are required:
 
 ## Usage
 
-See [tinwyl.zig][./tinywl/] for an example compositor using zig-wlroots and an example
+See [tinwyl.zig](./tinywl/) for an example compositor using zig-wlroots and an example
 of how to integrate zig-wlroots and its dependencies into your build.zig.
 
 See the C headers of wlroots for documentation.
