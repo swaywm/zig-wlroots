@@ -46,6 +46,9 @@ pub const DataOffer = @import("types/data_device.zig").DataOffer;
 pub const DataSource = @import("types/data_device.zig").DataSource;
 pub const Drag = @import("types/data_device.zig").Drag;
 
+pub const DataControlManagerV1 = @import("types/data_control_v1.zig").DataControlManagerV1;
+pub const DataControlDeviceV1 = @import("types/data_control_v1.zig").DataControlDeviceV1;
+
 pub const PrimarySelectionSource = @import("types/primary_selection.zig").PrimarySelectionSource;
 
 pub const Output = @import("types/output.zig").Output;
