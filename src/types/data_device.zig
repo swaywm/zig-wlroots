@@ -147,7 +147,7 @@ pub const Drag = extern struct {
         destroy: wl.Signal(*Drag),
     },
 
-    // TODO: remove for wlroots11
+    // TODO: remove for wlroots12
     _: wl.Listener(void),
     source_destroy: wl.Listener(*DataSource),
     seat_client_destroy: wl.Listener(*wlr.Seat.Client),
