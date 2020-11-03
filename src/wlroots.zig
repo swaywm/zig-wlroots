@@ -44,6 +44,8 @@ pub const TabletTool = @import("types/tablet_tool.zig").TabletTool;
 pub const Idle = @import("types/idle.zig").Idle;
 pub const IdleTimeout = @import("types/idle.zig").IdleTimeout;
 
+pub const InputInhibitManager = @import("types/input_inhibitor.zig").InputInhibitManager;
+
 pub const DataDeviceManager = @import("types/data_device.zig").DataDeviceManager;
 pub const DataOffer = @import("types/data_device.zig").DataOffer;
 pub const DataSource = @import("types/data_device.zig").DataSource;

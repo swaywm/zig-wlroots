@@ -1,0 +1,21 @@
+const wayland = @import("wayland");
+const wl = wayland.server.wl;
+
+const InputInhibitManager = extern struct {
+    global: *wl.Global,
+    active_client: ?*wl.Client,
+    active_inhibitor: ?*wl.Resource,
+
+    server_destroy: wl.Listener(*wl.Server),
+
+    events: extern struct {
+        activate: wl.Signal(*InputInhibitManager),
+        deactivate: wl.Signal(*InputInhibitManager),
+        destroy: wl.Signal(*InputInhibitManager),
+    },
+
+    data: ?*c_void,
+
+    extern fn wlr_input_inhibit_manager_create(server: *wl.Server) ?*InputInhibitManager;
+    pub const create = wlr_input_inhibit_manager_create;
+};
