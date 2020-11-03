@@ -232,9 +232,8 @@ const Server = struct {
             else => {},
         }
 
-        var caps: u32 = @enumToInt(wl.Seat.Capability.pointer);
-        if (server.keyboards.len > 0)
-            caps |= @as(u32, @enumToInt(wl.Seat.Capability.keyboard));
+        var caps = wl.Seat.Capability{ .pointer = true };
+        if (server.keyboards.len > 0) caps.keyboard = true;
         server.seat.setCapabilities(caps);
     }
 

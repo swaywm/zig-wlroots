@@ -303,7 +303,9 @@ pub const Seat = extern struct {
     pub const clientForWlClient = wlr_seat_client_for_wl_client;
 
     extern fn wlr_seat_set_capabilities(seat: *Seat, capabilities: u32) void;
-    pub const setCapabilities = wlr_seat_set_capabilities;
+    pub inline fn setCapabilities(seat: *Seat, capabilities: wl.Seat.Capability) void {
+        wlr_seat_set_capabilities(seat, @bitCast(u32, capabilities));
+    }
 
     extern fn wlr_seat_set_name(seat: *Seat, name: [*:0]const u8) void;
     pub const setName = wlr_seat_set_name;
