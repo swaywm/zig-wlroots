@@ -309,4 +309,7 @@ pub const Output = extern struct {
 
     extern fn wlr_output_transform_compose(tr_a: wl.Output.Transform, tr_b: wl.Output.Transform) wl.Output.Transform;
     pub const transformCompose = wlr_output_transform_compose;
+
+    extern fn wlr_output_is_noop(output: *Output) bool;
+    pub const isNoop = wlr_output_is_noop;
 };

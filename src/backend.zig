@@ -49,4 +49,15 @@ pub const Backend = extern struct {
 
     extern fn wlr_multi_for_each_backend(backend: *Backend, callback: fn (backend: *Backend, data: ?*c_void) callconv(.C) void, data: ?*c_void) void;
     pub const multiForEachBackend = wlr_multi_for_each_backend;
+
+    // backend/noop.h
+
+    extern fn wlr_noop_backend_create(server: *wl.Server) *Backend;
+    pub const createNoop = wlr_noop_backend_create;
+
+    extern fn wlr_noop_add_output(noop: *Backend) ?*Output;
+    pub const noopAddOutput = wlr_noop_add_output;
+
+    extern fn wlr_backend_is_noop(backend: *Backend) bool;
+    pub const isNoop = wlr_backend_is_noop;
 };
