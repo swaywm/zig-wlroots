@@ -1,0 +1,44 @@
+const wlr = @import("../wlroots.zig");
+
+const wayland = @import("wayland");
+const wl = wayland.server.wl;
+
+pub const VirtualPointerManagerV1 = extern struct {
+    pub const event = struct {
+        pub const NewPointer = extern struct {
+            new_pointer: *VirtualPointerV1,
+            suggested_seat: ?*wlr.Seat,
+            suggested_output: ?*wlr.Output,
+        };
+    };
+
+    global: *wl.Global,
+    /// VirtualPointerV1.link
+    virtual_pointers: wl.List,
+
+    server_destroy: wl.Listener(*wl.Server),
+
+    events: extern struct {
+        new_virtual_pointer: wl.Signal(*event.NewPointer),
+        destroy: wl.Signal(*VirtualPointerManagerV1),
+    },
+
+    extern fn wlr_virtual_pointer_manager_v1_create(server: *wl.Server) ?*VirtualPointerManagerV1;
+    pub const create = wlr_virtual_pointer_manager_v1_create;
+};
+
+pub const VirtualPointerV1 = extern struct {
+    input_device: wlr.InputDevice,
+    resource: *wl.Resource,
+
+    axis_event: [2]wlr.Pointer.event.Axis,
+    axis: wl.Pointer.Axis,
+    axis_valid: [2]bool,
+
+    /// VirtualPointerManagerV1.virtual_pointers
+    link: struct_wl_list,
+
+    events: extern struct {
+        destroy: wl.Signal(*VirtualPointerV1),
+    },
+};

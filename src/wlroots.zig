@@ -47,6 +47,9 @@ pub const Touch = @import("types/touch.zig").Touch;
 pub const Tablet = @import("types/tablet_tool.zig").Tablet;
 pub const TabletTool = @import("types/tablet_tool.zig").TabletTool;
 
+pub const VirtualPointerManagerV1 = @import("types/virtual_pointer_v1.zig").VirtualPointerManagerV1;
+pub const VirtualPointerV1 = @import("types/virtual_pointer_v1.zig").VirtualPointerV1;
+
 pub const Idle = @import("types/idle.zig").Idle;
 pub const IdleTimeout = @import("types/idle.zig").IdleTimeout;
 
