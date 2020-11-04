@@ -59,6 +59,9 @@ pub const DataControlDeviceV1 = @import("types/data_control_v1.zig").DataControl
 
 pub const PrimarySelectionSource = @import("types/primary_selection.zig").PrimarySelectionSource;
 
+pub const PrimarySelectionDeviceManagerV1 = @import("types/primary_selection_v1.zig").PrimarySelectionDeviceManagerV1;
+pub const PrimarySelectionDeviceV1 = @import("types/primary_selection_v1.zig").PrimarySelectionDeviceV1;
+
 pub const Output = @import("types/output.zig").Output;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 
