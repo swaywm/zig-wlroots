@@ -14,6 +14,9 @@ pub const Subcompositor = @import("types/compositor.zig").Subcompositor;
 pub const Surface = @import("types/surface.zig").Surface;
 pub const Subsurface = @import("types/surface.zig").Subsurface;
 
+pub const Viewporter = @import("types/viewporter.zig").Viewporter;
+pub const Viewport = @import("types/viewporter.zig").Viewport;
+
 pub const XdgShell = @import("types/xdg_shell.zig").XdgShell;
 pub const XdgClient = @import("types/xdg_shell.zig").XdgClient;
 pub const XdgSurface = @import("types/xdg_shell.zig").XdgSurface;
