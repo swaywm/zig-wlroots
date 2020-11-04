@@ -50,6 +50,9 @@ pub const TabletTool = @import("types/tablet_tool.zig").TabletTool;
 pub const VirtualPointerManagerV1 = @import("types/virtual_pointer_v1.zig").VirtualPointerManagerV1;
 pub const VirtualPointerV1 = @import("types/virtual_pointer_v1.zig").VirtualPointerV1;
 
+pub const VirtualKeyboardManagerV1 = @import("types/virtual_keyboard_v1.zig").VirtualKeyboardManagerV1;
+pub const VirtualKeyboardV1 = @import("types/virtual_keyboard_v1.zig").VirtualKeyboardV1;
+
 pub const Idle = @import("types/idle.zig").Idle;
 pub const IdleTimeout = @import("types/idle.zig").IdleTimeout;
 
