@@ -21,6 +21,9 @@ pub const XdgToplevel = @import("types/xdg_shell.zig").XdgToplevel;
 pub const XdgPositioner = @import("types/xdg_shell.zig").XdgPositioner;
 pub const XdgPopup = @import("types/xdg_shell.zig").XdgPopup;
 
+pub const LayerShellV1 = @import("types/layer_shell_v1.zig").LayerShellV1;
+pub const LayerSurfaceV1 = @import("types/layer_shell_v1.zig").LayerSurfaceV1;
+
 pub const Seat = @import("types/seat.zig").Seat;
 pub const SerialRange = @import("types/seat.zig").SerialRange;
 pub const SerialRingset = @import("types/seat.zig").SerialRingset;

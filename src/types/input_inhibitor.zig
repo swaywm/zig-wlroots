@@ -1,7 +1,7 @@
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
-const InputInhibitManager = extern struct {
+pub const InputInhibitManager = extern struct {
     global: *wl.Global,
     active_client: ?*wl.Client,
     active_inhibitor: ?*wl.Resource,
