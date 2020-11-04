@@ -71,6 +71,10 @@ pub const OutputPowerV1 = @import("types/output_power_management_v1.zig").Output
 pub const ExportDmabufManagerV1 = @import("types/export_dmabuf_v1.zig").ExportDmabufManagerV1;
 pub const ExportDmabufFrameV1 = @import("types/export_dmabuf_v1.zig").ExportDmabufFrameV1;
 
+pub const ScreencopyManagerV1 = @import("types/screencopy_v1.zig").ScreencopyManagerV1;
+pub const ScreencopyClientV1 = @import("types/screencopy_v1.zig").ScreencopyClientV1;
+pub const ScreencopyFrameV1 = @import("types/screencopy_v1.zig").ScreencopyFrameV1;
+
 pub const GammaControlManagerV1 = @import("types/gamma_control_v1.zig").GammaControlManagerV1;
 pub const GamaControlV1 = @import("types/gamma_control_v1.zig").GamaControlV1;
 
