@@ -62,6 +62,9 @@ pub const PrimarySelectionSource = @import("types/primary_selection.zig").Primar
 pub const Output = @import("types/output.zig").Output;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 
+pub const OutputPowerManagerV1 = @import("types/output_power_management_v1.zig").OutputPowerManagerV1;
+pub const OutputPowerV1 = @import("types/output_power_management_v1.zig").OutputPowerV1;
+
 pub const ExportDmabufManagerV1 = @import("types/export_dmabuf_v1.zig").ExportDmabufManagerV1;
 pub const ExportDmabufFrameV1 = @import("types/export_dmabuf_v1.zig").ExportDmabufFrameV1;
 
