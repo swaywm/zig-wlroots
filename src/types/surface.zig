@@ -157,6 +157,9 @@ pub const Surface = extern struct {
 
     extern fn wlr_surface_is_layer_surface(surface: *Surface) bool;
     pub const isLayerSurface = wlr_surface_is_layer_surface;
+
+    extern fn wlr_surface_is_xwayland_surface(surface: *Surface) bool;
+    pub const isXWaylandSurface = wlr_surface_is_xwayland_surface;
 };
 
 pub const Subsurface = extern struct {

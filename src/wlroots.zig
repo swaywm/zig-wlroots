@@ -103,6 +103,12 @@ pub const XCursorTheme = @import("xcursor.zig").XCursorTheme;
 pub const XCursorManager = @import("types/xcursor_manager.zig").XCursorManager;
 pub const XCursorManagerTheme = @import("types/xcursor_manager.zig").XCursorManagerTheme;
 
+pub const Xwayland = @import("xwayland.zig").Xwayland;
+pub const XwaylandServer = @import("xwayland.zig").XwaylandServer;
+pub const XwaylandSurface = @import("xwayland.zig").XwaylandSurface;
+pub const XwaylandCursor = @import("xwayland.zig").XwaylandCursor;
+pub const Xwm = @import("xwayland.zig").Xwm;
+
 pub const List = @import("types/list.zig").List;
 pub const Box = @import("types/box.zig").Box;
 pub const FBox = @import("types/box.zig").FBox;
