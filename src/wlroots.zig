@@ -96,12 +96,12 @@ pub const ScreencopyFrameV1 = @import("types/screencopy_v1.zig").ScreencopyFrame
 pub const GammaControlManagerV1 = @import("types/gamma_control_v1.zig").GammaControlManagerV1;
 pub const GamaControlV1 = @import("types/gamma_control_v1.zig").GamaControlV1;
 
-pub const XCursorImage = @import("xcursor.zig").XCursorImage;
-pub const XCursor = @import("xcursor.zig").XCursor;
-pub const XCursorTheme = @import("xcursor.zig").XCursorTheme;
+pub const XcursorImage = @import("xcursor.zig").XcursorImage;
+pub const Xcursor = @import("xcursor.zig").Xcursor;
+pub const XcursorTheme = @import("xcursor.zig").XcursorTheme;
 
-pub const XCursorManager = @import("types/xcursor_manager.zig").XCursorManager;
-pub const XCursorManagerTheme = @import("types/xcursor_manager.zig").XCursorManagerTheme;
+pub const XcursorManager = @import("types/xcursor_manager.zig").XcursorManager;
+pub const XcursorManagerTheme = @import("types/xcursor_manager.zig").XcursorManagerTheme;
 
 pub const Xwayland = @import("xwayland.zig").Xwayland;
 pub const XwaylandServer = @import("xwayland.zig").XwaylandServer;

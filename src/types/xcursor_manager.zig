@@ -2,30 +2,30 @@ const wlr = @import("../wlroots.zig");
 
 const wl = @import("wayland").server.wl;
 
-pub const XCursorManagerTheme = extern struct {
+pub const XcursorManagerTheme = extern struct {
     scale: f32,
-    theme: *wlr.XCursorTheme,
+    theme: *wlr.XcursorTheme,
     link: wl.List,
 };
 
-pub const XCursorManager = extern struct {
+pub const XcursorManager = extern struct {
     name: ?[*:0]u8,
     size: u32,
-    /// XCursorManagerTheme.link
+    /// XcursorManagerTheme.link
     scaled_themes: wl.List,
 
-    extern fn wlr_xcursor_manager_create(name: ?[*:0]const u8, size: u32) ?*XCursorManager;
+    extern fn wlr_xcursor_manager_create(name: ?[*:0]const u8, size: u32) ?*XcursorManager;
     pub const create = wlr_xcursor_manager_create;
 
-    extern fn wlr_xcursor_manager_destroy(manager: *XCursorManager) void;
+    extern fn wlr_xcursor_manager_destroy(manager: *XcursorManager) void;
     pub const destroy = wlr_xcursor_manager_destroy;
 
-    extern fn wlr_xcursor_manager_load(manager: *XCursorManager, scale: f32) bool;
+    extern fn wlr_xcursor_manager_load(manager: *XcursorManager, scale: f32) bool;
     pub const load = wlr_xcursor_manager_load;
 
-    extern fn wlr_xcursor_manager_get_xcursor(manager: *XCursorManager, name: [*:0]const u8, scale: f32) ?*wlr.XCursor;
-    pub const getXCursor = wlr_xcursor_manager_get_xcursor;
+    extern fn wlr_xcursor_manager_get_xcursor(manager: *XcursorManager, name: [*:0]const u8, scale: f32) ?*wlr.Xcursor;
+    pub const getXcursor = wlr_xcursor_manager_get_xcursor;
 
-    extern fn wlr_xcursor_manager_set_cursor_image(manager: *XCursorManager, name: [*:0]const u8, cursor: *wlr.Cursor) void;
+    extern fn wlr_xcursor_manager_set_cursor_image(manager: *XcursorManager, name: [*:0]const u8, cursor: *wlr.Cursor) void;
     pub const setCursorImage = wlr_xcursor_manager_set_cursor_image;
 };

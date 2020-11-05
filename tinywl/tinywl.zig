@@ -53,7 +53,7 @@ const Server = struct {
     keyboards: std.TailQueue(Keyboard) = .{},
 
     cursor: *wlr.Cursor,
-    cursor_mgr: *wlr.XCursorManager,
+    cursor_mgr: *wlr.XcursorManager,
     cursor_motion: wl.Listener(*wlr.Pointer.event.Motion) = undefined,
     cursor_motion_absolute: wl.Listener(*wlr.Pointer.event.MotionAbsolute) = undefined,
     cursor_button: wl.Listener(*wlr.Pointer.event.Button) = undefined,
@@ -78,7 +78,7 @@ const Server = struct {
             .xdg_shell = wlr.XdgShell.create(wl_server) orelse return error.OutOfMemory,
             .seat = wlr.Seat.create(wl_server, "default") orelse return error.OutOfMemory,
             .cursor = wlr.Cursor.create() orelse return error.OutOfMemory,
-            .cursor_mgr = wlr.XCursorManager.create(null, 24) orelse return error.OutOfMemory,
+            .cursor_mgr = wlr.XcursorManager.create(null, 24) orelse return error.OutOfMemory,
         };
 
         if (!server.renderer.initServer(wl_server)) return error.InitRendererFailed;
@@ -100,7 +100,7 @@ const Server = struct {
         server.seat.events.request_set_selection.add(&server.request_set_selection);
 
         server.cursor.attachOutputLayout(server.output_layout);
-        if (!server.cursor_mgr.load(1)) return error.CantLoadXCursorTheme;
+        if (!server.cursor_mgr.load(1)) return error.CantLoadXcursorTheme;
         server.cursor_motion.setNotify(cursorMotion);
         server.cursor.events.motion.add(&server.cursor_motion);
         server.cursor_motion_absolute.setNotify(cursorMotionAbsolute);
