@@ -77,6 +77,9 @@ pub const PrimarySelectionDeviceV1 = @import("types/primary_selection_v1.zig").P
 pub const Output = @import("types/output.zig").Output;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 
+pub const XdgOutputManagerV1 = @import("types/xdg_output_v1.zig").XdgOutputManagerV1;
+pub const XdgOutputV1 = @import("types/xdg_output_v1.zig").XdgOutputV1;
+
 pub const OutputPowerManagerV1 = @import("types/output_power_management_v1.zig").OutputPowerManagerV1;
 pub const OutputPowerV1 = @import("types/output_power_management_v1.zig").OutputPowerV1;
 
