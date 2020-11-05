@@ -8,6 +8,9 @@ pub const Texture = @import("render/texture.zig").Texture;
 pub const Buffer = @import("types/buffer.zig").Buffer;
 pub const ClientBuffer = @import("types/buffer.zig").ClientBuffer;
 
+pub const DmabufBufferV1 = @import("types/linux_dmabuf_v1.zig").DmabufBufferV1;
+pub const LinuxDmabufV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufV1;
+
 pub const Compositor = @import("types/compositor.zig").Compositor;
 pub const Subcompositor = @import("types/compositor.zig").Subcompositor;
 
