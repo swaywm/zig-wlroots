@@ -52,7 +52,7 @@ pub const Backend = extern struct {
 
     // backend/noop.h
 
-    extern fn wlr_noop_backend_create(server: *wl.Server) *Backend;
+    extern fn wlr_noop_backend_create(server: *wl.Server) ?*Backend;
     pub const createNoop = wlr_noop_backend_create;
 
     extern fn wlr_noop_add_output(noop: *Backend) ?*Output;
