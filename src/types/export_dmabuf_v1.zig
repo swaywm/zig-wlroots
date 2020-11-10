@@ -24,8 +24,9 @@ pub const ExportDmabufFrameV1 = extern struct {
     /// ExportDmabufManagerV1.frames
     link: wl.List,
 
-    attribs: wlr.DmabufAttributes,
     output: ?*wlr.Output,
+
     cursor_locked: bool,
-    output_precommit: wl.Listener(*wlr.Output.event.Precommit),
+
+    output_commit: wl.Listener(*wlr.Output.event.Commit),
 };

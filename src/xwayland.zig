@@ -83,8 +83,6 @@ pub const Xwayland = extern struct {
 
     server_ready: wl.Listener(*XwaylandServer.event.Ready),
     server_destroy: wl.Listener(void),
-    /// TODO: Remove this with wlroots12
-    _: wl.Listener(void),
     seat_destroy: wl.Listener(*wlr.Seat),
 
     data: ?*c_void,
@@ -161,6 +159,11 @@ pub const XwaylandSurface = extern struct {
             surface: *XwaylandSurface,
             edges: u32,
         };
+
+        pub const Minimize = extern struct {
+            surface: *XwaylandSurface,
+            minimize: bool,
+        };
     };
 
     window_id: xcb.Window,
@@ -211,6 +214,7 @@ pub const XwaylandSurface = extern struct {
     fullscreen: bool,
     maximized_vert: bool,
     maximized_horz: bool,
+    minimized: bool,
 
     has_alpha: bool,
 
@@ -219,6 +223,7 @@ pub const XwaylandSurface = extern struct {
         request_configure: wl.Signal(*event.Configure),
         request_move: wl.Signal(*event.Move),
         request_resize: wl.Signal(*event.Resize),
+        request_minimize: wl.Signal(*event.Minimize),
         request_maximize: wl.Signal(*XwaylandSurface),
         request_fullscreen: wl.Signal(*XwaylandSurface),
         request_activate: wl.Signal(*XwaylandSurface),
@@ -234,6 +239,7 @@ pub const XwaylandSurface = extern struct {
         set_hints: wl.Signal(*XwaylandSurface),
         set_decorations: wl.Signal(*XwaylandSurface),
         set_override_redirect: wl.Signal(*XwaylandSurface),
+        set_geometry: wl.Signal(*XwaylandSurface),
         ping_timeout: wl.Signal(*XwaylandSurface),
     },
 
@@ -249,6 +255,9 @@ pub const XwaylandSurface = extern struct {
 
     extern fn wlr_xwayland_surface_close(surface: *XwaylandSurface) void;
     pub const close = wlr_xwayland_surface_close;
+
+    extern fn wlr_xwayland_surface_set_minimized(surface: *XwaylandSurface, minimized: bool) void;
+    pub const setMinimized = wlr_xwayland_surface_set_minimized;
 
     extern fn wlr_xwayland_surface_set_maximized(surface: *XwaylandSurface, maximized: bool) void;
     pub const setMaximized = wlr_xwayland_surface_set_maximized;

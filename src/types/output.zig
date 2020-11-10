@@ -122,12 +122,11 @@ pub const Output = extern struct {
             when: *os.timespec,
         };
 
-        // TODO: added in wlroots12
-        //pub const Commit = extern struct {
-        //    output: *wlr.Output,
-        //    /// This is a bitfield of State.field members
-        //    comitted: u32,
-        //};
+        pub const Commit = extern struct {
+            output: *wlr.Output,
+            /// This is a bitfield of State.field members
+            comitted: u32,
+        };
 
         pub const Present = extern struct {
             pub const flag = struct {
@@ -189,8 +188,7 @@ pub const Output = extern struct {
         damage: wl.Signal(*event.Damage),
         needs_frame: wl.Signal(*Output),
         precommit: wl.Signal(*event.Precommit),
-        // TODO: event.Commit in wlroots12
-        commit: wl.Signal(*Output),
+        commit: wl.Signal(*event.Commit),
         present: wl.Signal(*event.Present),
         enable: wl.Signal(*Output),
         mode: wl.Signal(*Output),

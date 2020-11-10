@@ -37,7 +37,7 @@ pub const OutputPowerV1 = extern struct {
     link: wl.List,
 
     output_destroy_listener: wl.Listener(*wlr.Output),
-    output_enable_listener: wl.Listener(*wlr.Output),
+    output_commit_listener: wl.Listener(*wlr.Output.event.Commit),
 
     data: ?*c_void,
 };

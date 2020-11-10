@@ -100,7 +100,21 @@ pub const LayerSurfaceV1 = extern struct {
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
         data: T,
     ) void {
-        wlr_layer_surface_v1_for_each_surface(surfacen, iterator, data);
+        wlr_layer_surface_v1_for_each_surface(surface, iterator, data);
+    }
+
+    extern fn wlr_layer_surface_v1_for_each_popup(
+        surface: *LayerSurfaceV1,
+        iterator: fn (*wlr.Surface, c_int, c_int, ?*c_void) callconv(.C) void,
+        user_data: ?*c_void,
+    ) void;
+    pub fn forEachPopup(
+        surface: *LayerSurfaceV1,
+        comptime T: type,
+        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
+        data: T,
+    ) void {
+        wlr_layer_surface_v1_for_each_popup(surface, iterator, data);
     }
 
     extern fn wlr_layer_surface_v1_surface_at(surface: *LayerSurfaceV1, sx: f64, sy: f64, sub_x: *f64, sub_y: *f64) ?*wlr.Surface;

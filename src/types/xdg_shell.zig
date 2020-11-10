@@ -39,10 +39,6 @@ pub const XdgClient = extern struct {
 };
 
 pub const XdgPositioner = extern struct {
-    /// This field is never initialized or used by wlroots, using it would be a bug
-    /// TODO(wlroots11): remove this
-    _: *wl.Resource,
-
     anchor_rect: wlr.Box,
     anchor: xdg.Positioner.Anchor,
     gravity: xdg.Positioner.Gravity,

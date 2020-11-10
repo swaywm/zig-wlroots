@@ -26,6 +26,10 @@ pub const GamaControlV1 = extern struct {
     /// GammaControlManagerV1.controls
     link: wl.List,
 
+    table: *u16,
+    ramp_size: usize,
+
+    output_commit_listener: wl.Listener(*wlr.Output.event.Commit),
     output_destroy_listener: wl.Listener(*wlr.Output),
 
     data: ?*c_void,

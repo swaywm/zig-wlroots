@@ -44,6 +44,7 @@ pub const ScreencopyFrameV1 = extern struct {
 
     output: *wlr.Output,
     output_precommit: wl.Listener(*wlr.Output.event.Precommit),
+    output_commit: wl.Listener(*wlr.Output.event.Commit),
     output_destroy: wl.Listener(*wlr.Output),
     output_enable: wl.Listener(*wlr.Output),
 
