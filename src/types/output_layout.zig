@@ -34,7 +34,7 @@ pub const OutputLayout = extern struct {
         destroy: wl.Signal(*OutputLayout),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_output_layout_create() ?*OutputLayout;
     pub const create = wlr_output_layout_create;

@@ -16,7 +16,7 @@ pub const PrimarySelectionSource = extern struct {
         destroy: wl.Signal(*PrimarySelectionSource),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_primary_selection_source_init(source: *PrimarySelectionSource, impl: *const PrimarySelectionSource.Impl) void;
     pub const init = wlr_primary_selection_source_init;

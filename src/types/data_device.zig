@@ -13,7 +13,7 @@ pub const DataDeviceManager = extern struct {
         destroy: wl.Signal(*DataDeviceManager)
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_data_device_manager_create(server: *wl.Server) ?*DataDeviceManager;
     pub const create = wlr_data_device_manager_create;
@@ -98,7 +98,7 @@ pub const Drag = extern struct {
 
         surface_destroy: wl.Listener(*wlr.Surface),
 
-        data: ?*c_void,
+        data: usize,
     };
 
     pub const GrabType = extern enum {
@@ -151,7 +151,7 @@ pub const Drag = extern struct {
     seat_client_destroy: wl.Listener(*wlr.Seat.Client),
     icon_destroy: wl.Listener(*Drag.Icon),
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_drag_create(seat_client: *wlr.Seat.Client, source: ?*DataSource, icon_surface: ?*wlr.Surface) ?*Drag;
     pub const create = wlr_drag_create;

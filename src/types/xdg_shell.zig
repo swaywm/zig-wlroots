@@ -19,7 +19,7 @@ pub const XdgShell = extern struct {
         destroy: wl.Signal(*wlr.XdgShell),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_xdg_shell_create(server: *wl.Server) ?*wlr.XdgShell;
     pub const create = wlr_xdg_shell_create;
@@ -270,7 +270,7 @@ pub const XdgSurface = extern struct {
         ack_configure: wl.Signal(*wlr.XdgSurface.Configure),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_xdg_surface_from_resource(resource: *xdg.Surface) ?*wlr.XdgSurface;
     pub const fromResource = wlr_xdg_surface_from_resource;

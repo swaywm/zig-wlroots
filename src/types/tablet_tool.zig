@@ -29,7 +29,7 @@ pub const TabletTool = extern struct {
         destroy: wl.Signal(*TabletTool),
     },
 
-    data: ?*c_void,
+    data: usize,
 };
 
 pub const Tablet = extern struct {
@@ -112,5 +112,5 @@ pub const Tablet = extern struct {
     name: [*:0]u8,
     paths: wlr.List,
 
-    data: ?*c_void,
+    data: usize,
 };

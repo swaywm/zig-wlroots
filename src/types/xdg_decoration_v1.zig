@@ -15,7 +15,7 @@ pub const XdgDecorationManagerV1 = extern struct {
         destroy: wl.Signal(*XdgDecorationManagerV1),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_xdg_decoration_manager_v1_create(server: *wl.Server) ?*XdgDecorationManagerV1;
     pub const create = wlr_xdg_decoration_manager_v1_create;
@@ -59,7 +59,7 @@ pub const XdgToplevelDecorationV1 = extern struct {
     surface_ack_configure: wl.Listener(*wlr.XdgSurface.Configure),
     surface_commit: wl.Listener(*wlr.Surface),
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_xdg_toplevel_decoration_v1_set_mode(decoration: *XdgToplevelDecorationV1, mode: Mode) u32;
     pub const setMode = wlr_xdg_toplevel_decoration_v1_set_mode;

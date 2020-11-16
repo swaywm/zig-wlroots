@@ -210,7 +210,7 @@ pub const Output = extern struct {
 
     server_destroy: wl.Listener(*wl.Server),
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_output_enable(output: *Output, enable: bool) void;
     pub const enable = wlr_output_enable;

@@ -14,7 +14,7 @@ pub const InputInhibitManager = extern struct {
         destroy: wl.Signal(*InputInhibitManager),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_input_inhibit_manager_create(server: *wl.Server) ?*InputInhibitManager;
     pub const create = wlr_input_inhibit_manager_create;

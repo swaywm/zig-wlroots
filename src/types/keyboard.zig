@@ -68,7 +68,7 @@ pub const Keyboard = extern struct {
         destroy: wl.Signal(*Keyboard),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_keyboard_set_keymap(kb: *Keyboard, keymap: *xkb.Keymap) bool;
     pub const setKeymap = wlr_keyboard_set_keymap;

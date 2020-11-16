@@ -89,7 +89,7 @@ pub const Surface = extern struct {
 
     renderer_destroy: wl.Listener(*wlr.Renderer),
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_surface_create(client: *wl.Client, version: u32, id: u32, renderer: *wlr.Renderer, resource_list: ?*wl.List) ?*Surface;
     pub const create = wlr_surface_create;
@@ -196,7 +196,7 @@ pub const Subsurface = extern struct {
         unmap: wl.Signal(*Subsurface),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_subsurface_create(surface: *Surface, parent: *Surface, version: u32, id: u32, resource_list: ?*wl.List) ?*Subsurface;
     pub const create = wlr_subsurface_create;

@@ -14,7 +14,7 @@ pub const GammaControlManagerV1 = extern struct {
         destroy: wl.Signal(*GammaControlManagerV1),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_gamma_control_manager_v1_create(server: *wl.Server) ?*GammaControlManagerV1;
     pub const create = wlr_gamma_control_manager_v1_create;
@@ -32,5 +32,5 @@ pub const GamaControlV1 = extern struct {
     output_commit_listener: wl.Listener(*wlr.Output.event.Commit),
     output_destroy_listener: wl.Listener(*wlr.Output),
 
-    data: ?*c_void,
+    data: usize,
 };

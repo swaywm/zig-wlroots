@@ -48,5 +48,5 @@ pub const Touch = extern struct {
         cancel: wl.Signal(*event.Cancel),
     },
 
-    data: ?*c_void,
+    data: usize,
 };

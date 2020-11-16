@@ -43,7 +43,7 @@ pub const InputDevice = extern struct {
         destroy: wl.Signal(*InputDevice),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     link: wl.List,
 

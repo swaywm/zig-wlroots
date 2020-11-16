@@ -54,7 +54,7 @@ pub const XwaylandServer = extern struct {
     client_destroy: wl.Listener(*wl.Client),
     display_destroy: wl.Listener(*wl.Server),
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_xwayland_server_create(wl_server: *wl.Server, options: *Options) ?*XwaylandServer;
     pub const create = wlr_xwayland_server_create;
@@ -85,7 +85,7 @@ pub const Xwayland = extern struct {
     server_destroy: wl.Listener(void),
     seat_destroy: wl.Listener(*wlr.Seat),
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_xwayland_create(wl_server: *wl.Server, compositor: *wlr.Compositor, lazy: bool) ?*Xwayland;
     pub const create = wlr_xwayland_create;
@@ -245,7 +245,7 @@ pub const XwaylandSurface = extern struct {
 
     surface_destroy: wl.Listener(*wlr.Surface),
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_xwayland_surface_activate(surface: *XwaylandSurface, activated: bool) void;
     pub const activate = wlr_xwayland_surface_activate;

@@ -23,7 +23,7 @@ pub const OutputPowerManagerV1 = extern struct {
         destroy: wl.Signal(*OutputPowerManagerV1),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_output_power_manager_v1_create(server: *wl.Server) ?*OutputPowerManagerV1;
     pub const create = wlr_output_power_manager_v1_create;
@@ -39,5 +39,5 @@ pub const OutputPowerV1 = extern struct {
     output_destroy_listener: wl.Listener(*wlr.Output),
     output_commit_listener: wl.Listener(*wlr.Output.event.Commit),
 
-    data: ?*c_void,
+    data: usize,
 };

@@ -14,7 +14,7 @@ pub const LayerShellV1 = extern struct {
         destroy: wl.Signal(*LayerShellV1),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_layer_shell_v1_create(server: *wl.Server) ?*LayerShellV1;
     pub const create = wlr_layer_shell_v1_create;
@@ -78,7 +78,7 @@ pub const LayerSurfaceV1 = extern struct {
         new_popup: wl.Signal(*wlr.XdgPopup),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_layer_surface_v1_configure(surface: *LayerSurfaceV1, width: u32, height: u32) void;
     pub const configure = wlr_layer_surface_v1_configure;

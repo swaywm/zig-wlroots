@@ -14,7 +14,7 @@ pub const PrimarySelectionDeviceManagerV1 = extern struct {
         destroy: wl.Signal(*PrimarySelectionDeviceManagerV1),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_primary_selection_v1_device_manager_create(server: *wl.Server) ?*PrimarySelectionDeviceManagerV1;
     pub const create = wlr_primary_selection_v1_device_manager_create;
@@ -35,5 +35,5 @@ pub const PrimarySelectionDeviceV1 = extern struct {
     seat_focus_change: wl.Listener(*wlr.Seat.event.KeyboardFocusChange),
     seat_set_primary_selection: wl.Listener(*wlr.Seat.event.RequestSetPrimarySelection),
 
-    data: ?*c_void,
+    data: usize,
 };

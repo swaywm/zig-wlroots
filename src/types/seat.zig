@@ -100,7 +100,7 @@ pub const Seat = extern struct {
 
         interface: *const Interface,
         seat: *Seat,
-        data: ?*c_void,
+        data: usize,
     };
 
     pub const KeyboardGrab = extern struct {
@@ -120,7 +120,7 @@ pub const Seat = extern struct {
 
         interface: *const Interface,
         seat: *Seat,
-        data: ?*c_void,
+        data: usize,
     };
 
     pub const TouchGrab = extern struct {
@@ -134,7 +134,7 @@ pub const Seat = extern struct {
 
         interface: *const Interface,
         seat: *Seat,
-        data: ?*c_void,
+        data: usize,
     };
 
     pub const PointerState = extern struct {
@@ -291,7 +291,7 @@ pub const Seat = extern struct {
         destroy: wl.Signal(*wlr.Seat),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_seat_create(server: *wl.Server, name: [*:0]const u8) ?*Seat;
     pub const create = wlr_seat_create;

@@ -16,7 +16,7 @@ const Idle = extern struct {
         destroy: wl.Signal(*Idle),
     },
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_idle_create(server: *wl.Server) ?*Idle;
     pub const create = wlr_idle_create;
@@ -47,7 +47,7 @@ const IdleTimeout = extern struct {
     input_listener: wl.Listener(*wlr.Seat),
     seat_destroy: wl.Listener(*wlr.Seat),
 
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_idle_timeout_create(idle: *Idle, seat: *wlr.Seat, timeout: u32) ?*IdleTimeout;
     pub const create = wlr_idle_timeout_create;

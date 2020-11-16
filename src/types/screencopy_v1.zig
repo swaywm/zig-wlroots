@@ -10,7 +10,7 @@ pub const ScreencopyManagerV1 = extern struct {
     events: extern struct {
         destroy: wl.Signal(*ScreencopyManagerV1),
     },
-    data: ?*c_void,
+    data: usize,
 
     extern fn wlr_screencopy_manager_v1_create(server: *wl.Server) ?*ScreencopyManagerV1;
     pub const create = wlr_screencopy_manager_v1_create;
@@ -48,5 +48,5 @@ pub const ScreencopyFrameV1 = extern struct {
     output_destroy: wl.Listener(*wlr.Output),
     output_enable: wl.Listener(*wlr.Output),
 
-    data: ?*c_void,
+    data: usize,
 };
