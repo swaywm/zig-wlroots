@@ -286,7 +286,7 @@ pub const Seat = extern struct {
         set_primary_selection: wl.Signal(*wlr.Seat),
 
         request_start_drag: wl.Signal(*event.RequestStartDrag),
-        start_drag: wl.Signal(wlr.Drag),
+        start_drag: wl.Signal(*wlr.Drag),
 
         destroy: wl.Signal(*wlr.Seat),
     },
@@ -455,6 +455,12 @@ pub const Seat = extern struct {
 
     extern fn wlr_seat_set_selection(seat: *Seat, source: ?*wlr.DataSource, serial: u32) void;
     pub const setSelection = wlr_seat_set_selection;
+
+    extern fn wlr_seat_request_set_primary_selection(seat: *Seat, client: ?*Seat.Client, source: ?*wlr.PrimarySelectionSource, serial: u32) void;
+    pub const requestSetPrimarySelection = wlr_seat_request_set_primary_selection;
+
+    extern fn wlr_seat_set_primary_selection(seat: *Seat, source: ?*wlr.PrimarySelectionSource, serial: u32) void;
+    pub const setPrimarySelection = wlr_seat_set_primary_selection;
 
     extern fn wlr_seat_request_start_drag(seat: *Seat, drag: *wlr.Drag, origin: *wlr.Surface, serial: u32) void;
     pub const requestStartDrag = wlr_seat_request_start_drag;
