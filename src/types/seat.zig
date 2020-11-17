@@ -108,13 +108,13 @@ pub const Seat = extern struct {
             enter: fn (
                 grab: *KeyboardGrab,
                 surface: *wlr.Surface,
-                keycodes: [*]u32,
+                keycodes: ?[*]u32,
                 num_keycodes: usize,
-                modifiers: *wlr.Keyboard.Modifiers,
+                modifiers: ?*wlr.Keyboard.Modifiers,
             ) callconv(.C) void,
             clear_focus: fn (grab: *KeyboardGrab) callconv(.C) void,
             key: fn (grab: *KeyboardGrab, time_msec: u32, key: u32, state: u32) callconv(.C) void,
-            modifiers: fn (grab: *KeyboardGrab, modifiers: *wlr.Keyboard.Modifiers) callconv(.C) void,
+            modifiers: fn (grab: *KeyboardGrab, modifiers: ?*wlr.Keyboard.Modifiers) callconv(.C) void,
             cancel: ?fn (grab: *KeyboardGrab) callconv(.C) void,
         };
 
@@ -370,10 +370,10 @@ pub const Seat = extern struct {
     extern fn wlr_seat_keyboard_send_key(seat: *Seat, time_msec: u32, key: u32, state: u32) void;
     pub const keyboardSendKey = wlr_seat_keyboard_send_key;
 
-    extern fn wlr_seat_keyboard_send_modifiers(seat: *Seat, modifiers: *wlr.Keyboard.Modifiers) void;
+    extern fn wlr_seat_keyboard_send_modifiers(seat: *Seat, modifiers: ?*wlr.Keyboard.Modifiers) void;
     pub const keyboardSendModifiers = wlr_seat_keyboard_send_modifiers;
 
-    extern fn wlr_seat_keyboard_enter(seat: *Seat, surface: ?*wlr.Surface, keycodes: [*]u32, num_keycodes: usize, modifiers: *wlr.Keyboard.Modifiers) void;
+    extern fn wlr_seat_keyboard_enter(seat: *Seat, surface: ?*wlr.Surface, keycodes: ?[*]u32, num_keycodes: usize, modifiers: ?*wlr.Keyboard.Modifiers) void;
     pub const keyboardEnter = wlr_seat_keyboard_enter;
 
     extern fn wlr_seat_keyboard_clear_focus(seat: *Seat) void;
@@ -384,10 +384,10 @@ pub const Seat = extern struct {
         wlr_seat_keyboard_notify_key(seat, time_msec, key, @intCast(u32, @enumToInt(state)));
     }
 
-    extern fn wlr_seat_keyboard_notify_modifiers(seat: *Seat, modifiers: *wlr.Keyboard.Modifiers) void;
+    extern fn wlr_seat_keyboard_notify_modifiers(seat: *Seat, modifiers: ?*wlr.Keyboard.Modifiers) void;
     pub const keyboardNotifyModifiers = wlr_seat_keyboard_notify_modifiers;
 
-    extern fn wlr_seat_keyboard_notify_enter(seat: *Seat, surface: *wlr.Surface, keycodes: [*]u32, num_keycodes: usize, modifiers: *wlr.Keyboard.Modifiers) void;
+    extern fn wlr_seat_keyboard_notify_enter(seat: *Seat, surface: *wlr.Surface, keycodes: ?[*]u32, num_keycodes: usize, modifiers: ?*wlr.Keyboard.Modifiers) void;
     pub const keyboardNotifyEnter = wlr_seat_keyboard_notify_enter;
 
     extern fn wlr_seat_keyboard_notify_clear_focus(seat: *Seat) void;
