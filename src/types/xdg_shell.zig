@@ -115,7 +115,7 @@ pub const XdgToplevel = extern struct {
         fullscreen: bool,
         resizing: bool,
         activated: bool,
-        tiled: u32,
+        tiled: wlr.Edges,
         width: u32,
         height: u32,
         max_width: u32,
@@ -144,7 +144,7 @@ pub const XdgToplevel = extern struct {
             surface: *wlr.XdgSurface,
             seat: *wlr.Seat.Client,
             serial: u32,
-            edges: u32,
+            edges: wlr.Edges,
         };
 
         pub const ShowWindowMenu = extern struct {
@@ -205,8 +205,8 @@ pub const XdgToplevel = extern struct {
     }
 
     extern fn wlr_xdg_toplevel_set_tiled(surface: *wlr.XdgSurface, tiled_edges: u32) u32;
-    pub fn setTiled(toplevel: *wlr.XdgToplevel, tiled_edges: u32) u32 {
-        return wlr_xdg_toplevel_set_tiled(toplevel.base, tiled_edges);
+    pub fn setTiled(toplevel: *wlr.XdgToplevel, tiled_edges: wlr.Edges) u32 {
+        return wlr_xdg_toplevel_set_tiled(toplevel.base, @bitCast(u32, tiled_edges));
     }
 
     extern fn wlr_xdg_toplevel_send_close(surface: *wlr.XdgSurface) void;

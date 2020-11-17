@@ -510,17 +510,16 @@ const View = struct {
     ) void {
         const view = @fieldParentPtr(View, "request_resize", listener);
         const server = view.server;
-        const edges = @bitCast(wlr.Edges, @intCast(u4, event.edges));
 
         server.grabbed_view = view;
         server.cursor_mode = .resize;
-        server.resize_edges = edges;
+        server.resize_edges = event.edges;
 
         var box: wlr.Box = undefined;
         view.xdg_surface.getGeometry(&box);
 
-        const border_x = view.x + box.x + if (edges.right) box.width else 0;
-        const border_y = view.y + box.y + if (edges.bottom) box.height else 0;
+        const border_x = view.x + box.x + if (event.edges.right) box.width else 0;
+        const border_y = view.y + box.y + if (event.edges.bottom) box.height else 0;
         server.grab_x = server.cursor.x - @intToFloat(f64, border_x);
         server.grab_y = server.cursor.y - @intToFloat(f64, border_y);
 
