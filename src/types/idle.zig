@@ -3,7 +3,7 @@ const wlr = @import("wlroots");
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
-const Idle = extern struct {
+pub const Idle = extern struct {
     global: *wl.Global,
     /// IdleTimeout.link
     idle_timers: wl.List,
@@ -28,7 +28,7 @@ const Idle = extern struct {
     pub const setEnabled = wlr_idle_set_enabled;
 };
 
-const IdleTimeout = extern struct {
+pub const IdleTimeout = extern struct {
     resource: *wl.Resource,
     link: wl.List,
     seat: *wlr.Seat,
