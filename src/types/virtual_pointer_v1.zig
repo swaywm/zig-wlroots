@@ -36,7 +36,7 @@ pub const VirtualPointerV1 = extern struct {
     axis_valid: [2]bool,
 
     /// VirtualPointerManagerV1.virtual_pointers
-    link: struct_wl_list,
+    link: wl.List,
 
     events: extern struct {
         destroy: wl.Signal(*VirtualPointerV1),

@@ -4,7 +4,7 @@ const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
 pub const ScreencopyManagerV1 = extern struct {
-    global: ?*struct_wl_global,
+    global: *wl.Global,
     frames: wl.List,
     server_destroy: wl.Listener(*wl.Server),
     events: extern struct {

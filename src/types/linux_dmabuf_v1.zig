@@ -32,5 +32,8 @@ pub const LinuxDmabufV1 = extern struct {
     renderer_destroy: wl.Listener(*wlr.Renderer),
 
     extern fn wlr_linux_dmabuf_v1_create(server: *wl.Server, renderer: *wlr.Renderer) ?*LinuxDmabufV1;
-    extern fn wlr_linux_dmabuf_v1_from_resource(resource: [*c]struct_wl_resource) *LinuxDmabufV1;
+    pub const create = wlr_linux_dmabuf_v1_create;
+
+    extern fn wlr_linux_dmabuf_v1_from_resource(resource: *wl.Resource) *LinuxDmabufV1;
+    pub const fromResource = wlr_linux_dmabuf_v1_from_resource;
 };

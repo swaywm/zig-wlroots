@@ -24,7 +24,7 @@ pub const XdgOutputManagerV1 = extern struct {
 };
 
 pub const XdgOutputV1 = extern struct {
-    manager: [*c]struct_wlr_xdg_output_manager_v1,
+    manager: *XdgOutputManagerV1,
     /// wl.Resource.getLink()
     resources: wl.List,
     /// XdgOutputManagerV1.outputs

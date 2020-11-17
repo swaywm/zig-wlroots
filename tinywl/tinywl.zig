@@ -232,9 +232,10 @@ const Server = struct {
             else => {},
         }
 
-        var caps = wl.Seat.Capability{ .pointer = true };
-        if (server.keyboards.len > 0) caps.keyboard = true;
-        server.seat.setCapabilities(caps);
+        server.seat.setCapabilities(.{
+            .pointer = true,
+            .keyboard = server.keyboards.len > 0,
+        });
     }
 
     fn requestSetCursor(
