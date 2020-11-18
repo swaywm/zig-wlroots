@@ -5,8 +5,7 @@ const wl = wayland.server.wl;
 
 pub const VirtualKeyboardManagerV1 = extern struct {
     global: *wl.Global,
-    /// VirtualKeyboardV1.link
-    virtual_keyboards: wl.List,
+    virtual_keyboards: wl.list.Head(VirtualKeyboardV1, "link"),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -25,7 +24,7 @@ pub const VirtualKeyboardV1 = extern struct {
     has_keymap: bool,
 
     /// VirtualKeyboardManagerV1.virtual_keyboards
-    link: wl.List,
+    link: wl.list.Link,
 
     events: extern struct {
         destroy: wl.Signal(*VirtualKeyboardV1),

@@ -5,8 +5,7 @@ const wl = wayland.server.wl;
 
 pub const XdgDecorationManagerV1 = extern struct {
     global: *wl.Global,
-    /// XdgToplevelDecorationV1.link
-    decorations: wl.List,
+    decorations: wl.list.Head(XdgToplevelDecorationV1, "link"),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -30,7 +29,7 @@ pub const XdgToplevelDecorationV1 = extern struct {
 
     pub const Configure = extern struct {
         /// XdgToplevelDecorationV1.configure_list
-        link: wl.List,
+        link: wl.list.Link,
         surface_configure: *wlr.XdgSurface.Configure,
         mode: Mode,
     };
@@ -39,15 +38,14 @@ pub const XdgToplevelDecorationV1 = extern struct {
     surface: *wlr.XdgSurface,
     manager: *XdgDecorationManagerV1,
     /// XdgDecorationManagerV1.decorations
-    link: wl.List,
+    link: wl.list.Link,
 
     added: bool,
     current_mode: Mode,
     client_pending_mode: Mode,
     server_pending_mode: Mode,
 
-    /// Configure.link
-    configure_list: wl.List,
+    configure_list: wl.list.Head(XdgToplevelDecorationV1.Configure, "link"),
 
     events: extern struct {
         destroy: wl.Signal(*XdgToplevelDecorationV1),

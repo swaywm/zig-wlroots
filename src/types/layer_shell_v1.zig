@@ -40,7 +40,7 @@ pub const LayerSurfaceV1 = extern struct {
 
     pub const Configure = extern struct {
         /// LayerSurfaceV1.configure_list
-        link: wl.List,
+        link: wl.list.Link,
         serial: u32,
         state: State,
     };
@@ -50,7 +50,7 @@ pub const LayerSurfaceV1 = extern struct {
     resource: *wl.Resource,
     shell: *LayerShellV1,
     /// wlr.XdgPopup.link
-    popups: wl.List,
+    popups: wl.list.Head(wlr.XdgPopup, "link"),
 
     namespace: [*:0]u8,
 
@@ -61,7 +61,7 @@ pub const LayerSurfaceV1 = extern struct {
 
     configure_serial: u32,
     configure_next_serial: u32,
-    configure_list: wl.List,
+    configure_list: wl.list.Head(LayerSurfaceV1.Configure, "link"),
 
     acked_configure: ?*Configure,
 

@@ -6,7 +6,7 @@ const wl = wayland.server.wl;
 pub const PrimarySelectionDeviceManagerV1 = extern struct {
     global: *wl.Global,
     /// PrimarySelectionV1Device.link
-    devices: wl.List,
+    devices: wl.list.Head(PrimarySelectionDeviceV1, "link"),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -24,12 +24,10 @@ pub const PrimarySelectionDeviceV1 = extern struct {
     manager: *PrimarySelectionDeviceManagerV1,
     seat: *wlr.Seat,
     /// PrimarySelectionDeviceManagerV1.devices
-    link: wl.List,
-    /// wl.Resource.getLink()
-    resources: wl.List,
+    link: wl.list.Link,
+    resources: wl.list.Head(wl.Resource, null),
 
-    /// wl.Resource.getLink()
-    offers: wl.List,
+    offers: wl.list.Head(wl.Resource, null),
 
     seat_destroy: wl.Listener(*wlr.Seat),
     seat_focus_change: wl.Listener(*wlr.Seat.event.KeyboardFocusChange),

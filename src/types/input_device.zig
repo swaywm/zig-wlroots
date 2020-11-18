@@ -45,7 +45,7 @@ pub const InputDevice = extern struct {
 
     data: usize,
 
-    link: wl.List,
+    link: wl.list.Link,
 
     extern fn wlr_input_device_get_virtual_keyboard(wlr_dev: *InputDevice) ?*wlr.VirtualKeyboardV1;
     pub const getVirtualKeyboard = wlr_input_device_get_virtual_keyboard;

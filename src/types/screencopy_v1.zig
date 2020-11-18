@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const ScreencopyManagerV1 = extern struct {
     global: *wl.Global,
-    frames: wl.List,
+    frames: wl.list.Head(ScreencopyFrameV1, "link"),
     server_destroy: wl.Listener(*wl.Server),
     events: extern struct {
         destroy: wl.Signal(*ScreencopyManagerV1),
@@ -19,13 +19,15 @@ pub const ScreencopyManagerV1 = extern struct {
 pub const ScreencopyClientV1 = extern struct {
     ref: c_int,
     manager: *ScreencopyManagerV1,
-    damages: wl.List,
+    // A list head, but usage is internal to wlroots
+    damages: wl.list.Link,
 };
 
 pub const ScreencopyFrameV1 = extern struct {
     resource: *wl.Resource,
     client: *ScreencopyClientV1,
-    link: wl.List,
+    /// ScreencopyManagerV1.frames
+    link: wl.list.Link,
 
     format: wl.Shm.Format,
     fourcc: u32,

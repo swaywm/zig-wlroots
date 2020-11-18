@@ -10,7 +10,8 @@ pub const OutputLayout = extern struct {
         output: *wlr.Output,
         x: c_int,
         y: c_int,
-        link: wl.List,
+        /// OutputLayout.outputs
+        link: wl.list.Link,
         state: *State,
 
         events: extern struct {
@@ -25,7 +26,7 @@ pub const OutputLayout = extern struct {
         right = 8,
     };
 
-    outputs: wl.List,
+    outputs: wl.list.Head(OutputLayout.Output, "link"),
     state: *State,
 
     events: extern struct {

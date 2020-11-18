@@ -5,14 +5,14 @@ const wl = @import("wayland").server.wl;
 pub const XcursorManagerTheme = extern struct {
     scale: f32,
     theme: *wlr.XcursorTheme,
-    link: wl.List,
+    /// XcursorManager.scaled_themes
+    link: wl.list.Link,
 };
 
 pub const XcursorManager = extern struct {
     name: ?[*:0]u8,
     size: u32,
-    /// XcursorManagerTheme.link
-    scaled_themes: wl.List,
+    scaled_themes: wl.list.Head(XcursorManagerTheme, "link"),
 
     extern fn wlr_xcursor_manager_create(name: ?[*:0]const u8, size: u32) ?*XcursorManager;
     pub const create = wlr_xcursor_manager_create;

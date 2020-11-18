@@ -6,10 +6,8 @@ const xdg = wayland.server.xdg;
 
 pub const XdgShell = extern struct {
     global: *wl.Global,
-    /// XdgClient.link
-    clients: wl.List,
-    /// XdgPopup.Grab.link
-    popup_grabs: wl.List,
+    clients: wl.list.Head(XdgClient, "link"),
+    popup_grabs: wl.list.Head(XdgPopupGrab, "link"),
     ping_timeout: u32,
 
     server_destroy: wl.Listener(*wl.Server),
@@ -29,10 +27,9 @@ pub const XdgClient = extern struct {
     shell: *wlr.XdgShell,
     resource: *xdg.WmBase,
     client: *wl.Client,
-    /// XdgSurface.link
-    surfaces: wl.List,
+    surfaces: wl.list.Head(XdgSurface, "link"),
     /// XdgShell.clients
-    link: wl.List,
+    link: wl.list.Link,
 
     ping_serial: u32,
     ping_timer: *wl.EventSource,
@@ -64,25 +61,24 @@ pub const XdgPositioner = extern struct {
     pub const invertY = wlr_positioner_invert_y;
 };
 
+pub const XdgPopupGrab = extern struct {
+    client: *wl.Client,
+
+    pointer_grab: wlr.Seat.PointerGrab,
+    keyboard_grab: wlr.Seat.KeyboardGrab,
+    touch_grab: wlr.Seat.TouchGrab,
+    seat: *wlr.Seat,
+
+    popups: wl.list.Head(XdgPopup, "grab_link"),
+    /// XdgShell.popup_grabs
+    link: wl.list.Link,
+
+    seat_destroy: wl.Listener(*wlr.Seat),
+};
+
 pub const XdgPopup = extern struct {
-    pub const Grab = extern struct {
-        client: *wl.Client,
-
-        pointer_grab: wlr.Seat.PointerGrab,
-        keyboard_grab: wlr.Seat.KeyboardGrab,
-        touch_grab: wlr.Seat.TouchGrab,
-        seat: *wlr.Seat,
-
-        /// XdgPopup.grab_link
-        popups: wl.List,
-        /// XdgShell.popup_grabs
-        link: wl.List,
-
-        seat_destroy: wl.Listener(*wlr.Seat),
-    };
-
     base: *wlr.XdgSurface,
-    link: wl.List,
+    link: wl.list.Link,
 
     resource: *xdg.Popup,
     committed: bool,
@@ -92,7 +88,7 @@ pub const XdgPopup = extern struct {
     geometry: wlr.Box,
     positioner: wlr.XdgPositioner,
     /// Grab.popups
-    grab_link: wl.List,
+    grab_link: wl.list.Link,
 
     extern fn wlr_xdg_popup_destroy(surface: *wlr.Surface) void;
     pub inline fn destroy(popup: *wlr.XdgPopup) void {
@@ -225,7 +221,7 @@ pub const XdgSurface = extern struct {
     pub const Configure = extern struct {
         surface: *wlr.XdgSurface,
         /// XdgSurface.configure_list
-        link: wl.List,
+        link: wl.list.Link,
         serial: u32,
         toplevel_state: *wlr.XdgToplevel.State,
     };
@@ -234,7 +230,7 @@ pub const XdgSurface = extern struct {
     resource: *xdg.Surface,
     surface: *wlr.Surface,
     /// XdgClient.surfaces
-    link: wl.List,
+    link: wl.list.Link,
 
     role: Role,
     role_data: extern union {
@@ -242,8 +238,7 @@ pub const XdgSurface = extern struct {
         popup: *wlr.XdgPopup,
     },
 
-    /// wlr.XdgPopup.link
-    popups: wl.List,
+    popups: wl.list.Head(XdgPopup, "link"),
 
     added: bool,
     configured: bool,
@@ -251,7 +246,7 @@ pub const XdgSurface = extern struct {
     configure_serial: u32,
     configure_idle: ?*wl.EventSource,
     configure_next_serial: u32,
-    configure_list: wl.List,
+    configure_list: wl.list.Head(XdgSurface.Configure, "link"),
 
     has_next_geometry: bool,
     next_geometry: wlr.Box,

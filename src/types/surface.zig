@@ -33,7 +33,7 @@ pub const Surface = extern struct {
         input: pixman.Region32,
         transform: wl.Output.Transform,
         scale: i32,
-        frame_callback_list: wl.List,
+        frame_callback_list: wl.list.Head(wl.Resource, null),
 
         width: c_int,
         height: c_int,
@@ -82,16 +82,20 @@ pub const Surface = extern struct {
         destroy: wl.Signal(*wlr.Surface),
     },
 
-    /// Subsurface.parent_link
-    subsurfaces: wl.List,
-    /// Subsurface.parent_pending_link
-    subsurface_pending_list: wl.List,
+    subsurfaces: wl.list.Head(Subsurface, "parent_link"),
+    subsurface_pending_list: wl.list.Head(Subsurface, "parent_pending_link"),
 
     renderer_destroy: wl.Listener(*wlr.Renderer),
 
     data: usize,
 
-    extern fn wlr_surface_create(client: *wl.Client, version: u32, id: u32, renderer: *wlr.Renderer, resource_list: ?*wl.List) ?*Surface;
+    extern fn wlr_surface_create(
+        client: *wl.Client,
+        version: u32,
+        id: u32,
+        renderer: *wlr.Renderer,
+        resource_list: ?*wl.list.Head(wl.Resource, null),
+    ) ?*Surface;
     pub const create = wlr_surface_create;
 
     extern fn wlr_surface_set_role(surface: *Surface, role: *const Role, role_data: ?*c_void, error_resource: ?*wl.Resource, error_code: u32) bool;
@@ -183,9 +187,9 @@ pub const Subsurface = extern struct {
     mapped: bool,
 
     /// Surface.subsurfaces
-    parent_link: wl.List,
+    parent_link: wl.list.Link,
     /// Surface.subsurface_pending_list
-    parent_pending_link: wl.List,
+    parent_pending_link: wl.list.Link,
 
     surface_destroy: wl.Listener(*Surface),
     parent_destroy: wl.Listener(*Surface),
@@ -198,6 +202,6 @@ pub const Subsurface = extern struct {
 
     data: usize,
 
-    extern fn wlr_subsurface_create(surface: *Surface, parent: *Surface, version: u32, id: u32, resource_list: ?*wl.List) ?*Subsurface;
+    extern fn wlr_subsurface_create(surface: *Surface, parent: *Surface, version: u32, id: u32, resource_list: ?*wl.list.Head(wl.Resource, null)) ?*Subsurface;
     pub const create = wlr_subsurface_create;
 };

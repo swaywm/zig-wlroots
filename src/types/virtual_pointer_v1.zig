@@ -13,8 +13,7 @@ pub const VirtualPointerManagerV1 = extern struct {
     };
 
     global: *wl.Global,
-    /// VirtualPointerV1.link
-    virtual_pointers: wl.List,
+    virtual_pointers: wl.list.Head(VirtualPointerV1, "link"),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -36,7 +35,7 @@ pub const VirtualPointerV1 = extern struct {
     axis_valid: [2]bool,
 
     /// VirtualPointerManagerV1.virtual_pointers
-    link: wl.List,
+    link: wl.list.Link,
 
     events: extern struct {
         destroy: wl.Signal(*VirtualPointerV1),

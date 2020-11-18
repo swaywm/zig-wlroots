@@ -5,8 +5,7 @@ const wl = wayland.server.wl;
 
 pub const GammaControlManagerV1 = extern struct {
     global: *wl.Global,
-    /// GamaControlV1.link
-    controls: wl.List,
+    controls: wl.list.Head(GamaControlV1, "link"),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -24,7 +23,7 @@ pub const GamaControlV1 = extern struct {
     resource: *wl.Resource,
     output: *wlr.Output,
     /// GammaControlManagerV1.controls
-    link: wl.List,
+    link: wl.list.Link,
 
     table: *u16,
     ramp_size: usize,

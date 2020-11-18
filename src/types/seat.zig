@@ -35,7 +35,7 @@ pub const TouchPoint = extern struct {
     },
 
     /// Seat.TouchState.touch_points
-    link: wl.List,
+    link: wl.list.Link,
 };
 
 pub const Seat = extern struct {
@@ -43,13 +43,13 @@ pub const Seat = extern struct {
         client: *wl.Client,
         seat: *Seat,
         /// Seat.clients
-        link: wl.List,
+        link: wl.list.Link,
 
-        resources: wl.List,
-        pointers: wl.List,
-        keyboards: wl.List,
-        touches: wl.List,
-        data_devices: wl.List,
+        resources: wl.list.Head(wl.Resource, null),
+        pointers: wl.list.Head(wl.Resource, null),
+        keyboards: wl.list.Head(wl.Resource, null),
+        touches: wl.list.Head(wl.Resource, null),
+        data_devices: wl.list.Head(wl.Resource, null),
 
         events: extern struct {
             destroy: wl.Signal(*Seat.Client),
@@ -183,8 +183,7 @@ pub const Seat = extern struct {
 
     pub const TouchState = extern struct {
         seat: *Seat,
-        /// TouchPoint.link
-        touch_points: wl.List,
+        touch_points: wl.list.Head(TouchPoint, "link"),
 
         grab_serial: u32,
         grab_id: u32,
@@ -235,8 +234,7 @@ pub const Seat = extern struct {
 
     global: *wl.Global,
     server: *wl.Server,
-    /// Seat.Client.link
-    clients: wl.List,
+    clients: wl.list.Head(Seat.Client, "link"),
 
     name: [*:0]u8,
 
@@ -247,7 +245,7 @@ pub const Seat = extern struct {
     selection_source: ?*wlr.DataSource,
     selection_serial: u32,
     /// wlr.DataOffer.link
-    selection_offers: wl.List,
+    selection_offers: wl.list.Head(wlr.DataOffer, "link"),
 
     primary_selection_source: ?*wlr.PrimarySelectionSource,
     primary_selection_serial: u32,
@@ -256,7 +254,7 @@ pub const Seat = extern struct {
     drag_source: ?*wlr.DataSource,
     drag_serial: u32,
     /// wlr.DataOffer.link
-    drag_offers: wl.List,
+    drag_offers: wl.list.Head(wlr.DataOffer, "link"),
 
     pointer_state: PointerState,
     keyboard_state: KeyboardState,

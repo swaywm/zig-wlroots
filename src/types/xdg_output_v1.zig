@@ -7,8 +7,7 @@ pub const XdgOutputManagerV1 = extern struct {
     global: *wl.Global,
     layout: *wlr.OutputLayout,
 
-    /// XdgOutputV1.link
-    outputs: wl.List,
+    outputs: wl.list.Head(XdgOutputV1, "link"),
 
     events: extern struct {
         destroy: wl.Signal(*XdgOutputManagerV1),
@@ -25,10 +24,9 @@ pub const XdgOutputManagerV1 = extern struct {
 
 pub const XdgOutputV1 = extern struct {
     manager: *XdgOutputManagerV1,
-    /// wl.Resource.getLink()
-    resources: wl.List,
+    resources: wl.list.Head(wl.Resource, null),
     /// XdgOutputManagerV1.outputs
-    link: wl.List,
+    link: wl.list.Link,
 
     layout_output: *wlr.OutputLayout.Output,
 

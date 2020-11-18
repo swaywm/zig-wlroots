@@ -13,7 +13,8 @@ pub const Output = extern struct {
         height: i32,
         refresh: i32,
         preferred: bool,
-        link: wl.List,
+        /// Output.modes
+        link: wl.list.Link,
     };
 
     pub const AdaptiveSyncStatus = extern enum {
@@ -80,7 +81,8 @@ pub const Output = extern struct {
         height: u32,
         hotspot_x: i32,
         hotspot_y: i32,
-        link: wl.List,
+        /// Output.cursors
+        link: wl.list.Link,
 
         /// only when using a software cursor without a surface
         texture: ?*wlr.Texture,
@@ -153,7 +155,7 @@ pub const Output = extern struct {
     server: *wl.Server,
 
     global: *wl.Global,
-    resources: wl.List,
+    resources: wl.list.Head(wl.Resource, null),
 
     name: [24]u8,
     description: ?[*:0]u8,
@@ -163,8 +165,8 @@ pub const Output = extern struct {
     phys_width: i32,
     phys_height: i32,
 
-    modes: wl.List,
-    current_mode: *Mode,
+    modes: wl.list.Head(Output.Mode, "link"),
+    current_mode: *Output.Mode,
     width: i32,
     height: i32,
     refresh: i32,
@@ -203,9 +205,9 @@ pub const Output = extern struct {
 
     attach_render_locks: c_int,
 
-    cursors: wl.List,
+    cursors: wl.list.Head(Output.Cursor, "link"),
 
-    hardware_cursor: *Cursor,
+    hardware_cursor: *Output.Cursor,
     software_cursor_locks: c_int,
 
     server_destroy: wl.Listener(*wl.Server),

@@ -25,6 +25,7 @@ pub const XdgClient = @import("types/xdg_shell.zig").XdgClient;
 pub const XdgSurface = @import("types/xdg_shell.zig").XdgSurface;
 pub const XdgToplevel = @import("types/xdg_shell.zig").XdgToplevel;
 pub const XdgPositioner = @import("types/xdg_shell.zig").XdgPositioner;
+pub const XdgPopupGrab = @import("types/xdg_shell.zig").XdgPopupGrab;
 pub const XdgPopup = @import("types/xdg_shell.zig").XdgPopup;
 
 pub const XdgDecorationManagerV1 = @import("types/xdg_decoration_v1.zig").XdgDecorationManagerV1;

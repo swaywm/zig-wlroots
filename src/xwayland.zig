@@ -170,8 +170,8 @@ pub const XwaylandSurface = extern struct {
     xwm: *Xwm,
     surface_id: u32,
 
-    link: wl.List,
-    unpaired_link: wl.List,
+    link: wl.list.Link,
+    unpaired_link: wl.list.Link,
 
     surface: ?*wlr.Surface,
     x: i16,
@@ -190,11 +190,10 @@ pub const XwaylandSurface = extern struct {
     pid: os.pid_t,
     has_utf8_title: bool,
 
-    /// XwaylandSurface.parent_link
-    children: wl.List,
+    children: wl.list.Head(XwaylandSurface, "parent_link"),
     parent: ?*XwaylandSurface,
     /// XwaylandSurface.children
-    parent_link: wl.List,
+    parent_link: wl.list.Link,
 
     window_type: ?[*]xcb.Atom,
     window_type_len: usize,

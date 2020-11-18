@@ -5,8 +5,7 @@ const wl = wayland.server.wl;
 
 pub const DataControlManagerV1 = extern struct {
     global: *wl.Global,
-    /// DataControlDeviceV1.link
-    devices: wl.List,
+    devices: wl.list.Head(DataControlDeviceV1, "link"),
 
     events: extern struct {
         destroy: wl.Signal(*DataControlManagerV1),
@@ -23,7 +22,7 @@ pub const DataControlDeviceV1 = extern struct {
     resource: *wl.Resource,
     manager: *DataControlManagerV1,
     /// DataControlManagerV1.devices
-    link: wl.List,
+    link: wl.list.Link,
 
     seat: *wlr.Seat,
     selection_offer_resource: ?*wl.Resource,

@@ -13,8 +13,7 @@ pub const OutputPowerManagerV1 = extern struct {
     };
 
     global: *wl.Global,
-    /// OutputPowerV1.link
-    output_powers: wl.List,
+    output_powers: wl.list.Head(OutputPowerV1, "link"),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -34,7 +33,7 @@ pub const OutputPowerV1 = extern struct {
     output: *wlr.Output,
     manager: *OutputPowerManagerV1,
     /// OutputPowerManagerV1.output_powers
-    link: wl.List,
+    link: wl.list.Link,
 
     output_destroy_listener: wl.Listener(*wlr.Output),
     output_commit_listener: wl.Listener(*wlr.Output.event.Commit),

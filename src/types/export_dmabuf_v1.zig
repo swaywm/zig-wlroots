@@ -5,8 +5,7 @@ const wl = wayland.server.wl;
 
 pub const ExportDmabufManagerV1 = extern struct {
     global: *wl.Global,
-    /// ExportDmabufFrameV1.link
-    frames: wl.List,
+    frames: wl.list.Head(ExportDmabufFrameV1, "link"),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -22,7 +21,7 @@ pub const ExportDmabufFrameV1 = extern struct {
     resource: *wl.Resource,
     manager: *ExportDmabufManagerV1,
     /// ExportDmabufManagerV1.frames
-    link: wl.List,
+    link: wl.list.Link,
 
     output: ?*wlr.Output,
 

@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const DataDeviceManager = extern struct {
     global: *wl.Global,
-    data_sources: wl.List,
+    data_sources: wl.list.Head(wl.Resource, null),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -29,7 +29,7 @@ pub const DataOffer = extern struct {
     source: ?*DataSource,
     type: Type,
     /// wlr.Seat.selection_offers, wlr.Seat.drag_offers
-    link: wl.List,
+    link: wl.list.Link,
 
     actions: u32,
     preferred_action: wl.DataDeviceManager.DndAction,

@@ -6,8 +6,9 @@ pub const KeyboardGroup = extern struct {
     keyboard: wlr.Keyboard,
     input_device: *wlr.InputDevice,
 
-    devices: wl.List,
-    keys: wl.List,
+    // these are technically list heads, but their usage is internal to wlroots
+    devices: wl.list.Link,
+    keys: wl.list.Link,
 
     events: extern struct {
         /// wl.Array of u32 keycodes
