@@ -16,7 +16,9 @@ pub const DataDeviceManager = extern struct {
     data: usize,
 
     extern fn wlr_data_device_manager_create(server: *wl.Server) ?*DataDeviceManager;
-    pub const create = wlr_data_device_manager_create;
+    pub fn create(server: *wl.Server) !*DataDeviceManager {
+        return wlr_data_device_manager_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const DataOffer = extern struct {

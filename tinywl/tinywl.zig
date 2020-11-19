@@ -27,7 +27,7 @@ pub fn main() anyerror!void {
         try child.spawn();
     }
 
-    if (!server.backend.start()) return error.BackendStartFailed;
+    try server.backend.start();
 
     std.log.info("Runnnig compositor on WAYLAND_DISPLAY={}", .{socket});
     server.wl_server.run();
@@ -69,22 +69,22 @@ const Server = struct {
 
     fn init(server: *Server) !void {
         const wl_server = try wl.Server.create();
-        const backend = wlr.Backend.autocreate(wl_server, null) orelse return error.BackendCreateFailed;
+        const backend = try wlr.Backend.autocreate(wl_server, null);
         server.* = .{
             .wl_server = wl_server,
             .backend = backend,
             .renderer = backend.getRenderer() orelse return error.GetRendererFailed,
-            .output_layout = wlr.OutputLayout.create() orelse return error.OutOfMemory,
-            .xdg_shell = wlr.XdgShell.create(wl_server) orelse return error.OutOfMemory,
-            .seat = wlr.Seat.create(wl_server, "default") orelse return error.OutOfMemory,
-            .cursor = wlr.Cursor.create() orelse return error.OutOfMemory,
-            .cursor_mgr = wlr.XcursorManager.create(null, 24) orelse return error.OutOfMemory,
+            .output_layout = try wlr.OutputLayout.create(),
+            .xdg_shell = try wlr.XdgShell.create(wl_server),
+            .seat = try wlr.Seat.create(wl_server, "default"),
+            .cursor = try wlr.Cursor.create(),
+            .cursor_mgr = try wlr.XcursorManager.create(null, 24),
         };
 
-        if (!server.renderer.initServer(wl_server)) return error.InitRendererFailed;
+        try server.renderer.initServer(wl_server);
 
-        _ = wlr.Compositor.create(server.wl_server, server.renderer) orelse return error.OutOfMemory;
-        _ = wlr.DataDeviceManager.create(server.wl_server) orelse return error.OutOfMemory;
+        _ = try wlr.Compositor.create(server.wl_server, server.renderer);
+        _ = try wlr.DataDeviceManager.create(server.wl_server);
 
         server.new_output.setNotify(newOutput);
         server.backend.events.new_output.add(&server.new_output);
@@ -100,7 +100,7 @@ const Server = struct {
         server.seat.events.request_set_selection.add(&server.request_set_selection);
 
         server.cursor.attachOutputLayout(server.output_layout);
-        if (!server.cursor_mgr.load(1)) return error.CantLoadXcursorTheme;
+        try server.cursor_mgr.load(1);
         server.cursor_motion.setNotify(cursorMotion);
         server.cursor.events.motion.add(&server.cursor_motion);
         server.cursor_motion_absolute.setNotify(cursorMotionAbsolute);
@@ -453,7 +453,7 @@ const Output = struct {
         wlr.matrix.projectBox(&matrix, &box, transform, 0, &wlr_output.transform_matrix);
 
         // wlroots will log an error for us
-        _ = rdata.renderer.renderTextureWithMatrix(texture, &matrix, 1);
+        rdata.renderer.renderTextureWithMatrix(texture, &matrix, 1) catch {};
         surface.sendFrameDone(rdata.when);
     }
 };

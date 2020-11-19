@@ -21,5 +21,7 @@ pub const Compositor = extern struct {
     },
 
     extern fn wlr_compositor_create(server: *wl.Server, renderer: *wlr.Renderer) ?*Compositor;
-    pub const create = wlr_compositor_create;
+    pub fn create(server: *wl.Server, renderer: *wlr.Renderer) !*Compositor {
+        return wlr_compositor_create(server, renderer) orelse error.OutOfMemory;
+    }
 };
