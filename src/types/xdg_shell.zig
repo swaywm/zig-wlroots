@@ -20,7 +20,9 @@ pub const XdgShell = extern struct {
     data: usize,
 
     extern fn wlr_xdg_shell_create(server: *wl.Server) ?*wlr.XdgShell;
-    pub const create = wlr_xdg_shell_create;
+    pub fn create(server: *wl.Server) !*wlr.XdgShell {
+        return wlr_xdg_shell_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const XdgClient = extern struct {

@@ -16,10 +16,16 @@ pub const Backend = extern struct {
     // backend.h
 
     extern fn wlr_backend_autocreate(server: *wl.Server, create_renderer_func: ?wlr.Renderer.CreateFn) ?*Backend;
-    pub const autocreate = wlr_backend_autocreate;
+    pub fn autocreate(server: *wl.Server, create_renderer_func: ?wlr.Renderer.CreateFn) !*Backend {
+        return wlr_backend_autocreate(server, create_renderer_func) orelse error.BackendCreateFailure;
+    }
 
     extern fn wlr_backend_start(backend: *Backend) bool;
-    pub const start = wlr_backend_start;
+    pub fn start(backend: *Backend) !void {
+        if (!wlr_backend_start(backend)) {
+            return error.BackendStartFailure;
+        }
+    }
 
     extern fn wlr_backend_destroy(backend: *Backend) void;
     pub const destroy = wlr_backend_destroy;

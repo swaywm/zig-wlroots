@@ -292,7 +292,9 @@ pub const Seat = extern struct {
     data: usize,
 
     extern fn wlr_seat_create(server: *wl.Server, name: [*:0]const u8) ?*Seat;
-    pub const create = wlr_seat_create;
+    pub fn create(server: *wl.Server, name: [*:0]const u8) !*Seat {
+        return wlr_seat_create(server, name) orelse error.OutOfMemory;
+    }
 
     extern fn wlr_seat_destroy(seat: *Seat) void;
     pub const destroy = wlr_seat_destroy;

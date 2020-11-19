@@ -37,7 +37,9 @@ pub const Cursor = extern struct {
     data: usize,
 
     extern fn wlr_cursor_create() ?*Cursor;
-    pub const create = wlr_cursor_create;
+    pub fn create() !*Cursor {
+        return wlr_cursor_create() orelse error.OutOfMemory;
+    }
 
     extern fn wlr_cursor_destroy(cur: *Cursor) void;
     pub const destroy = wlr_cursor_destroy;

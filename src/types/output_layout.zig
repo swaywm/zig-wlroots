@@ -38,7 +38,9 @@ pub const OutputLayout = extern struct {
     data: usize,
 
     extern fn wlr_output_layout_create() ?*OutputLayout;
-    pub const create = wlr_output_layout_create;
+    pub fn create() !*OutputLayout {
+        return wlr_output_layout_create() orelse error.OutOfMemory;
+    }
 
     extern fn wlr_output_layout_destroy(layout: *OutputLayout) void;
     pub const destroy = wlr_output_layout_destroy;

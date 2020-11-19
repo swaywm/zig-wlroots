@@ -31,7 +31,11 @@ pub const Renderer = extern struct {
     pub const clear = wlr_renderer_clear;
 
     extern fn wlr_renderer_init_wl_display(r: *Renderer, server: *wl.Server) bool;
-    pub const initServer = wlr_renderer_init_wl_display;
+    pub fn initServer(r: *Renderer, server: *wl.Server) !void {
+        if (!wlr_renderer_init_wl_display(r, server)) {
+            return error.RenderInitFailure;
+        }
+    }
 
     extern fn wlr_resource_get_buffer_size(resource: *wl.Buffer, renderer: *wlr.Renderer, width: *c_int, height: *c_int) bool;
     pub inline fn getBufferSize(renderer: *wlr.Renderer, resource: *wl.Buffer, width: *c_int, height: *c_int) bool {
@@ -39,5 +43,9 @@ pub const Renderer = extern struct {
     }
 
     extern fn wlr_render_texture_with_matrix(r: *Renderer, texture: *wlr.Texture, matrix: *const [9]f32, alpha: f32) bool;
-    pub const renderTextureWithMatrix = wlr_render_texture_with_matrix;
+    pub fn renderTextureWithMatrix(r: *Renderer, texture: *wlr.Texture, matrix: *const [9]f32, alpha: f32) !void {
+        if (!wlr_render_texture_with_matrix(r, texture, matrix, alpha)) {
+            return error.RenderFailure;
+        }
+    }
 };
