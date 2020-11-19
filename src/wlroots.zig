@@ -1,5 +1,8 @@
 pub const Backend = @import("backend.zig").Backend;
 
+pub const Device = @import("backend/session.zig").Device;
+pub const Session = @import("backend/session.zig").Session;
+
 pub const DmabufAttributes = @import("render/dmabuf.zig").DmabufAttributes;
 pub const Egl = @import("render/egl.zig").Egl;
 pub const Renderer = @import("render/renderer.zig").Renderer;
