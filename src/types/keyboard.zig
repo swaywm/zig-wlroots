@@ -13,7 +13,7 @@ pub const Keyboard = extern struct {
     };
 
     pub const ModifierMask = packed struct {
-        shift: bool = false,
+        shift: bool align(@alignOf(u32)) = false,
         caps: bool = false,
         ctrl: bool = false,
         alt: bool = false,
@@ -21,6 +21,9 @@ pub const Keyboard = extern struct {
         mod3: bool = false,
         logo: bool = false,
         mod5: bool = false,
+        // can't wait till stage2 fixes all the packed struct bugs
+        _: u16 = 0,
+        __: u8 = 0,
     };
 
     pub const Modifiers = extern struct {
@@ -84,6 +87,6 @@ pub const Keyboard = extern struct {
 
     extern fn wlr_keyboard_get_modifiers(keyboard: *Keyboard) u32;
     pub fn getModifiers(keyboard: *Keyboard) ModifierMask {
-        return @bitCast(ModifierMask, @intCast(u8, wlr_keyboard_get_modifiers(keyboard)));
+        return @bitCast(ModifierMask, wlr_keyboard_get_modifiers(keyboard));
     }
 };
