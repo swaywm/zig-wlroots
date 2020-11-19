@@ -577,13 +577,9 @@ const Keyboard = struct {
         // Translate libinput keycode -> xkbcommon
         const keycode = event.keycode + 8;
 
-        var syms: ?[*]xkb.Keysym = undefined;
-        const nsyms = wlr_keyboard.xkb_state.?.keyGetSyms(keycode, &syms);
-
         var handled = false;
-        const modmask = wlr_keyboard.getModifiers();
-        if (nsyms > 0 and modmask.alt and event.state == .pressed) {
-            for (syms.?[0..@intCast(usize, nsyms)]) |sym| {
+        if (wlr_keyboard.getModifiers().alt and event.state == .pressed) {
+            for (wlr_keyboard.xkb_state.?.keyGetSyms(keycode)) |sym| {
                 if (keyboard.server.handleKeybind(sym)) {
                     handled = true;
                     break;
