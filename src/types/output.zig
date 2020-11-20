@@ -155,7 +155,7 @@ pub const Output = extern struct {
     server: *wl.Server,
 
     global: *wl.Global,
-    resources: wl.list.Head(wl.Resource, null),
+    resources: wl.list.Head(wl.Output, null),
 
     name: [24]u8,
     description: ?[*:0]u8,

@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const DataDeviceManager = extern struct {
     global: *wl.Global,
-    data_sources: wl.list.Head(wl.Resource, null),
+    data_sources: wl.list.Head(wl.DataSource, null),
 
     server_destroy: wl.Listener(*wl.Server),
 

@@ -45,11 +45,11 @@ pub const Seat = extern struct {
         /// Seat.clients
         link: wl.list.Link,
 
-        resources: wl.list.Head(wl.Resource, null),
-        pointers: wl.list.Head(wl.Resource, null),
-        keyboards: wl.list.Head(wl.Resource, null),
-        touches: wl.list.Head(wl.Resource, null),
-        data_devices: wl.list.Head(wl.Resource, null),
+        resources: wl.list.Head(wl.Seat, null),
+        pointers: wl.list.Head(wl.Pointer, null),
+        keyboards: wl.list.Head(wl.Keyboard, null),
+        touches: wl.list.Head(wl.Touch, null),
+        data_devices: wl.list.Head(wl.DataDevice, null),
 
         events: extern struct {
             destroy: wl.Signal(*Seat.Client),

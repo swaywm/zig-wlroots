@@ -33,7 +33,7 @@ pub const Surface = extern struct {
         input: pixman.Region32,
         transform: wl.Output.Transform,
         scale: i32,
-        frame_callback_list: wl.list.Head(wl.Resource, null),
+        frame_callback_list: wl.list.Head(wl.Callback, null),
 
         width: c_int,
         height: c_int,
@@ -57,7 +57,7 @@ pub const Surface = extern struct {
         precommit: ?fn (surface: *Surface) callconv(.C) void,
     };
 
-    resource: *wl.Resource,
+    resource: *wl.Surface,
     renderer: *wlr.Renderer,
 
     buffer: ?*wlr.ClientBuffer,
@@ -94,11 +94,17 @@ pub const Surface = extern struct {
         version: u32,
         id: u32,
         renderer: *wlr.Renderer,
-        resource_list: ?*wl.list.Head(wl.Resource, null),
+        resource_list: ?*wl.list.Head(wl.Surface, null),
     ) ?*Surface;
     pub const create = wlr_surface_create;
 
-    extern fn wlr_surface_set_role(surface: *Surface, role: *const Role, role_data: ?*c_void, error_resource: ?*wl.Resource, error_code: u32) bool;
+    extern fn wlr_surface_set_role(
+        surface: *Surface,
+        role: *const Role,
+        role_data: ?*c_void,
+        error_resource: ?*wl.Resource,
+        error_code: u32,
+    ) bool;
     pub const setRole = wlr_surface_set_role;
 
     extern fn wlr_surface_has_buffer(surface: *Surface) bool;
@@ -128,8 +134,8 @@ pub const Surface = extern struct {
     extern fn wlr_surface_get_extends(surface: *Surface, box: *wlr.Box) void;
     pub const getExtends = wlr_surface_get_extends;
 
-    extern fn wlr_surface_from_resource(resource: *wl.Resource) ?*Surface;
-    pub const fromResource = wlr_surface_from_resource;
+    extern fn wlr_surface_from_resource(resource: *wl.Surface) ?*Surface;
+    pub const fromWlSurface = wlr_surface_from_resource;
 
     extern fn wlr_surface_for_each_surface(
         surface: *Surface,
@@ -172,7 +178,7 @@ pub const Subsurface = extern struct {
         y: i32,
     };
 
-    resource: *wl.Resource,
+    resource: *wl.Subsurface,
     surface: *Surface,
     parent: ?*Surface,
 
@@ -202,6 +208,12 @@ pub const Subsurface = extern struct {
 
     data: usize,
 
-    extern fn wlr_subsurface_create(surface: *Surface, parent: *Surface, version: u32, id: u32, resource_list: ?*wl.list.Head(wl.Resource, null)) ?*Subsurface;
+    extern fn wlr_subsurface_create(
+        surface: *Surface,
+        parent: *Surface,
+        version: u32,
+        id: u32,
+        resource_list: ?*wl.list.Head(wl.Subsurface, null),
+    ) ?*Subsurface;
     pub const create = wlr_subsurface_create;
 };
