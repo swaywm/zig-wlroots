@@ -251,8 +251,8 @@ pub const Output = extern struct {
     extern fn wlr_output_export_dmabuf(output: *Output, attribs: *wlr.DmabufAttributes) bool;
     pub const exportDmabuf = wlr_output_export_dmabuf;
 
-    extern fn wlr_output_from_resource(resource: *Output) ?*Output;
-    pub const fromResource = wlr_output_from_resource;
+    extern fn wlr_output_from_resource(resource: *wl.Output) ?*Output;
+    pub const fromWlOutput = wlr_output_from_resource;
 
     extern fn wlr_output_lock_attach_render(output: *Output, lock: bool) void;
     pub const lockAttachRender = wlr_output_lock_attach_render;
