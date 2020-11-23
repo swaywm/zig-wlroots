@@ -107,8 +107,8 @@ pub const Surface = extern struct {
     ) bool;
     pub const setRole = wlr_surface_set_role;
 
+    // Just check if Surface.buffer is null, that's all this function does
     extern fn wlr_surface_has_buffer(surface: *Surface) bool;
-    pub const hasBuffer = wlr_surface_has_buffer;
 
     extern fn wlr_surface_get_texture(surface: *Surface) ?*wlr.Texture;
     pub const getTexture = wlr_surface_get_texture;
