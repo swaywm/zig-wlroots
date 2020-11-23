@@ -12,7 +12,7 @@ pub const DataControlManagerV1 = extern struct {
         new_device: wl.Signal(*DataControlDeviceV1),
     },
 
-    server_destroy: wl.Listener(*Server),
+    server_destroy: wl.Listener(*wl.Server),
 
     extern fn wlr_data_control_manager_v1_create(server: *wl.Server) ?*DataControlManagerV1;
     pub const create = wlr_data_control_manager_v1_create;

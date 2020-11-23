@@ -34,7 +34,7 @@ pub const DataOffer = extern struct {
     link: wl.list.Link,
 
     actions: u32,
-    preferred_action: wl.DataDeviceManager.DndAction,
+    preferred_action: wl.DataDeviceManager.DndAction.Enum,
     in_ask: bool,
 
     source_destroy: wl.Listener(*DataSource),
@@ -47,7 +47,7 @@ pub const DataSource = extern struct {
         destroy: ?fn (source: *DataSource) callconv(.C) void,
         dnd_drop: ?fn (source: *DataSource) callconv(.C) void,
         dnd_finish: ?fn (source: *DataSource) callconv(.C) void,
-        dnd_action: ?fn (source: *DataSource, wl.DataDeviceManager.DndAction) callconv(.C) void,
+        dnd_action: ?fn (source: *DataSource, wl.DataDeviceManager.DndAction.Enum) callconv(.C) void,
     };
 
     impl: *const Impl,
@@ -57,7 +57,7 @@ pub const DataSource = extern struct {
 
     accepted: bool,
 
-    current_dnd_action: wl.DataDeviceManager.DndAction,
+    current_dnd_action: wl.DataDeviceManager.DndAction.Enum,
     compositor_action: u32,
 
     events: extern struct {
@@ -82,7 +82,7 @@ pub const DataSource = extern struct {
     extern fn wlr_data_source_dnd_finish(source: *DataSource) void;
     pub const dndFinish = wlr_data_source_dnd_finish;
 
-    extern fn wlr_data_source_dnd_action(source: *DataSource, action: wl.DataDeviceManager.DndAction) void;
+    extern fn wlr_data_source_dnd_action(source: *DataSource, action: wl.DataDeviceManager.DndAction.Enum) void;
     pub const dndAction = wlr_data_source_dnd_action;
 };
 

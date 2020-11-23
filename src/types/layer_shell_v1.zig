@@ -2,7 +2,7 @@ const wlr = @import("../wlroots.zig");
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
-const wlr_proto = wayland.server.wlr;
+const zwlr = wayland.server.zwlr;
 
 pub const LayerShellV1 = extern struct {
     global: *wl.Global,
@@ -22,7 +22,7 @@ pub const LayerShellV1 = extern struct {
 
 pub const LayerSurfaceV1 = extern struct {
     pub const State = extern struct {
-        anchor: wlr_proto.LayerSurfaceV1.Anchor,
+        anchor: zwlr.LayerSurfaceV1.Anchor,
         exclusive_zone: i32,
         margin: extern struct {
             top: u32,
@@ -35,7 +35,7 @@ pub const LayerSurfaceV1 = extern struct {
         desired_height: u32,
         actual_width: u32,
         actual_height: u32,
-        layer: wlr_proto.LayerShellV1.Layer,
+        layer: zwlr.LayerShellV1.Layer,
     };
 
     pub const Configure = extern struct {

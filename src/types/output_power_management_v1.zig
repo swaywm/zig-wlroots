@@ -2,13 +2,13 @@ const wlr = @import("../wlroots.zig");
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
-const wlr_proto = wayland.server.wlr;
+const zwlr = wayland.server.zwlr;
 
 pub const OutputPowerManagerV1 = extern struct {
     pub const event = struct {
         pub const SetMode = extern struct {
             output: *wlr.Output,
-            mode: wlr_proto.OutputPowerV1.Mode,
+            mode: zwlr.OutputPowerV1.Mode,
         };
     };
 

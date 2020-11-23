@@ -92,18 +92,18 @@ pub const XdgPopup = extern struct {
     /// Grab.popups
     grab_link: wl.list.Link,
 
-    extern fn wlr_xdg_popup_destroy(surface: *wlr.Surface) void;
+    extern fn wlr_xdg_popup_destroy(surface: *wlr.XdgSurface) void;
     pub inline fn destroy(popup: *wlr.XdgPopup) void {
         wlr_xdg_popup_destroy(popup.base);
     }
 
-    extern fn wlr_xdg_popup_get_anchor_point(popup: *wlr.Popup, toplevel_sx: *c_int, toplevel_sy: *c_int) void;
+    extern fn wlr_xdg_popup_get_anchor_point(popup: *XdgPopup, toplevel_sx: *c_int, toplevel_sy: *c_int) void;
     pub const getAnchorPoint = wlr_xdg_popup_get_anchor_point;
 
-    extern fn wlr_xdg_popup_get_toplevel_coords(popup: *wlr.Popup, popup_sx: c_int, popup_sy: c_int, toplevel_sx: *c_int, toplevel_sy: *c_int) void;
+    extern fn wlr_xdg_popup_get_toplevel_coords(popup: *XdgPopup, popup_sx: c_int, popup_sy: c_int, toplevel_sx: *c_int, toplevel_sy: *c_int) void;
     pub const getToplevelCoords = wlr_xdg_popup_get_toplevel_coords;
 
-    extern fn wlr_xdg_popup_unconstrain_from_box(popup: *wlr.Popup, toplevel_sx_box: *wlr.Box) void;
+    extern fn wlr_xdg_popup_unconstrain_from_box(popup: *XdgPopup, toplevel_sx_box: *wlr.Box) void;
     pub const unconstrainFromBox = wlr_xdg_popup_unconstrain_from_box;
 };
 
@@ -275,7 +275,7 @@ pub const XdgSurface = extern struct {
     extern fn wlr_xdg_surface_from_popup_resource(resource: *xdg.Popup) ?*wlr.XdgSurface;
     pub const fromPopupResource = wlr_xdg_surface_from_popup_resource;
 
-    extern fn wlr_xdg_surface_from_toplevel_resource(resource: xdg.Toplevel) ?*wlr.XdgSurface;
+    extern fn wlr_xdg_surface_from_toplevel_resource(resource: *xdg.Toplevel) ?*wlr.XdgSurface;
     pub const fromToplevelResource = wlr_xdg_surface_from_toplevel_resource;
 
     extern fn wlr_xdg_surface_ping(surface: *wlr.XdgSurface) void;

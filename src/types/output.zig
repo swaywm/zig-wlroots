@@ -71,47 +71,6 @@ pub const Output = extern struct {
         gamma_lut_size: usize,
     };
 
-    pub const Cursor = extern struct {
-        output: *wlr.Output,
-        x: f64,
-        y: f64,
-        enabled: bool,
-        visible: bool,
-        width: u32,
-        height: u32,
-        hotspot_x: i32,
-        hotspot_y: i32,
-        /// Output.cursors
-        link: wl.list.Link,
-
-        /// only when using a software cursor without a surface
-        texture: ?*wlr.Texture,
-
-        /// only when using a cursor surface
-        surface: ?*wlr.Surface,
-        surface_commit: wl.Listener(*wlr.Surface),
-        surface_destroy: wl.Listener(*wlr.Surface),
-
-        events: extern struct {
-            destroy: wl.Signal(*Output.Cursor),
-        },
-
-        extern fn wlr_output_cursor_create(output: *Output) ?*Cursor;
-        pub const create = wlr_output_cursor_create;
-
-        extern fn wlr_output_cursor_set_image(cursor: *Cursor, pixels: ?[*]const u8, stride: i32, width: u32, height: u32, hotspot_x: i32, hotspot_y: i32) bool;
-        pub const setImage = wlr_output_cursor_set_image;
-
-        extern fn wlr_output_cursor_set_surface(cursor: *Cursor, surface: ?*wlr.Surface, hotspot_x: i32, hotspot_y: i32) void;
-        pub const setSurface = wlr_output_cursor_set_surface;
-
-        extern fn wlr_output_cursor_move(cursor: *Cursor, x: f64, y: f64) bool;
-        pub const move = wlr_output_cursor_move;
-
-        extern fn wlr_output_cursor_destroy(cursor: *Cursor) void;
-        pub const destroy = wlr_output_cursor_destroy;
-    };
-
     pub const event = struct {
         pub const Damage = extern struct {
             output: *wlr.Output,
@@ -205,9 +164,9 @@ pub const Output = extern struct {
 
     attach_render_locks: c_int,
 
-    cursors: wl.list.Head(Output.Cursor, "link"),
+    cursors: wl.list.Head(OutputCursor, "link"),
 
-    hardware_cursor: *Output.Cursor,
+    hardware_cursor: *OutputCursor,
     software_cursor_locks: c_int,
 
     server_destroy: wl.Listener(*wl.Server),
@@ -312,4 +271,45 @@ pub const Output = extern struct {
 
     extern fn wlr_output_is_noop(output: *Output) bool;
     pub const isNoop = wlr_output_is_noop;
+};
+
+pub const OutputCursor = extern struct {
+    output: *wlr.Output,
+    x: f64,
+    y: f64,
+    enabled: bool,
+    visible: bool,
+    width: u32,
+    height: u32,
+    hotspot_x: i32,
+    hotspot_y: i32,
+    /// Output.cursors
+    link: wl.list.Link,
+
+    /// only when using a software cursor without a surface
+    texture: ?*wlr.Texture,
+
+    /// only when using a cursor surface
+    surface: ?*wlr.Surface,
+    surface_commit: wl.Listener(*wlr.Surface),
+    surface_destroy: wl.Listener(*wlr.Surface),
+
+    events: extern struct {
+        destroy: wl.Signal(*OutputCursor),
+    },
+
+    extern fn wlr_output_cursor_create(output: *Output) ?*OutputCursor;
+    pub const create = wlr_output_cursor_create;
+
+    extern fn wlr_output_cursor_set_image(cursor: *OutputCursor, pixels: ?[*]const u8, stride: i32, width: u32, height: u32, hotspot_x: i32, hotspot_y: i32) bool;
+    pub const setImage = wlr_output_cursor_set_image;
+
+    extern fn wlr_output_cursor_set_surface(cursor: *OutputCursor, surface: ?*wlr.Surface, hotspot_x: i32, hotspot_y: i32) void;
+    pub const setSurface = wlr_output_cursor_set_surface;
+
+    extern fn wlr_output_cursor_move(cursor: *OutputCursor, x: f64, y: f64) bool;
+    pub const move = wlr_output_cursor_move;
+
+    extern fn wlr_output_cursor_destroy(cursor: *OutputCursor) void;
+    pub const destroy = wlr_output_cursor_destroy;
 };
