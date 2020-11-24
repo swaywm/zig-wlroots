@@ -18,7 +18,9 @@ pub const Idle = extern struct {
     data: usize,
 
     extern fn wlr_idle_create(server: *wl.Server) ?*Idle;
-    pub const create = wlr_idle_create;
+    pub fn create(server: *wl.Server) !*Idle {
+        return wlr_idle_create(server) orelse error.OutOfMemory;
+    }
 
     extern fn wlr_idle_notify_activity(idle: *Idle, seat: *wlr.Seat) void;
     pub const notifyActivity = wlr_idle_notify_activity;
@@ -49,7 +51,9 @@ pub const IdleTimeout = extern struct {
     data: usize,
 
     extern fn wlr_idle_timeout_create(idle: *Idle, seat: *wlr.Seat, timeout: u32) ?*IdleTimeout;
-    pub const create = wlr_idle_timeout_create;
+    pub fn create(idle: *Idle) !*IdleTimeout {
+        return wlr_idle_timeout_create(server) orelse error.OutOfMemory;
+    }
 
     extern fn wlr_idle_timeout_destroy(timeout: *IdleTimeout) void;
     pub const destroy = wlr_idle_timeout_destroy;

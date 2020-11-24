@@ -17,5 +17,7 @@ pub const InputInhibitManager = extern struct {
     data: usize,
 
     extern fn wlr_input_inhibit_manager_create(server: *wl.Server) ?*InputInhibitManager;
-    pub const create = wlr_input_inhibit_manager_create;
+    pub fn create(server: *wl.Server) !*InputInhibitManager {
+        return wlr_input_inhibit_manager_create(server) orelse error.OutOfMemory;
+    }
 };

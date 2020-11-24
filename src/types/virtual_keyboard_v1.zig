@@ -13,8 +13,11 @@ pub const VirtualKeyboardManagerV1 = extern struct {
         new_virtual_keyboard: wl.Signal(*VirtualKeyboardV1),
         destroy: wl.Signal(*VirtualKeyboardManagerV1),
     },
+
     extern fn wlr_virtual_keyboard_manager_v1_create(server: *wl.Server) ?*VirtualKeyboardManagerV1;
-    pub const create = wlr_virtual_keyboard_manager_v1_create;
+    pub fn create(server: *wl.Server) !*VirtualKeyboardManagerV1 {
+        return wlr_virtual_keyboard_manager_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const VirtualKeyboardV1 = extern struct {

@@ -23,7 +23,9 @@ pub const VirtualPointerManagerV1 = extern struct {
     },
 
     extern fn wlr_virtual_pointer_manager_v1_create(server: *wl.Server) ?*VirtualPointerManagerV1;
-    pub const create = wlr_virtual_pointer_manager_v1_create;
+    pub fn create(server: *wl.Server) !*VirtualPointerManagerV1 {
+        return wlr_virtual_pointer_manager_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const VirtualPointerV1 = extern struct {
