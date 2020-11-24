@@ -87,7 +87,7 @@ pub const LayerSurfaceV1 = extern struct {
     pub const close = wlr_layer_surface_v1_close;
 
     extern fn wlr_layer_surface_v1_from_wlr_surface(surface: *wlr.Surface) *LayerSurfaceV1;
-    pub const fromSurface = wlr_layer_surface_v1_from_wlr_surface;
+    pub const fromWlrSurface = wlr_layer_surface_v1_from_wlr_surface;
 
     extern fn wlr_layer_surface_v1_for_each_surface(
         surface: *LayerSurfaceV1,
