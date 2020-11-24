@@ -72,7 +72,7 @@ pub const OutputLayout = extern struct {
     extern fn wlr_output_layout_closest_point(layout: *OutputLayout, reference: ?*wlr.Output, lx: f64, ly: f64, dest_lx: *f64, dest_ly: *f64) void;
     pub const closestPoint = wlr_output_layout_closest_point;
 
-    extern fn wlr_output_layout_get_box(layout: *OutputLayout, reference: ?*wlr.Output) *wlr.Box;
+    extern fn wlr_output_layout_get_box(layout: *OutputLayout, reference: ?*wlr.Output) ?*wlr.Box;
     pub const getBox = wlr_output_layout_get_box;
 
     extern fn wlr_output_layout_add_auto(layout: *OutputLayout, output: *wlr.Output) void;
