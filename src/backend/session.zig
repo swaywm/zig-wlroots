@@ -54,7 +54,9 @@ pub const Session = extern struct {
     pub const signalAdd = wlr_session_signal_add;
 
     extern fn wlr_session_change_vt(session: *Session, vt: c_uint) bool;
-    pub const changeVt = wlr_session_change_vt;
+    pub fn changeVt(session: *Session, vt: c_uint) !void {
+        if (!wlr_session_change_vt(session, vt)) return error.ChangeVtFailed;
+    }
 
     extern fn wlr_session_find_gpus(session: *Session, ret_len: usize, ret: [*]c_int) usize;
     pub const findGpus = wlr_session_find_gpus;
