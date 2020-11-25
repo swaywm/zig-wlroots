@@ -66,7 +66,9 @@ pub const Backend = extern struct {
     }
 
     extern fn wlr_noop_add_output(noop: *Backend) ?*wlr.Output;
-    pub const noopAddOutput = wlr_noop_add_output;
+    pub fn noopAddOutput(noop: *Backend) !*wlr.Output {
+        return wlr_noop_add_output(noop) orelse error.OutOfMemory;
+    }
 
     extern fn wlr_backend_is_noop(backend: *Backend) bool;
     pub const isNoop = wlr_backend_is_noop;
