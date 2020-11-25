@@ -96,7 +96,15 @@ pub const Surface = extern struct {
         renderer: *wlr.Renderer,
         resource_list: ?*wl.list.Head(wl.Surface, null),
     ) ?*Surface;
-    pub const create = wlr_surface_create;
+    pub fn create(
+        client: *wl.Client,
+        version: u32,
+        id: u32,
+        renderer: *wlr.Renderer,
+        resource_list: ?*wl.list.Head(wl.Surface, null),
+    ) !*Surface {
+        return wlr_surface_create(client, version, id, renderer, resource_list) orelse error.OutOfMemory;
+    }
 
     extern fn wlr_surface_set_role(
         surface: *Surface,
@@ -215,5 +223,13 @@ pub const Subsurface = extern struct {
         id: u32,
         resource_list: ?*wl.list.Head(wl.Subsurface, null),
     ) ?*Subsurface;
-    pub const create = wlr_subsurface_create;
+    pub fn create(
+        surface: *Surface,
+        parent: *Surface,
+        version: u32,
+        id: u32,
+        resource_list: ?*wl.list.Head(wl.Subsurface, null),
+    ) !*Subsurface {
+        return wlr_subsurface_create(surface, parent, version, id, resource_list) orelse error.OutOfMemory;
+    }
 };

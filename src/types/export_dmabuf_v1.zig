@@ -14,7 +14,9 @@ pub const ExportDmabufManagerV1 = extern struct {
     },
 
     extern fn wlr_export_dmabuf_manager_v1_create(server: *wl.Server) ?*ExportDmabufManagerV1;
-    pub const create = wlr_export_dmabuf_manager_v1_create;
+    pub fn create(server: *wl.Server) !*ExportDmabufManagerV1 {
+        return wlr_export_dmabuf_manager_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const ExportDmabufFrameV1 = extern struct {

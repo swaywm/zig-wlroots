@@ -17,7 +17,9 @@ pub const XdgDecorationManagerV1 = extern struct {
     data: usize,
 
     extern fn wlr_xdg_decoration_manager_v1_create(server: *wl.Server) ?*XdgDecorationManagerV1;
-    pub const create = wlr_xdg_decoration_manager_v1_create;
+    pub fn create(server: *wl.Server) !*XdgDecorationManagerV1 {
+        return wlr_xdg_decoration_manager_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const XdgToplevelDecorationV1 = extern struct {

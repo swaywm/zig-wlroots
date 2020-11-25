@@ -25,7 +25,7 @@ pub const XcursorManager = extern struct {
     extern fn wlr_xcursor_manager_load(manager: *XcursorManager, scale: f32) bool;
     pub fn load(manager: *XcursorManager, scale: f32) !void {
         if (!wlr_xcursor_manager_load(manager, scale)) {
-            return error.XcursorLoadFailure;
+            return error.XcursorLoadFailed;
         }
     }
 

@@ -37,7 +37,7 @@ pub const XwaylandServer = extern struct {
     wl_fd: [2]c_int,
 
     // TODO: remove this check in zig 0.7.1
-    server_start: if(@hasDecl(os, "time_t")) os.time_t else isize,
+    server_start: if (@hasDecl(os, "time_t")) os.time_t else isize,
     display: c_int,
     display_name: [16]u8,
     x_fd: [2]c_int,
@@ -58,7 +58,9 @@ pub const XwaylandServer = extern struct {
     data: usize,
 
     extern fn wlr_xwayland_server_create(wl_server: *wl.Server, options: *Options) ?*XwaylandServer;
-    pub const create = wlr_xwayland_server_create;
+    pub fn create(wl_server: *wl.Server, options: *Options) !*XwaylandServer {
+        return wlr_xwayland_server_create(server, options) orelse error.XwaylandServerCreateFailed;
+    }
 
     extern fn wlr_xwayland_server_destroy(server: *XwaylandServer) void;
     pub const destroy = wlr_xwayland_server_destroy;
@@ -88,8 +90,10 @@ pub const Xwayland = extern struct {
 
     data: usize,
 
-    extern fn wlr_xwayland_create(wl_server: *wl.Server, compositor: *wlr.Compositor, lazy: bool) ?*Xwayland;
-    pub const create = wlr_xwayland_create;
+    extern fn wlr_xwayland_create(server: *wl.Server, compositor: *wlr.Compositor, lazy: bool) ?*Xwayland;
+    pub fn create(server: *wl.Server, compositor: *wlr.Compositor, lazy: bool) !*Xwayland {
+        return wlr_xwayland_create(server, compositor, lazy) orelse error.XwaylandCreateFailed;
+    }
 
     extern fn wlr_xwayland_destroy(wlr_xwayland: *Xwayland) void;
     pub const destroy = wlr_xwayland_destroy;

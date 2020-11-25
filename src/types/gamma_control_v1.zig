@@ -16,7 +16,9 @@ pub const GammaControlManagerV1 = extern struct {
     data: usize,
 
     extern fn wlr_gamma_control_manager_v1_create(server: *wl.Server) ?*GammaControlManagerV1;
-    pub const create = wlr_gamma_control_manager_v1_create;
+    pub fn create(server: *wl.Server) !*GammaControlManagerV1 {
+        return wlr_gamma_control_manager_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const GamaControlV1 = extern struct {

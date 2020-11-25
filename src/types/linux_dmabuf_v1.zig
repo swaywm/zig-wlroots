@@ -32,7 +32,9 @@ pub const LinuxDmabufV1 = extern struct {
     renderer_destroy: wl.Listener(*wlr.Renderer),
 
     extern fn wlr_linux_dmabuf_v1_create(server: *wl.Server, renderer: *wlr.Renderer) ?*LinuxDmabufV1;
-    pub const create = wlr_linux_dmabuf_v1_create;
+    pub fn create(server: *wl.Server, renderer: *wlr.Renderer) !*LinuxDmabufV1 {
+        return wlr_linux_dmabuf_v1_create(server, renderer) orelse error.OutOfMemory;
+    }
 
     extern fn wlr_linux_dmabuf_v1_from_resource(resource: *wl.Resource) *LinuxDmabufV1;
     pub const fromResource = wlr_linux_dmabuf_v1_from_resource;

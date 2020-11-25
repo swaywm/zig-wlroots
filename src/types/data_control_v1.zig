@@ -15,7 +15,9 @@ pub const DataControlManagerV1 = extern struct {
     server_destroy: wl.Listener(*wl.Server),
 
     extern fn wlr_data_control_manager_v1_create(server: *wl.Server) ?*DataControlManagerV1;
-    pub const create = wlr_data_control_manager_v1_create;
+    pub fn create(server: *wl.Server) !*DataControlManagerV1 {
+        return wlr_data_control_manager_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const DataControlDeviceV1 = extern struct {

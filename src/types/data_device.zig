@@ -155,6 +155,16 @@ pub const Drag = extern struct {
 
     data: usize,
 
-    extern fn wlr_drag_create(seat_client: *wlr.Seat.Client, source: ?*DataSource, icon_surface: ?*wlr.Surface) ?*Drag;
-    pub const create = wlr_drag_create;
+    extern fn wlr_drag_create(
+        seat_client: *wlr.Seat.Client,
+        source: ?*DataSource,
+        icon_surface: ?*wlr.Surface,
+    ) ?*Drag;
+    pub fn create(
+        seat_client: *wlr.Seat.Client,
+        source: ?*DataSource,
+        icon_surface: ?*wlr.Surface,
+    ) !*Drag {
+        return wlr_drag_create(seat_client, source, icon_surface) orelse error.OutOfMemory;
+    }
 };

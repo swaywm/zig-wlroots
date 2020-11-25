@@ -33,7 +33,7 @@ pub const Renderer = extern struct {
     extern fn wlr_renderer_init_wl_display(r: *Renderer, server: *wl.Server) bool;
     pub fn initServer(r: *Renderer, server: *wl.Server) !void {
         if (!wlr_renderer_init_wl_display(r, server)) {
-            return error.RenderInitFailure;
+            return error.RenderInitFailed;
         }
     }
 
@@ -45,7 +45,7 @@ pub const Renderer = extern struct {
     extern fn wlr_render_texture_with_matrix(r: *Renderer, texture: *wlr.Texture, matrix: *const [9]f32, alpha: f32) bool;
     pub fn renderTextureWithMatrix(r: *Renderer, texture: *wlr.Texture, matrix: *const [9]f32, alpha: f32) !void {
         if (!wlr_render_texture_with_matrix(r, texture, matrix, alpha)) {
-            return error.RenderFailure;
+            return error.RenderFailed;
         }
     }
 };

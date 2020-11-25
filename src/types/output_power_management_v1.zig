@@ -25,7 +25,9 @@ pub const OutputPowerManagerV1 = extern struct {
     data: usize,
 
     extern fn wlr_output_power_manager_v1_create(server: *wl.Server) ?*OutputPowerManagerV1;
-    pub const create = wlr_output_power_manager_v1_create;
+    pub fn create(server: *wl.Server) !*OutputPowerManagerV1 {
+        return wlr_output_power_manager_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const OutputPowerV1 = extern struct {

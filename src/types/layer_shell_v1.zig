@@ -17,7 +17,9 @@ pub const LayerShellV1 = extern struct {
     data: usize,
 
     extern fn wlr_layer_shell_v1_create(server: *wl.Server) ?*LayerShellV1;
-    pub const create = wlr_layer_shell_v1_create;
+    pub fn create(server: *wl.Server) !*LayerShellV1 {
+        return wlr_layer_shell_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const LayerSurfaceV1 = extern struct {

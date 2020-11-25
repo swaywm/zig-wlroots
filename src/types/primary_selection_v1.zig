@@ -17,7 +17,9 @@ pub const PrimarySelectionDeviceManagerV1 = extern struct {
     data: usize,
 
     extern fn wlr_primary_selection_v1_device_manager_create(server: *wl.Server) ?*PrimarySelectionDeviceManagerV1;
-    pub const create = wlr_primary_selection_v1_device_manager_create;
+    pub fn create(server: *wl.Server) !*PrimarySelectionDeviceManagerV1 {
+        return wlr_primary_selection_v1_device_manager_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const PrimarySelectionDeviceV1 = extern struct {

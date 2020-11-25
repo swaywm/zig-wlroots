@@ -17,13 +17,13 @@ pub const Backend = extern struct {
 
     extern fn wlr_backend_autocreate(server: *wl.Server, create_renderer_func: ?wlr.Renderer.CreateFn) ?*Backend;
     pub fn autocreate(server: *wl.Server, create_renderer_func: ?wlr.Renderer.CreateFn) !*Backend {
-        return wlr_backend_autocreate(server, create_renderer_func) orelse error.BackendCreateFailure;
+        return wlr_backend_autocreate(server, create_renderer_func) orelse error.BackendCreateFailed;
     }
 
     extern fn wlr_backend_start(backend: *Backend) bool;
     pub fn start(backend: *Backend) !void {
         if (!wlr_backend_start(backend)) {
-            return error.BackendStartFailure;
+            return error.BackendStartFailed;
         }
     }
 
@@ -39,7 +39,9 @@ pub const Backend = extern struct {
     // backend/multi.h
 
     extern fn wlr_multi_backend_create(server: *wl.Server) ?*Backend;
-    pub const createMulti = wlr_multi_backend_create;
+    pub fn createMulti(server: *wl.Server) !*Backend {
+        return wlr_multi_backend_create(server) orelse error.BackendCreateFailed;
+    }
 
     extern fn wlr_multi_backend_add(multi: *Backend, backend: *Backend) bool;
     pub const multiAdd = wlr_multi_backend_add;
@@ -59,7 +61,9 @@ pub const Backend = extern struct {
     // backend/noop.h
 
     extern fn wlr_noop_backend_create(server: *wl.Server) ?*Backend;
-    pub const createNoop = wlr_noop_backend_create;
+    pub fn createNoop(server: *wl.Server) !*Backend {
+        return wlr_noop_backend_create(server) orelse error.BackendCreateFailed;
+    }
 
     extern fn wlr_noop_add_output(noop: *Backend) ?*wlr.Output;
     pub const noopAddOutput = wlr_noop_add_output;

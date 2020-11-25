@@ -13,7 +13,9 @@ pub const ScreencopyManagerV1 = extern struct {
     data: usize,
 
     extern fn wlr_screencopy_manager_v1_create(server: *wl.Server) ?*ScreencopyManagerV1;
-    pub const create = wlr_screencopy_manager_v1_create;
+    pub fn create(server: *wl.Server) !*ScreencopyManagerV1 {
+        return wlr_screencopy_manager_v1_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const ScreencopyClientV1 = extern struct {

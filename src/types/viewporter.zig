@@ -13,7 +13,9 @@ pub const Viewporter = extern struct {
     server_destroy: wl.Listener(*wl.Server),
 
     extern fn wlr_viewporter_create(server: *wl.Server) ?*Viewporter;
-    pub const create = wlr_viewporter_create;
+    pub fn create(server: *wl.Server) !*Viewporter {
+        return wlr_viewporter_create(server) orelse error.OutOfMemory;
+    }
 };
 
 pub const Viewport = extern struct {

@@ -20,7 +20,9 @@ pub const KeyboardGroup = extern struct {
     data: usize,
 
     extern fn wlr_keyboard_group_create() ?*KeyboardGroup;
-    pub const create = wlr_keyboard_group_create;
+    pub fn create() !*KeyboardGroup {
+        return wlr_keyboard_group_create() orelse error.OutOfMemory;
+    }
 
     extern fn wlr_keyboard_group_from_wlr_keyboard(keyboard: *wlr.Keyboard) ?*KeyboardGroup;
     pub const fromKeyboard = wlr_keyboard_group_from_wlr_keyboard;

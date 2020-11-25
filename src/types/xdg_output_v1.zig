@@ -19,7 +19,9 @@ pub const XdgOutputManagerV1 = extern struct {
     layout_destroy: wl.Listener(*wlr.OutputLayout),
 
     extern fn wlr_xdg_output_manager_v1_create(server: *wl.Server, layout: *wlr.OutputLayout) ?*XdgOutputManagerV1;
-    pub const create = wlr_xdg_output_manager_v1_create;
+    pub fn create(server: *wl.Server, layout: *wlr.OutputLayout) !*XdgOutputManagerV1 {
+        return wlr_xdg_output_manager_v1_create(server, layout) orelse error.OutOfMemory;
+    }
 };
 
 pub const XdgOutputV1 = extern struct {

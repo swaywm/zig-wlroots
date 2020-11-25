@@ -299,7 +299,9 @@ pub const OutputCursor = extern struct {
     },
 
     extern fn wlr_output_cursor_create(output: *Output) ?*OutputCursor;
-    pub const create = wlr_output_cursor_create;
+    pub fn create(output: *Output) !*OutputCursor {
+        return wlr_output_cursor_create(output) orelse error.OutOfMemory;
+    }
 
     extern fn wlr_output_cursor_set_image(cursor: *OutputCursor, pixels: ?[*]const u8, stride: i32, width: u32, height: u32, hotspot_x: i32, hotspot_y: i32) bool;
     pub const setImage = wlr_output_cursor_set_image;
