@@ -156,7 +156,11 @@ pub const Surface = extern struct {
         iterator: fn (surface: *Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
         data: T,
     ) void {
-        wlr_surface_for_each_surface(surface, iterator, data);
+        wlr_surface_for_each_surface(
+            surface,
+            @ptrCast(fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void, iterator),
+            data,
+        );
     }
 
     extern fn wlr_surface_get_effective_damage(surface: *Surface, damage: *pixman.Region32) void;
