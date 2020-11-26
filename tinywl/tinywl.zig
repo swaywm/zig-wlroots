@@ -125,7 +125,7 @@ const Server = struct {
         if (wlr_output.preferredMode()) |mode| {
             wlr_output.setMode(mode);
             wlr_output.enable(true);
-            if (!wlr_output.commit()) return;
+            wlr_output.commit() catch return;
         }
 
         const node = gpa.create(std.TailQueue(Output).Node) catch {
@@ -399,7 +399,7 @@ const Output = struct {
         var now: os.timespec = undefined;
         os.clock_gettime(os.CLOCK_MONOTONIC, &now) catch @panic("CLOCK_MONOTONIC not supported");
 
-        if (!wlr_output.attachRender(null)) return;
+        wlr_output.attachRender(null) catch return;
 
         var width: c_int = undefined;
         var height: c_int = undefined;
@@ -428,7 +428,7 @@ const Output = struct {
         server.renderer.end();
 
         // Pending changes are automatically rolled back on failure
-        _ = wlr_output.commit();
+        wlr_output.commit() catch {};
     }
 
     fn renderSurface(surface: *wlr.Surface, sx: c_int, sy: c_int, rdata: *RenderData) callconv(.C) void {
