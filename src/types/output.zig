@@ -219,7 +219,9 @@ pub const Output = extern struct {
     pub const effectiveResolution = wlr_output_effective_resolution;
 
     extern fn wlr_output_attach_render(output: *Output, buffer_age: ?*c_int) bool;
-    pub const attachRender = wlr_output_attach_render;
+    pub fn attachRender(output: *Output, buffer_age: ?*c_int) !void {
+        if (!wlr_output_attach_render(output, buffer_age)) return error.AttachRenderFailed;
+    }
 
     extern fn wlr_output_attach_buffer(output: *Output, buffer: *wlr.Buffer) void;
     pub const attachBuffer = wlr_output_attach_buffer;
@@ -231,10 +233,12 @@ pub const Output = extern struct {
     pub const setDamage = wlr_output_set_damage;
 
     extern fn wlr_output_test(output: *Output) bool;
-    pub const @"test" = wlr_output_test;
+    pub const testCommit = wlr_output_test;
 
     extern fn wlr_output_commit(output: *Output) bool;
-    pub const commit = wlr_output_commit;
+    pub fn commit(output: *Output) !void {
+        if (!wlr_output_commit(output)) return error.OutputCommitFailed;
+    }
 
     extern fn wlr_output_rollback(output: *Output) void;
     pub const rollback = wlr_output_rollback;
