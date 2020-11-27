@@ -188,10 +188,10 @@ pub const XwaylandSurface = extern struct {
     override_redirect: bool,
     mapped: bool,
 
-    title: [*:0]u8,
-    class: [*:0]u8,
-    instance: [*:0]u8,
-    role: [*:0]u8,
+    title: ?[*:0]u8,
+    class: ?[*:0]u8,
+    instance: ?[*:0]u8,
+    role: ?[*:0]u8,
     pid: os.pid_t,
     has_utf8_title: bool,
 
