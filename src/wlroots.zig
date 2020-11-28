@@ -120,3 +120,7 @@ pub const matrix = @import("types/matrix.zig");
 
 pub const Edges = @import("util/edges.zig").Edges;
 pub const log = @import("util/log.zig");
+
+pub const OutputManagerV1 = @import("types/output_management_v1.zig").OutputManagerV1;
+pub const OutputHeadV1 = @import("types/output_management_v1.zig").OutputHeadV1;
+pub const OutputConfigurationV1 = @import("types/output_management_v1.zig").OutputConfigurationV1;
