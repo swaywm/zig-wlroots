@@ -10,7 +10,7 @@ pub const ExportDmabufManagerV1 = extern struct {
     server_destroy: wl.Listener(*wl.Server),
 
     events: extern struct {
-        destroy: wl.Listener(*ExportDmabufManagerV1),
+        destroy: wl.Signal(*ExportDmabufManagerV1),
     },
 
     extern fn wlr_export_dmabuf_manager_v1_create(server: *wl.Server) ?*ExportDmabufManagerV1;
