@@ -125,7 +125,7 @@ pub const Output = extern struct {
     phys_height: i32,
 
     modes: wl.list.Head(Output.Mode, "link"),
-    current_mode: *Output.Mode,
+    current_mode: ?*Output.Mode,
     width: i32,
     height: i32,
     refresh: i32,
@@ -166,7 +166,7 @@ pub const Output = extern struct {
 
     cursors: wl.list.Head(OutputCursor, "link"),
 
-    hardware_cursor: *OutputCursor,
+    hardware_cursor: ?*OutputCursor,
     software_cursor_locks: c_int,
 
     server_destroy: wl.Listener(*wl.Server),
