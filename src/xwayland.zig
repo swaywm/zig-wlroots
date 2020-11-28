@@ -57,8 +57,8 @@ pub const XwaylandServer = extern struct {
 
     data: usize,
 
-    extern fn wlr_xwayland_server_create(wl_server: *wl.Server, options: *Options) ?*XwaylandServer;
-    pub fn create(wl_server: *wl.Server, options: *Options) !*XwaylandServer {
+    extern fn wlr_xwayland_server_create(server: *wl.Server, options: *Options) ?*XwaylandServer;
+    pub fn create(server: *wl.Server, options: *Options) !*XwaylandServer {
         return wlr_xwayland_server_create(server, options) orelse error.XwaylandServerCreateFailed;
     }
 
