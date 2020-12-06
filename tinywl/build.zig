@@ -8,7 +8,7 @@ pub fn build(b: *Builder) void {
     const target = b.standardTargetOptions(.{});
     const mode = b.standardReleaseOptions();
 
-    const scanner = ScanProtocolsStep.create(b, "deps/zig-wayland");
+    const scanner = ScanProtocolsStep.create(b);
     scanner.addSystemProtocol("stable/xdg-shell/xdg-shell.xml");
 
     const wayland = scanner.getPkg();
