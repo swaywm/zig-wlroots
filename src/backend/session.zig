@@ -5,8 +5,7 @@ const wl = wayland.server.wl;
 
 pub const Device = extern struct {
     fd: c_int,
-    // TODO: zig 0.7.0 is missing a dev_t definition for x86_64 linux
-    dev: if (@hasDecl(os, "dev_t")) os.dev_t else u64,
+    dev: os.dev_t,
     signal: wl.Signal(*Session),
 
     /// Session.devices

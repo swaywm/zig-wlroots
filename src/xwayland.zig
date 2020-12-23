@@ -37,8 +37,7 @@ pub const XwaylandServer = extern struct {
     wm_fd: [2]c_int,
     wl_fd: [2]c_int,
 
-    // TODO: remove this check in zig 0.7.1
-    server_start: if (@hasDecl(os, "time_t")) os.time_t else isize,
+    server_start: os.time_t,
     display: c_int,
     display_name: [16]u8,
     x_fd: [2]c_int,

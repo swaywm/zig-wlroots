@@ -1,16 +1,15 @@
 # zig-wlroots
 
 Idiomatic [Zig](https://ziglang.org/) bindings for
-[wlroots](https://github.com/swaywm/wlroots) 0.12.0.
+[wlroots](https://github.com/swaywm/wlroots).
 
 *Note: these bindings are early in development and should not be considered
 as stable as wlroots*
 
 ## Dependencies
 
-`zig-wlroots` of course depends on wlroots 0.12.0 and all of its
-dependencies. In addition the following zig bindings are required:
-
+- [zig](https://ziglang.org/) 0.7.1
+- [wlroots](https://github.com/swaywm/wlroots) 0.12.0
 - [zig-wayland](https://github.com/ifreund/zig-wayland)
 - [zig-xkbcommon](https://github.com/ifreund/zig-xkbcommon)
 - [zig-pixman](https://github.com/ifreund/zig-pixman)
