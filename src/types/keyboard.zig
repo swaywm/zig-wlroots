@@ -1,5 +1,7 @@
 const wlr = @import("../wlroots.zig");
 
+const std = @import("std");
+
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
@@ -24,6 +26,11 @@ pub const Keyboard = extern struct {
         // can't wait till stage2 fixes all the packed struct bugs
         _: u16 = 0,
         __: u8 = 0,
+
+        comptime {
+            std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
+            std.debug.assert(@alignOf(@This()) == @alignOf(u32));
+        }
     };
 
     pub const Modifiers = extern struct {

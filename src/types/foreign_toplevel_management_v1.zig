@@ -1,4 +1,6 @@
 const wlr = @import("../wlroots.zig");
+
+const std = @import("std");
 const wl = @import("wayland").server.wl;
 
 pub const ForeignToplevelManagerV1 = extern struct {
@@ -26,6 +28,10 @@ pub const ForeignToplevelHandleV1 = extern struct {
         activated: bool = false,
         fullscreen: bool = false,
         _: u28,
+        comptime {
+            std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
+            std.debug.assert(@alignOf(@This()) == @alignOf(u32));
+        }
     };
 
     pub const Output = extern struct {

@@ -1,6 +1,7 @@
 const wlr = @import("wlroots.zig");
 
-const os = @import("std").os;
+const std = @import("std");
+const os = std.os;
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
@@ -111,6 +112,11 @@ pub const XwaylandSurface = extern struct {
         no_border: bool align(@alignOf(u32)) = false,
         no_title: bool = false,
         _: u30 = 0,
+
+        comptime {
+            std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
+            std.debug.assert(@alignOf(@This()) == @alignOf(u32));
+        }
     };
 
     pub const Hints = extern struct {
