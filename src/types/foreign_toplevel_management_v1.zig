@@ -17,7 +17,7 @@ pub const ForeignToplevelManagerV1 = extern struct {
 
     data: usize,
 
-    extern fn wlr_foreign_toplevel_manager_v1_create(wl_server: *wl.Server) *ForeignToplevelManagerV1;
+    extern fn wlr_foreign_toplevel_manager_v1_create(wl_server: *wl.Server) ?*ForeignToplevelManagerV1;
     pub fn create(wl_server: *wl.Server) !*ForeignToplevelManagerV1 {
         return wlr_foreign_toplevel_manager_v1_create(wl_server) orelse error.OutOfMemory;
     }
@@ -100,7 +100,7 @@ pub const ForeignToplevelHandleV1 = extern struct {
 
     extern fn wlr_foreign_toplevel_handle_v1_create(manager: *ForeignToplevelManagerV1) ?*ForeignToplevelHandleV1;
     pub fn create(manager: *ForeignToplevelManagerV1) !*ForeignToplevelHandleV1 {
-        return wlr_foreign_toplevel_handle_v1_create(wl_server) orelse error.OutOfMemory;
+        return wlr_foreign_toplevel_handle_v1_create(manager) orelse error.OutOfMemory;
     }
 
     extern fn wlr_foreign_toplevel_handle_v1_destroy(toplevel: *ForeignToplevelHandleV1) void;
