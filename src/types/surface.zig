@@ -150,7 +150,7 @@ pub const Surface = extern struct {
         iterator: fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
         user_data: ?*c_void,
     ) void;
-    pub fn forEachSurface(
+    pub inline fn forEachSurface(
         surface: *Surface,
         comptime T: type,
         iterator: fn (surface: *Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,

@@ -295,7 +295,7 @@ pub const XdgSurface = extern struct {
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
         user_data: ?*c_void,
     ) void;
-    pub fn forEachSurface(
+    pub inline fn forEachSurface(
         surface: *wlr.XdgSurface,
         comptime T: type,
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
@@ -316,7 +316,7 @@ pub const XdgSurface = extern struct {
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
         user_data: ?*c_void,
     ) void;
-    pub fn forEachPopup(
+    pub inline fn forEachPopup(
         surface: *wlr.XdgSurface,
         comptime T: type,
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
