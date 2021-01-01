@@ -15,9 +15,9 @@ pub const Backend = extern struct {
 
     // backend.h
 
-    extern fn wlr_backend_autocreate(server: *wl.Server, create_renderer_func: ?wlr.Renderer.CreateFn) ?*Backend;
-    pub fn autocreate(server: *wl.Server, create_renderer_func: ?wlr.Renderer.CreateFn) !*Backend {
-        return wlr_backend_autocreate(server, create_renderer_func) orelse error.BackendCreateFailed;
+    extern fn wlr_backend_autocreate(server: *wl.Server) ?*Backend;
+    pub fn autocreate(server: *wl.Server) !*Backend {
+        return wlr_backend_autocreate(server) orelse error.BackendCreateFailed;
     }
 
     extern fn wlr_backend_start(backend: *Backend) bool;

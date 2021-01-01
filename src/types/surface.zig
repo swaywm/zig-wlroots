@@ -23,6 +23,7 @@ pub const Surface = extern struct {
 
         /// This is a bitfield of State.field members
         committed: u32,
+        seq: u32,
 
         buffer_resource: ?*wl.Buffer,
         dx: i32,
@@ -49,12 +50,25 @@ pub const Surface = extern struct {
         },
 
         buffer_destroy: wl.Listener(*wl.Buffer),
+
+        cached_state_locks: usize,
+        cached_state_link: wl.list.Link,
     };
 
     pub const Role = extern struct {
         name: [*:0]const u8,
         commit: ?fn (surface: *Surface) callconv(.C) void,
         precommit: ?fn (surface: *Surface) callconv(.C) void,
+    };
+
+    pub const Output = extern struct {
+        surface: *wlr.Surface,
+        output: *wlr.Output,
+
+        // Surface.current_outputs
+        link: wl.list.Link,
+        bind: wl.Listener(*wlr.Output.event.Bind),
+        destroy: wl.Listener(*wlr.Output),
     };
 
     resource: *wl.Surface,
@@ -73,6 +87,8 @@ pub const Surface = extern struct {
     pending: State,
     previous: State,
 
+    cached: wl.list.Head(Surface.State, "cached_state_link"),
+
     role: ?*const Role,
     role_data: ?*c_void,
 
@@ -85,26 +101,11 @@ pub const Surface = extern struct {
     subsurfaces: wl.list.Head(Subsurface, "parent_link"),
     subsurface_pending_list: wl.list.Head(Subsurface, "parent_pending_link"),
 
+    current_outputs: wl.list.Head(Surface.Output, "link"),
+
     renderer_destroy: wl.Listener(*wlr.Renderer),
 
     data: usize,
-
-    extern fn wlr_surface_create(
-        client: *wl.Client,
-        version: u32,
-        id: u32,
-        renderer: *wlr.Renderer,
-        resource_list: ?*wl.list.Head(wl.Surface, null),
-    ) ?*Surface;
-    pub fn create(
-        client: *wl.Client,
-        version: u32,
-        id: u32,
-        renderer: *wlr.Renderer,
-        resource_list: ?*wl.list.Head(wl.Surface, null),
-    ) !*Surface {
-        return wlr_surface_create(client, version, id, renderer, resource_list) orelse error.OutOfMemory;
-    }
 
     extern fn wlr_surface_set_role(
         surface: *Surface,
@@ -182,6 +183,12 @@ pub const Surface = extern struct {
 
     extern fn wlr_surface_is_xwayland_surface(surface: *Surface) bool;
     pub const isXWaylandSurface = wlr_surface_is_xwayland_surface;
+
+    extern fn wlr_surface_lock_pending(surface: *Surface) u32;
+    pub const lockPending = wlr_surface_lock_pending;
+
+    extern fn wlr_surface_unlock_cached(surface: *Surface, seq: u32) void;
+    pub const unlockCached = wlr_surface_unlock_cached;
 };
 
 pub const Subsurface = extern struct {
@@ -197,7 +204,7 @@ pub const Subsurface = extern struct {
     current: State,
     pending: State,
 
-    cached: Surface.State,
+    cached_seq: u32,
     has_cache: bool,
 
     synchronized: bool,

@@ -49,6 +49,9 @@ pub const ClientBuffer = extern struct {
     resource_destroy: wl.Listener(*wl.Buffer),
     release: wl.Listener(void),
 
+    extern fn wlr_client_buffer_get(buffer: *wlr.Buffer) ?*ClientBuffer;
+    pub const get = wlr_client_buffer_get;
+
     extern fn wlr_client_buffer_import(renderer: *wlr.Renderer, resource: *wl.Buffer) ?*ClientBuffer;
     pub const import = wlr_client_buffer_import;
 

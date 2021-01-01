@@ -36,14 +36,14 @@ pub const OutputHeadV1 = extern struct {
         enabled: bool,
         mode: ?*wlr.Output.Mode,
         custom_mode: extern struct {
-            width: c_int,
-            height: c_int,
-            refresh: c_int,
+            width: i32,
+            height: i32,
+            refresh: i32,
         },
         x: i32,
         y: i32,
         transform: wl.Output.Transform,
-        scale: f64,
+        scale: f32,
     };
 
     state: State,

@@ -6,17 +6,24 @@ const wl = wayland.server.wl;
 pub const Device = extern struct {
     fd: c_int,
     dev: os.dev_t,
-    signal: wl.Signal(*Session),
-
     /// Session.devices
     link: wl.list.Link,
+
+    events: extern struct {
+        change: wl.Signal(void),
+    },
 };
 
 pub const Session = extern struct {
     const Impl = opaque {};
 
+    pub const event = struct {
+        pub const Add = extern struct {
+            path: [*:0]const u8,
+        };
+    };
+
     impl: *const Impl,
-    session_signal: wl.Signal(*Session),
     active: bool,
 
     vtnr: c_uint,
@@ -29,9 +36,12 @@ pub const Session = extern struct {
 
     devices: wl.list.Head(Device, "link"),
 
+    server: *wl.Server,
     server_destroy: wl.Listener(*wl.Server),
 
     events: extern struct {
+        active: wl.Signal(void),
+        add_drm_card: wl.Signal(*event.Add),
         destroy: wl.Signal(*Session),
     },
 
@@ -43,20 +53,19 @@ pub const Session = extern struct {
     extern fn wlr_session_destroy(session: *Session) void;
     pub const destroy = wlr_session_destroy;
 
-    extern fn wlr_session_open_file(session: *Session, path: [*:0]const u8) c_int;
-    pub const openFile = wlr_session_open_file;
+    extern fn wlr_session_open_file(session: *Session, path: [*:0]const u8) ?*Device;
+    pub fn openFile(session: *Session, path: [*:0]const u8) !*Device {
+        return wlr_session_open_file(session, path) orelse error.SessionOpenFileFailed;
+    }
 
-    extern fn wlr_session_close_file(session: *Session, fd: c_int) void;
+    extern fn wlr_session_close_file(session: *Session, device: *Device) void;
     pub const closeFile = wlr_session_close_file;
-
-    extern fn wlr_session_signal_add(session: *Session, fd: c_int, listener: *wl.Listener(*Session)) void;
-    pub const signalAdd = wlr_session_signal_add;
 
     extern fn wlr_session_change_vt(session: *Session, vt: c_uint) bool;
     pub fn changeVt(session: *Session, vt: c_uint) !void {
         if (!wlr_session_change_vt(session, vt)) return error.ChangeVtFailed;
     }
 
-    extern fn wlr_session_find_gpus(session: *Session, ret_len: usize, ret: [*]c_int) usize;
+    extern fn wlr_session_find_gpus(session: *Session, ret_len: usize, ret: [*]*Device) isize;
     pub const findGpus = wlr_session_find_gpus;
 };

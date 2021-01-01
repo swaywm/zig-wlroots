@@ -13,6 +13,14 @@ const xcb = struct {
     const Pixmap = u32;
     const Window = u32;
     const Atom = u32;
+
+    const StackMode = extern enum {
+        above = 0,
+        below = 1,
+        top_if = 2,
+        bottom_if = 3,
+        opposite = 4,
+    };
 };
 
 pub const Xwm = opaque {};
@@ -33,7 +41,7 @@ pub const XwaylandServer = extern struct {
 
     pid: os.pid_t,
     client: ?*wl.Client,
-    sigusr1_source: ?*wl.EventSource,
+    pipe_source: ?*wl.EventSource,
     wm_fd: [2]c_int,
     wl_fd: [2]c_int,
 
@@ -106,6 +114,13 @@ pub const Xwayland = extern struct {
 };
 
 pub const XwaylandSurface = extern struct {
+    pub const IccmInputModel = extern enum {
+        none = 0,
+        passive = 1,
+        local = 2,
+        global = 3,
+    };
+
     /// Bitfield with the size/alignment of a u32
     pub const Decorations = packed struct {
         no_border: bool align(@alignOf(u32)) = false,
@@ -259,6 +274,9 @@ pub const XwaylandSurface = extern struct {
     extern fn wlr_xwayland_surface_activate(surface: *XwaylandSurface, activated: bool) void;
     pub const activate = wlr_xwayland_surface_activate;
 
+    extern fn wlr_xwayland_surface_restack(surface: *XwaylandSurface, sibling: *XwaylandSurface, mode: xcb.StackMode) void;
+    pub const restack = wlr_xwayland_surface_restack;
+
     extern fn wlr_xwayland_surface_configure(surface: *XwaylandSurface, x: i16, y: i16, width: u16, height: u16) void;
     pub const configure = wlr_xwayland_surface_configure;
 
@@ -282,4 +300,7 @@ pub const XwaylandSurface = extern struct {
 
     extern fn wlr_xwayland_or_surface_wants_focus(surface: *const XwaylandSurface) bool;
     pub const overrideRedirectWantsFocus = wlr_xwayland_or_surface_wants_focus;
+
+    extern fn wlr_xwayland_iccm_input_model(surface: *const XwaylandSurface) IccmInputModel;
+    pub const iccmInputModel = wlr_xwayland_iccm_input_model;
 };

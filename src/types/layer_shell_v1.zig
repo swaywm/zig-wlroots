@@ -32,7 +32,7 @@ pub const LayerSurfaceV1 = extern struct {
             bottom: u32,
             left: u32,
         },
-        keyboard_interactive: bool,
+        keyboard_interactive: zwlr.LayerSurfaceV1.KeyboardInteractivity,
         desired_width: u32,
         desired_height: u32,
         actual_width: u32,
@@ -109,18 +109,18 @@ pub const LayerSurfaceV1 = extern struct {
         );
     }
 
-    extern fn wlr_layer_surface_v1_for_each_popup(
+    extern fn wlr_layer_surface_v1_for_each_popup_surface(
         surface: *LayerSurfaceV1,
         iterator: fn (*wlr.Surface, c_int, c_int, ?*c_void) callconv(.C) void,
         user_data: ?*c_void,
     ) void;
-    pub inline fn forEachPopup(
+    pub inline fn forEachPopupSurface(
         surface: *LayerSurfaceV1,
         comptime T: type,
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
         data: T,
     ) void {
-        wlr_layer_surface_v1_for_each_popup(
+        wlr_layer_surface_v1_for_each_popup_surface(
             surface,
             @ptrCast(fn (*wlr.Surface, c_int, c_int, ?*c_void) callconv(.C) void, iterator),
             data,
@@ -129,4 +129,7 @@ pub const LayerSurfaceV1 = extern struct {
 
     extern fn wlr_layer_surface_v1_surface_at(surface: *LayerSurfaceV1, sx: f64, sy: f64, sub_x: *f64, sub_y: *f64) ?*wlr.Surface;
     pub const surfaceAt = wlr_layer_surface_v1_surface_at;
+
+    extern fn wlr_layer_surface_v1_popup_surface_at(surface: *LayerSurfaceV1, sx: f64, sy: f64, sub_x: *f64, sub_y: *f64) ?*wlr.Surface;
+    pub const popupSurfaceAt = wlr_layer_surface_v1_popup_surface_at;
 };

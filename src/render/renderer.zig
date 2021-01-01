@@ -6,14 +6,6 @@ const wl = wayland.server.wl;
 pub const Renderer = extern struct {
     const Impl = opaque {};
 
-    pub const CreateFn = fn (
-        egl: *wlr.Egl,
-        platform: c_uint, // EGLenum
-        remote_display: ?*c_void,
-        config_attribs: *i32, // EGLint
-        visual_id: i32, // EGLint
-    ) callconv(.C) ?*Renderer;
-
     impl: *const Impl,
     rendering: bool,
     events: extern struct {
@@ -22,8 +14,12 @@ pub const Renderer = extern struct {
 
     // wlr_renderer functions:
 
-    // TODO: int types
-    extern fn wlr_renderer_begin(renderer: *Renderer, width: c_int, height: c_int) void;
+    extern fn wlr_renderer_autocreate(backend: *wlr.Backend) ?*Renderer;
+    pub fn autocreate(backend: *wlr.Backend) !*Renderer {
+        return wlr_renderer_autocreate(backend) orelse error.RendererCreateFailed;
+    }
+
+    extern fn wlr_renderer_begin(renderer: *Renderer, width: u32, height: u32) void;
     pub const begin = wlr_renderer_begin;
 
     pub extern fn wlr_renderer_end(renderer: *Renderer) void;
@@ -47,8 +43,8 @@ pub const Renderer = extern struct {
     extern fn wlr_renderer_scissor(renderer: *Renderer, box: *wlr.Box) void;
     pub const scissor = wlr_renderer_scissor;
 
-    extern fn wlr_renderer_get_formats(renderer: *Renderer, len: *usize) [*]const wl.Shm.Format;
-    pub const getFormats = wlr_renderer_get_formats;
+    extern fn wlr_renderer_get_shm_texture_formats(renderer: *Renderer, len: *usize) [*]const u32;
+    pub const getShmTextureFormats = wlr_renderer_get_shm_texture_formats;
 
     extern fn wlr_renderer_resource_is_wl_drm_buffer(renderer: *Renderer, buffer: *wl.Buffer) bool;
     pub const resourceIsWlDrmBuffer = wlr_renderer_resource_is_wl_drm_buffer;
@@ -62,12 +58,12 @@ pub const Renderer = extern struct {
     pub const wlDrmBufferGetSize = wlr_renderer_wl_drm_buffer_get_size;
 
     // TODO:
-    //extern fn wlr_renderer_get_dmabuf_formats(renderer: *Renderer) [*c]const struct_wlr_drm_format_set;
+    //extern fn wlr_renderer_get_dmabuf_texture_formats(renderer: *Renderer) [*c]const struct_wlr_drm_format_set;
     //pub const getDmabufFormats = wlr_renderer_get_dmabuf_formats;
 
     extern fn wlr_renderer_read_pixels(
         renderer: *Renderer,
-        fmt: wl.Shm.Format,
+        fmt: u32,
         flags: ?*u32,
         stride: u32,
         width: u32,
@@ -86,9 +82,6 @@ pub const Renderer = extern struct {
         src: *wlr.DmabufAttributes,
     ) bool;
     pub const blitDmabuf = wlr_renderer_blit_dmabuf;
-
-    extern fn wlr_renderer_format_supported(renderer: *Renderer, fmt: wl.Shm.Format) bool;
-    pub const formatSupported = wlr_renderer_format_supported;
 
     extern fn wlr_renderer_get_drm_fd(renderer: *Renderer) c_int;
     pub const getDrmFd = wlr_renderer_get_drm_fd;

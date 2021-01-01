@@ -105,6 +105,11 @@ pub const Output = extern struct {
             /// This is a bitfield of Present.flag members
             flags: u32,
         };
+
+        pub const Bind = extern struct {
+            output: *wlr.Output,
+            resource: *wl.Output,
+        };
     };
 
     const Impl = opaque {};
@@ -151,10 +156,9 @@ pub const Output = extern struct {
         precommit: wl.Signal(*event.Precommit),
         commit: wl.Signal(*event.Commit),
         present: wl.Signal(*event.Present),
+        bind: wl.Signal(*event.Bind),
         enable: wl.Signal(*Output),
         mode: wl.Signal(*Output),
-        scale: wl.Signal(*Output),
-        transform: wl.Signal(*Output),
         description: wl.Signal(*Output),
         destroy: wl.Signal(*Output),
     },
@@ -226,7 +230,7 @@ pub const Output = extern struct {
     extern fn wlr_output_attach_buffer(output: *Output, buffer: *wlr.Buffer) void;
     pub const attachBuffer = wlr_output_attach_buffer;
 
-    extern fn wlr_output_preferred_read_format(output: *Output, fmt: *wl.Shm.Format) bool;
+    extern fn wlr_output_preferred_read_format(output: *Output) u32;
     pub const preferredReadFormat = wlr_output_preferred_read_format;
 
     extern fn wlr_output_set_damage(output: *Output, damage: *pixman.Region32) void;

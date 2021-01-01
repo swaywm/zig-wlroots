@@ -103,7 +103,7 @@ pub const XdgPopup = extern struct {
     extern fn wlr_xdg_popup_get_toplevel_coords(popup: *XdgPopup, popup_sx: c_int, popup_sy: c_int, toplevel_sx: *c_int, toplevel_sy: *c_int) void;
     pub const getToplevelCoords = wlr_xdg_popup_get_toplevel_coords;
 
-    extern fn wlr_xdg_popup_unconstrain_from_box(popup: *XdgPopup, toplevel_sx_box: *wlr.Box) void;
+    extern fn wlr_xdg_popup_unconstrain_from_box(popup: *XdgPopup, toplevel_sx_box: *const wlr.Box) void;
     pub const unconstrainFromBox = wlr_xdg_popup_unconstrain_from_box;
 };
 
@@ -211,6 +211,11 @@ pub const XdgToplevel = extern struct {
     pub fn sendClose(toplevel: *wlr.XdgToplevel) void {
         wlr_xdg_toplevel_send_close(toplevel.base);
     }
+
+    extern fn wlr_xdg_toplevel_set_parent(surface: *wlr.XdgSurface, parent: ?*wlr.XdgSurface) void;
+    pub fn setParent(toplevel: *wlr.XdgToplevel, parent: ?*wlr.XdgToplevel) void {
+        wlr_xdg_toplevel_set_parent(toplevel.base, if (parent) |p| p.base else null);
+    }
 };
 
 pub const XdgSurface = extern struct {
@@ -284,6 +289,9 @@ pub const XdgSurface = extern struct {
     extern fn wlr_xdg_surface_surface_at(surface: *wlr.XdgSurface, sx: f64, sy: f64, sub_x: *f64, sub_y: *f64) ?*wlr.Surface;
     pub const surfaceAt = wlr_xdg_surface_surface_at;
 
+    extern fn wlr_xdg_surface_popup_surface_at(surface: *wlr.XdgSurface, sx: f64, sy: f64, sub_x: *f64, sub_y: *f64) ?*wlr.Surface;
+    pub const popupSurfaceAt = wlr_xdg_surface_popup_surface_at;
+
     extern fn wlr_xdg_surface_from_wlr_surface(surface: *wlr.Surface) *wlr.XdgSurface;
     pub const fromWlrSurface = wlr_xdg_surface_from_wlr_surface;
 
@@ -308,24 +316,24 @@ pub const XdgSurface = extern struct {
         );
     }
 
-    extern fn wlr_xdg_surface_schedule_configure(surface: *wlr.XdgSurface) u32;
-    pub const scheduleConfigure = wlr_xdg_surface_schedule_configure;
-
-    extern fn wlr_xdg_surface_for_each_popup(
+    extern fn wlr_xdg_surface_for_each_popup_surface(
         surface: *wlr.XdgSurface,
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
         user_data: ?*c_void,
     ) void;
-    pub inline fn forEachPopup(
+    pub inline fn forEachPopupSurface(
         surface: *wlr.XdgSurface,
         comptime T: type,
         iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
         data: T,
     ) void {
-        wlr_xdg_surface_for_each_popup(
+        wlr_xdg_surface_for_each_popup_surface(
             surface,
             @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void, iterator),
             data,
         );
     }
+
+    extern fn wlr_xdg_surface_schedule_configure(surface: *wlr.XdgSurface) u32;
+    pub const scheduleConfigure = wlr_xdg_surface_schedule_configure;
 };

@@ -19,6 +19,6 @@ pub const DmabufAttributes = extern struct {
     extern fn wlr_dmabuf_attributes_finish(attribs: *DmabufAttributes) void;
     pub const finish = wlr_dmabuf_attributes_finish;
 
-    extern fn wlr_dmabuf_attributes_copy(dst: *DmabufAttributes, src: *DmabufAttributes) bool;
+    extern fn wlr_dmabuf_attributes_copy(dst: *DmabufAttributes, src: *const DmabufAttributes) bool;
     pub const copy = wlr_dmabuf_attributes_copy;
 };

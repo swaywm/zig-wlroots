@@ -14,4 +14,5 @@ pub const has_x11_backend = c.WLR_HAS_X11_BACKEND != 0;
 pub const has_xwayland = c.WLR_HAS_XWAYLAND != 0;
 
 pub const has_xcb_errors = c.WLR_HAS_XCB_ERRORS != 0;
-pub const has_xcb_iccm = c.WLR_HAS_XCB_ICCCM != 0;
+
+pub const has_xdg_foreign = c.WLR_HAS_XDG_FOREIGN != 0;
