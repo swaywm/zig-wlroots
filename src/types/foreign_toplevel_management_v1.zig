@@ -29,7 +29,7 @@ pub const ForeignToplevelHandleV1 = extern struct {
         minimized: bool = false,
         activated: bool = false,
         fullscreen: bool = false,
-        _: u28,
+        _: u28 = 0,
         comptime {
             std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
             std.debug.assert(@alignOf(@This()) == @alignOf(u32));
