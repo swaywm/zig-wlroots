@@ -142,7 +142,7 @@ pub const Surface = extern struct {
     extern fn wlr_surface_get_extends(surface: *Surface, box: *wlr.Box) void;
     pub const getExtends = wlr_surface_get_extends;
 
-    extern fn wlr_surface_from_resource(resource: *wl.Surface) ?*Surface;
+    extern fn wlr_surface_from_resource(resource: *wl.Surface) *Surface;
     pub const fromWlSurface = wlr_surface_from_resource;
 
     extern fn wlr_surface_for_each_surface(
