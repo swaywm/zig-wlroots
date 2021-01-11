@@ -40,25 +40,25 @@ const Server = struct {
 
     output_layout: *wlr.OutputLayout,
     outputs: std.TailQueue(Output) = .{},
-    new_output: wl.Listener(*wlr.Output) = undefined,
+    new_output: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(newOutput),
 
     xdg_shell: *wlr.XdgShell,
-    new_xdg_surface: wl.Listener(*wlr.XdgSurface) = undefined,
+    new_xdg_surface: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(newXdgSurface),
     views: std.TailQueue(View) = .{},
 
     seat: *wlr.Seat,
-    new_input: wl.Listener(*wlr.InputDevice) = undefined,
-    request_set_cursor: wl.Listener(*wlr.Seat.event.RequestSetCursor) = undefined,
-    request_set_selection: wl.Listener(*wlr.Seat.event.RequestSetSelection) = undefined,
+    new_input: wl.Listener(*wlr.InputDevice) = wl.Listener(*wlr.InputDevice).init(newInput),
+    request_set_cursor: wl.Listener(*wlr.Seat.event.RequestSetCursor) = wl.Listener(*wlr.Seat.event.RequestSetCursor).init(requestSetCursor),
+    request_set_selection: wl.Listener(*wlr.Seat.event.RequestSetSelection) = wl.Listener(*wlr.Seat.event.RequestSetSelection).init(requestSetSelection),
     keyboards: std.TailQueue(Keyboard) = .{},
 
     cursor: *wlr.Cursor,
     cursor_mgr: *wlr.XcursorManager,
-    cursor_motion: wl.Listener(*wlr.Pointer.event.Motion) = undefined,
-    cursor_motion_absolute: wl.Listener(*wlr.Pointer.event.MotionAbsolute) = undefined,
-    cursor_button: wl.Listener(*wlr.Pointer.event.Button) = undefined,
-    cursor_axis: wl.Listener(*wlr.Pointer.event.Axis) = undefined,
-    cursor_frame: wl.Listener(*wlr.Cursor) = undefined,
+    cursor_motion: wl.Listener(*wlr.Pointer.event.Motion) = wl.Listener(*wlr.Pointer.event.Motion).init(cursorMotion),
+    cursor_motion_absolute: wl.Listener(*wlr.Pointer.event.MotionAbsolute) = wl.Listener(*wlr.Pointer.event.MotionAbsolute).init(cursorMotionAbsolute),
+    cursor_button: wl.Listener(*wlr.Pointer.event.Button) = wl.Listener(*wlr.Pointer.event.Button).init(cursorButton),
+    cursor_axis: wl.Listener(*wlr.Pointer.event.Axis) = wl.Listener(*wlr.Pointer.event.Axis).init(cursorAxis),
+    cursor_frame: wl.Listener(*wlr.Cursor) = wl.Listener(*wlr.Cursor).init(cursorFrame),
 
     cursor_mode: enum { passthrough, move, resize } = .passthrough,
     grabbed_view: ?*View = null,
@@ -86,30 +86,20 @@ const Server = struct {
         _ = try wlr.Compositor.create(server.wl_server, server.renderer);
         _ = try wlr.DataDeviceManager.create(server.wl_server);
 
-        server.new_output.setNotify(newOutput);
         server.backend.events.new_output.add(&server.new_output);
 
-        server.new_xdg_surface.setNotify(newXdgSurface);
         server.xdg_shell.events.new_surface.add(&server.new_xdg_surface);
 
-        server.new_input.setNotify(newInput);
         server.backend.events.new_input.add(&server.new_input);
-        server.request_set_cursor.setNotify(requestSetCursor);
         server.seat.events.request_set_cursor.add(&server.request_set_cursor);
-        server.request_set_selection.setNotify(requestSetSelection);
         server.seat.events.request_set_selection.add(&server.request_set_selection);
 
         server.cursor.attachOutputLayout(server.output_layout);
         try server.cursor_mgr.load(1);
-        server.cursor_motion.setNotify(cursorMotion);
         server.cursor.events.motion.add(&server.cursor_motion);
-        server.cursor_motion_absolute.setNotify(cursorMotionAbsolute);
         server.cursor.events.motion_absolute.add(&server.cursor_motion_absolute);
-        server.cursor_button.setNotify(cursorButton);
         server.cursor.events.button.add(&server.cursor_button);
-        server.cursor_axis.setNotify(cursorAxis);
         server.cursor.events.axis.add(&server.cursor_axis);
-        server.cursor_frame.setNotify(cursorFrame);
         server.cursor.events.frame.add(&server.cursor_frame);
     }
 
@@ -139,7 +129,6 @@ const Server = struct {
             .wlr_output = wlr_output,
         };
 
-        output.frame.setNotify(Output.frame);
         wlr_output.events.frame.add(&output.frame);
 
         server.output_layout.addAuto(wlr_output);
@@ -163,15 +152,10 @@ const Server = struct {
             .xdg_surface = xdg_surface,
         };
 
-        view.map.setNotify(View.map);
         xdg_surface.events.map.add(&view.map);
-        view.unmap.setNotify(View.unmap);
         xdg_surface.events.unmap.add(&view.unmap);
-        view.destroy.setNotify(View.destroy);
         xdg_surface.events.destroy.add(&view.destroy);
-        view.request_move.setNotify(View.requestMove);
         xdg_surface.role_data.toplevel.events.request_move.add(&view.request_move);
-        view.request_resize.setNotify(View.requestResize);
         xdg_surface.role_data.toplevel.events.request_resize.add(&view.request_resize);
     }
 
@@ -390,7 +374,7 @@ const Output = struct {
     server: *Server,
     wlr_output: *wlr.Output,
 
-    frame: wl.Listener(*wlr.Output) = undefined,
+    frame: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(frame),
 
     fn frame(listener: *wl.Listener(*wlr.Output), wlr_output: *wlr.Output) void {
         const output = @fieldParentPtr(Output, "frame", listener);
@@ -465,11 +449,11 @@ const View = struct {
     x: i32 = 0,
     y: i32 = 0,
 
-    map: wl.Listener(*wlr.XdgSurface) = undefined,
-    unmap: wl.Listener(*wlr.XdgSurface) = undefined,
-    destroy: wl.Listener(*wlr.XdgSurface) = undefined,
-    request_move: wl.Listener(*wlr.XdgToplevel.event.Move) = undefined,
-    request_resize: wl.Listener(*wlr.XdgToplevel.event.Resize) = undefined,
+    map: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(map),
+    unmap: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(unmap),
+    destroy: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(destroy),
+    request_move: wl.Listener(*wlr.XdgToplevel.event.Move) = wl.Listener(*wlr.XdgToplevel.event.Move).init(requestMove),
+    request_resize: wl.Listener(*wlr.XdgToplevel.event.Resize) = wl.Listener(*wlr.XdgToplevel.event.Resize).init(requestResize),
 
     fn map(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "map", listener);
@@ -533,8 +517,8 @@ const Keyboard = struct {
     server: *Server,
     device: *wlr.InputDevice,
 
-    modifiers: wl.Listener(*wlr.Keyboard) = undefined,
-    key: wl.Listener(*wlr.Keyboard.event.Key) = undefined,
+    modifiers: wl.Listener(*wlr.Keyboard) = wl.Listener(*wlr.Keyboard).init(modifiers),
+    key: wl.Listener(*wlr.Keyboard.event.Key) = wl.Listener(*wlr.Keyboard.event.Key).init(key),
 
     fn create(server: *Server, device: *wlr.InputDevice) !void {
         const node = try gpa.create(std.TailQueue(Keyboard).Node);
@@ -555,9 +539,7 @@ const Keyboard = struct {
         if (!wlr_keyboard.setKeymap(keymap)) return error.SetKeymapFailed;
         wlr_keyboard.setRepeatInfo(25, 600);
 
-        keyboard.modifiers.setNotify(modifiers);
         wlr_keyboard.events.modifiers.add(&keyboard.modifiers);
-        keyboard.key.setNotify(key);
         wlr_keyboard.events.key.add(&keyboard.key);
 
         server.seat.setKeyboard(device);
