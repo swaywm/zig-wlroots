@@ -107,7 +107,6 @@ const Server = struct {
     fn deinit(server: *Server) void {
         server.wl_server.destroyClients();
         server.wl_server.destroy();
-        server.backend.destroy();
     }
 
     fn newOutput(listener: *wl.Listener(*wlr.Output), wlr_output: *wlr.Output) void {
