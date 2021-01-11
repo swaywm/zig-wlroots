@@ -39,18 +39,17 @@ const Server = struct {
     renderer: *wlr.Renderer,
 
     output_layout: *wlr.OutputLayout,
-    outputs: std.TailQueue(Output) = .{},
     new_output: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(newOutput),
 
     xdg_shell: *wlr.XdgShell,
     new_xdg_surface: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(newXdgSurface),
-    views: std.TailQueue(View) = .{},
+    views: wl.list.Head(View, "link") = undefined,
 
     seat: *wlr.Seat,
     new_input: wl.Listener(*wlr.InputDevice) = wl.Listener(*wlr.InputDevice).init(newInput),
     request_set_cursor: wl.Listener(*wlr.Seat.event.RequestSetCursor) = wl.Listener(*wlr.Seat.event.RequestSetCursor).init(requestSetCursor),
     request_set_selection: wl.Listener(*wlr.Seat.event.RequestSetSelection) = wl.Listener(*wlr.Seat.event.RequestSetSelection).init(requestSetSelection),
-    keyboards: std.TailQueue(Keyboard) = .{},
+    keyboards: wl.list.Head(Keyboard, "link") = undefined,
 
     cursor: *wlr.Cursor,
     cursor_mgr: *wlr.XcursorManager,
@@ -89,10 +88,12 @@ const Server = struct {
         server.backend.events.new_output.add(&server.new_output);
 
         server.xdg_shell.events.new_surface.add(&server.new_xdg_surface);
+        server.views.init();
 
         server.backend.events.new_input.add(&server.new_input);
         server.seat.events.request_set_cursor.add(&server.request_set_cursor);
         server.seat.events.request_set_selection.add(&server.request_set_selection);
+        server.keyboards.init();
 
         server.cursor.attachOutputLayout(server.output_layout);
         try server.cursor_mgr.load(1);
@@ -118,11 +119,10 @@ const Server = struct {
             wlr_output.commit() catch return;
         }
 
-        const node = gpa.create(std.TailQueue(Output).Node) catch {
+        const output = gpa.create(Output) catch {
             std.log.crit("failed to allocate new output", .{});
             return;
         };
-        const output = &node.data;
 
         output.* = .{
             .server = server,
@@ -132,7 +132,6 @@ const Server = struct {
         wlr_output.events.frame.add(&output.frame);
 
         server.output_layout.addAuto(wlr_output);
-        server.outputs.append(node);
     }
 
     fn newXdgSurface(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
@@ -141,11 +140,10 @@ const Server = struct {
         if (xdg_surface.role != .toplevel) return;
 
         // Don't add the view to server.views until it is mapped
-        const node = gpa.create(std.TailQueue(View).Node) catch {
+        const view = gpa.create(View) catch {
             std.log.crit("failed to allocate new view", .{});
             return;
         };
-        const view = &node.data;
 
         view.* = .{
             .server = server,
@@ -167,9 +165,8 @@ const Server = struct {
     };
 
     fn viewAt(server: *Server, lx: f64, ly: f64) ?ViewAtResult {
-        var it = server.views.first;
-        while (it) |node| : (it = node.next) {
-            const view = &node.data;
+        var it = server.views.iterator(.forward);
+        while (it.next()) |view| {
             var sx: f64 = undefined;
             var sy: f64 = undefined;
             const x = lx - @intToFloat(f64, view.x);
@@ -195,9 +192,8 @@ const Server = struct {
             }
         }
 
-        const node = @fieldParentPtr(std.TailQueue(View).Node, "data", view);
-        server.views.remove(node);
-        server.views.prepend(node);
+        view.link.remove();
+        server.views.prepend(view);
 
         _ = view.xdg_surface.role_data.toplevel.setActivated(true);
 
@@ -218,7 +214,7 @@ const Server = struct {
 
         server.seat.setCapabilities(.{
             .pointer = true,
-            .keyboard = server.keyboards.len > 0,
+            .keyboard = server.keyboards.length() > 0,
         });
     }
 
@@ -352,9 +348,10 @@ const Server = struct {
             .Escape => server.wl_server.terminate(),
             // Focus the next view in the stack, pushing the current top to the back
             .F1 => {
-                if (server.views.len < 2) return true;
-                server.views.append(server.views.popFirst().?);
-                const view = &server.views.first.?.data;
+                if (server.views.length() < 2) return true;
+                const view = @fieldParentPtr(View, "link", server.views.link.next.?);
+                view.link.remove();
+                server.views.append(view);
                 server.focusView(view, view.xdg_surface.surface);
             },
             else => return false,
@@ -395,9 +392,8 @@ const Output = struct {
         server.renderer.clear(&color);
 
         // In reverse order to render views at the front of the list on top
-        var it = server.views.last;
-        while (it) |node| : (it = node.prev) {
-            const view = &node.data;
+        var it = server.views.iterator(.reverse);
+        while (it.next()) |view| {
             var rdata = RenderData{
                 .wlr_output = wlr_output,
                 .view = view,
@@ -444,6 +440,7 @@ const Output = struct {
 
 const View = struct {
     server: *Server,
+    link: wl.list.Link = undefined,
     xdg_surface: *wlr.XdgSurface,
 
     x: i32 = 0,
@@ -457,8 +454,7 @@ const View = struct {
 
     fn map(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "map", listener);
-        const node = @fieldParentPtr(std.TailQueue(View).Node, "data", view);
-        view.server.views.prepend(node);
+        view.server.views.prepend(view);
         view.x -= xdg_surface.geometry.x;
         view.y -= xdg_surface.geometry.y;
         view.server.focusView(view, xdg_surface.surface);
@@ -466,14 +462,12 @@ const View = struct {
 
     fn unmap(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "unmap", listener);
-        const node = @fieldParentPtr(std.TailQueue(View).Node, "data", view);
-        view.server.views.remove(node);
+        view.link.remove();
     }
 
     fn destroy(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "destroy", listener);
-        const node = @fieldParentPtr(std.TailQueue(View).Node, "data", view);
-        gpa.destroy(node);
+        gpa.destroy(view);
     }
 
     fn requestMove(
@@ -515,16 +509,16 @@ const View = struct {
 
 const Keyboard = struct {
     server: *Server,
+    link: wl.list.Link = undefined,
     device: *wlr.InputDevice,
 
     modifiers: wl.Listener(*wlr.Keyboard) = wl.Listener(*wlr.Keyboard).init(modifiers),
     key: wl.Listener(*wlr.Keyboard.event.Key) = wl.Listener(*wlr.Keyboard.event.Key).init(key),
 
     fn create(server: *Server, device: *wlr.InputDevice) !void {
-        const node = try gpa.create(std.TailQueue(Keyboard).Node);
-        errdefer gpa.destroy(node);
+        const keyboard = try gpa.create(Keyboard);
+        errdefer gpa.destroy(keyboard);
 
-        const keyboard = &node.data;
         keyboard.* = .{
             .server = server,
             .device = device,
@@ -543,7 +537,7 @@ const Keyboard = struct {
         wlr_keyboard.events.key.add(&keyboard.key);
 
         server.seat.setKeyboard(device);
-        server.keyboards.append(node);
+        server.keyboards.append(keyboard);
     }
 
     fn modifiers(listener: *wl.Listener(*wlr.Keyboard), wlr_keyboard: *wlr.Keyboard) void {
