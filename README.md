@@ -16,7 +16,7 @@ as stable as wlroots*
 
 ## Usage
 
-See [tinwyl.zig](./tinywl/) for an example compositor using zig-wlroots and an example
+See [tinywl.zig](./tinywl/) for an example compositor using zig-wlroots and an example
 of how to integrate zig-wlroots and its dependencies into your build.zig.
 
 See the C headers of wlroots for documentation.
@@ -28,6 +28,6 @@ are not part of zig-wlroots and are released under the Zero Clause BSD license.
 
 ## TODO
 
-- [x] Bind enough to port [tinwyl](https://github.com/swaywm/wlroots/tree/master/tinywl)
+- [x] Bind enough to port [tinywl](https://github.com/swaywm/wlroots/tree/master/tinywl)
 - [x] Bind enough to port [river](https://github.com/ifreund/river)
 - [ ] Complete bindings
