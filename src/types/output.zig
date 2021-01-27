@@ -275,6 +275,18 @@ pub const Output = extern struct {
 
     extern fn wlr_output_is_noop(output: *Output) bool;
     pub const isNoop = wlr_output_is_noop;
+
+    extern fn wlr_output_is_wl(output: *Output) bool;
+    pub const isWl = wlr_output_is_wl;
+
+    extern fn wlr_output_is_X11(output: *Output) bool;
+    pub const isX11 = wlr_output_is_x11;
+
+    extern fn wlr_wl_output_set_title(output: *Output, title: ?[*:0]const u8) void;
+    pub const wlSetTitle = wlr_wl_output_set_title;
+
+    extern fn wlr_x11_output_set_title(output: *Output, title: ?[*:0]const u8) void;
+    pub const x11SetTitle = wlr_x11_output_set_title;
 };
 
 pub const OutputCursor = extern struct {
