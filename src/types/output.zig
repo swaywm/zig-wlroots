@@ -279,7 +279,7 @@ pub const Output = extern struct {
     extern fn wlr_output_is_wl(output: *Output) bool;
     pub const isWl = wlr_output_is_wl;
 
-    extern fn wlr_output_is_X11(output: *Output) bool;
+    extern fn wlr_output_is_x11(output: *Output) bool;
     pub const isX11 = wlr_output_is_x11;
 
     extern fn wlr_wl_output_set_title(output: *Output, title: ?[*:0]const u8) void;
