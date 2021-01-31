@@ -16,7 +16,6 @@ pub const PointerConstraint = extern struct {
         committed: u32,
         region: pixman.Region32,
 
-        // only valid for locked_pointer
         cursor_hint: extern struct {
           x: f64,
           y: f64,
