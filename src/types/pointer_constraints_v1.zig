@@ -4,7 +4,7 @@ const pixman = @import("pixman");
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
-const zpointer = wayland.server.zpointer;
+const zwp = wayland.server.zwp;
 
 pub const PointerConstraint = extern struct {
     pub const State = extern struct {
@@ -32,7 +32,7 @@ pub const PointerConstraint = extern struct {
     resource: *wl.Resource,
     surface: *wlr.Surface,
     seat: *wlr.Seat,
-    lifetime: zpointer.PointerConstraintsV1.Lifetime,
+    lifetime: zwp.PointerConstraintsV1.Lifetime,
     type: Type,
     region: pixman.Region32,
 
