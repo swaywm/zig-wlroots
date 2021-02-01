@@ -9,7 +9,7 @@ const zwp = wayland.server.zwp;
 
 pub const PointerConstraintV1 = extern struct {
     pub const State = extern struct {
-        pub const field = packed struct {
+        pub const Field = packed struct {
             region: bool align(@alignOf(u32)) = false,
             cursor_hint: bool = false,
             _: u30 = 0,
@@ -19,7 +19,7 @@ pub const PointerConstraintV1 = extern struct {
             }
         };
 
-        committed: u32,
+        committed: Field,
         region: pixman.Region32,
 
         cursor_hint: extern struct {
@@ -81,6 +81,6 @@ pub const PointerConstraintsV1 = extern struct {
         return wlr_pointer_constraints_v1_create(server) orelse error.OutOfMemory;
     }
 
-    extern fn wlr_pointer_constraints_v1_constraint_for_surface(pointer_constraints: *PointerConstraintsV1, surface: *wlr.Surface, seat: *wlr.Seat) ?*wlr_pointer_constraint_v1;
+    extern fn wlr_pointer_constraints_v1_constraint_for_surface(pointer_constraints: *PointerConstraintsV1, surface: *wlr.Surface, seat: *wlr.Seat) ?*PointerConstraintV1;
     pub const constraintForSurface = wlr_pointer_constraints_v1_constraint_for_surface;
 };
