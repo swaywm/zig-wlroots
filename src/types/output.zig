@@ -116,11 +116,11 @@ pub const Output = extern struct {
     global: *wl.Global,
     resources: wl.list.Head(wl.Output, null),
 
-    name: [24]u8,
+    name: [23:0]u8,
     description: ?[*:0]u8,
-    make: [56]u8,
-    model: [16]u8,
-    serial: [16]u8,
+    make: [55:0]u8,
+    model: [15:0]u8,
+    serial: [15:0]u8,
     phys_width: i32,
     phys_height: i32,
 
