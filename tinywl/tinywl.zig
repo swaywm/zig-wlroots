@@ -21,7 +21,9 @@ pub fn main() anyerror!void {
     if (os.argv.len >= 2) {
         const cmd = std.mem.span(os.argv[1]);
         var child = try std.ChildProcess.init(&[_][]const u8{ "/bin/sh", "-c", cmd }, gpa);
+        defer child.deinit();
         var env_map = try std.process.getEnvMap(gpa);
+        defer env_map.deinit();
         try env_map.set("WAYLAND_DISPLAY", socket);
         child.env_map = &env_map;
         try child.spawn();
@@ -29,7 +31,7 @@ pub fn main() anyerror!void {
 
     try server.backend.start();
 
-    std.log.info("Runnnig compositor on WAYLAND_DISPLAY={}", .{socket});
+    std.log.info("Running compositor on WAYLAND_DISPLAY={}", .{socket});
     server.wl_server.run();
 }
 
@@ -197,7 +199,12 @@ const Server = struct {
         _ = view.xdg_surface.role_data.toplevel.setActivated(true);
 
         const wlr_keyboard = server.seat.getKeyboard() orelse return;
-        server.seat.keyboardNotifyEnter(surface, &wlr_keyboard.keycodes, wlr_keyboard.num_keycodes, &wlr_keyboard.modifiers);
+        server.seat.keyboardNotifyEnter(
+            surface,
+            &wlr_keyboard.keycodes,
+            wlr_keyboard.num_keycodes,
+            &wlr_keyboard.modifiers,
+        );
     }
 
     fn newInput(listener: *wl.Listener(*wlr.InputDevice), device: *wlr.InputDevice) void {
@@ -466,6 +473,13 @@ const View = struct {
 
     fn destroy(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "destroy", listener);
+
+        view.map.link.remove();
+        view.unmap.link.remove();
+        view.destroy.link.remove();
+        view.request_move.link.remove();
+        view.request_resize.link.remove();
+
         gpa.destroy(view);
     }
 
