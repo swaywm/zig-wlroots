@@ -51,7 +51,7 @@ pub const PointerConstraintV1 = extern struct {
     link: wl.list.Link,
 
     events: extern struct {
-        set_region: wl.Signal(*PointerConstraintV1),
+        set_region: wl.Signal(void),
         destroy: wl.Signal(*PointerConstraintV1),
     },
 
