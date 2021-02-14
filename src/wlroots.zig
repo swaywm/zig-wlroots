@@ -55,6 +55,9 @@ pub const PointerGesturesV1 = @import("types/pointer_gestures_v1.zig").PointerGe
 pub const AxisOrientation = @import("types/pointer.zig").AxisOrientation;
 pub const AxisSource = @import("types/pointer.zig").AxisSource;
 
+pub const RelativePointerManagerV1 = @import("types/relative_pointer_v1.zig").RelativePointerManagerV1;
+pub const RelativePointerV1 = @import("types/relative_pointer_v1.zig").RelativePointerV1;
+
 pub const Touch = @import("types/touch.zig").Touch;
 
 pub const Tablet = @import("types/tablet_tool.zig").Tablet;
