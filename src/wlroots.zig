@@ -51,6 +51,7 @@ pub const Cursor = @import("types/cursor.zig").Cursor;
 pub const Pointer = @import("types/pointer.zig").Pointer;
 pub const PointerConstraintV1 = @import("types/pointer_constraints_v1.zig").PointerConstraintV1;
 pub const PointerConstraintsV1 = @import("types/pointer_constraints_v1.zig").PointerConstraintsV1;
+pub const PointerGesturesV1 = @import("types/pointer_gestures_v1.zig").PointerGesturesV1;
 pub const AxisOrientation = @import("types/pointer.zig").AxisOrientation;
 pub const AxisSource = @import("types/pointer.zig").AxisSource;
 
