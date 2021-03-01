@@ -135,3 +135,5 @@ pub const OutputConfigurationV1 = @import("types/output_management_v1.zig").Outp
 
 pub const ForeignToplevelManagerV1 = @import("types/foreign_toplevel_management_v1.zig").ForeignToplevelManagerV1;
 pub const ForeignToplevelHandleV1 = @import("types/foreign_toplevel_management_v1.zig").ForeignToplevelHandleV1;
+
+pub const config = @import("config.zig");
