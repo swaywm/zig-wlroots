@@ -72,6 +72,9 @@ pub const VirtualKeyboardV1 = @import("types/virtual_keyboard_v1.zig").VirtualKe
 pub const Idle = @import("types/idle.zig").Idle;
 pub const IdleTimeout = @import("types/idle.zig").IdleTimeout;
 
+pub const IdleInhibitManagerV1 = @import("types/idle_inhibit_v1.zig").IdleInhibitManagerV1;
+pub const IdleInhibitorV1 = @import("types/idle_inhibit_v1.zig").IdleInhibitorV1;
+
 pub const InputInhibitManager = @import("types/input_inhibitor.zig").InputInhibitManager;
 
 pub const DataDeviceManager = @import("types/data_device.zig").DataDeviceManager;
