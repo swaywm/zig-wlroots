@@ -70,7 +70,7 @@ const Server = struct {
 
     fn init(server: *Server) !void {
         const wl_server = try wl.Server.create();
-        const backend = try wlr.Backend.autocreate(wl_server, null);
+        const backend = try wlr.Backend.autocreate(wl_server);
         server.* = .{
             .wl_server = wl_server,
             .backend = backend,
@@ -388,11 +388,7 @@ const Output = struct {
 
         wlr_output.attachRender(null) catch return;
 
-        var width: c_int = undefined;
-        var height: c_int = undefined;
-        wlr_output.effectiveResolution(&width, &height);
-
-        server.renderer.begin(width, height);
+        server.renderer.begin(@intCast(u32, wlr_output.width), @intCast(u32, wlr_output.height));
 
         const color = [4]f32{ 0.3, 0.3, 0.3, 1.0 };
         server.renderer.clear(&color);
