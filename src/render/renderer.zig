@@ -40,7 +40,7 @@ pub const Renderer = extern struct {
         return wlr_resource_get_buffer_size(resource, renderer, width, height);
     }
 
-    extern fn wlr_renderer_scissor(renderer: *Renderer, box: *wlr.Box) void;
+    extern fn wlr_renderer_scissor(renderer: *Renderer, box: ?*wlr.Box) void;
     pub const scissor = wlr_renderer_scissor;
 
     extern fn wlr_renderer_get_shm_texture_formats(renderer: *Renderer, len: *usize) [*]const u32;
