@@ -355,9 +355,7 @@ const Server = struct {
             // Focus the next view in the stack, pushing the current top to the back
             .F1 => {
                 if (server.views.length() < 2) return true;
-                const view = @fieldParentPtr(View, "link", server.views.link.next.?);
-                view.link.remove();
-                server.views.append(view);
+                const view = @fieldParentPtr(View, "link", server.views.link.prev.?);
                 server.focusView(view, view.xdg_surface.surface);
             },
             else => return false,
