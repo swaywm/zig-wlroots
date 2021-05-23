@@ -24,14 +24,14 @@ pub fn main() anyerror!void {
         defer child.deinit();
         var env_map = try std.process.getEnvMap(gpa);
         defer env_map.deinit();
-        try env_map.set("WAYLAND_DISPLAY", socket);
+        try env_map.put("WAYLAND_DISPLAY", socket);
         child.env_map = &env_map;
         try child.spawn();
     }
 
     try server.backend.start();
 
-    std.log.info("Running compositor on WAYLAND_DISPLAY={}", .{socket});
+    std.log.info("Running compositor on WAYLAND_DISPLAY={s}", .{socket});
     server.wl_server.run();
 }
 
