@@ -10,7 +10,7 @@ pub const DataDeviceManager = extern struct {
     server_destroy: wl.Listener(*wl.Server),
 
     events: extern struct {
-        destroy: wl.Signal(*DataDeviceManager)
+        destroy: wl.Signal(*DataDeviceManager),
     },
 
     data: usize,
