@@ -42,6 +42,8 @@ pub const SerialRingset = @import("types/seat.zig").SerialRingset;
 pub const TouchPoint = @import("types/seat.zig").TouchPoint;
 
 pub const InputDevice = @import("types/input_device.zig").InputDevice;
+pub const InputMethodV2 = @import("types/input_method_v2.zig").InputMethodV2;
+pub const InputMethodManagerV2 = @import("types/input_method_v2.zig").InputMethodManagerV2;
 
 pub const Keyboard = @import("types/keyboard.zig").Keyboard;
 pub const KeyboardGroup = @import("types/keyboard_group.zig").KeyboardGroup;
