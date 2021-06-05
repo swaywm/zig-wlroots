@@ -43,6 +43,9 @@ pub const TouchPoint = @import("types/seat.zig").TouchPoint;
 
 pub const InputDevice = @import("types/input_device.zig").InputDevice;
 
+pub const TextInputV3 = @import("types/text_input_v3.zig").TextInputV3;
+pub const TextInputManagerV3 = @import("types/text_input_v3.zig").TextInputManagerV3;
+
 pub const Keyboard = @import("types/keyboard.zig").Keyboard;
 pub const KeyboardGroup = @import("types/keyboard_group.zig").KeyboardGroup;
 

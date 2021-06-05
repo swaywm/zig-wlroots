@@ -3,7 +3,7 @@ const wlr = @import("../wlroots.zig");
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
-pub const TextInputV3Manager = extern struct {
+pub const TextInputManagerV3 = extern struct {
     global: *wl.Global,
     text_inputs: wl.list.Head(TextInputV3, "link"),
 
@@ -11,11 +11,11 @@ pub const TextInputV3Manager = extern struct {
 
     events: extern struct {
         text_input: wl.Signal(*wlr.TextInputV3),
-        destroy: wl.Signal(*wlr.TextInputV3Manager),
+        destroy: wl.Signal(*wlr.TextInputManagerV3),
     },
 
-    extern fn wlr_text_input_manager_v3_create(server: *wl.Server) ?*wlr.TextInputV3Manager;
-    pub fn create(server: *wl.Server) !*wlr.TextInputV3Manager {
+    extern fn wlr_text_input_manager_v3_create(server: *wl.Server) ?*wlr.TextInputManagerV3;
+    pub fn create(server: *wl.Server) !*wlr.TextInputManagerV3 {
         return wlr_text_input_manager_v3_create(server) orelse error.OutOfMemory;
     }
 };
