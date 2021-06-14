@@ -98,8 +98,11 @@ pub const Surface = extern struct {
         destroy: wl.Signal(*wlr.Surface),
     },
 
-    subsurfaces: wl.list.Head(Subsurface, "parent_link"),
-    subsurface_pending_list: wl.list.Head(Subsurface, "parent_pending_link"),
+    subsurfaces_below: wl.list.Head(Subsurface, "parent_link"),
+    subsurfaces_above: wl.list.Head(Subsurface, "parent_link"),
+
+    subsurfaces_pending_below: wl.list.Head(Subsurface, "parent_pending_link"),
+    subsurfaces_pending_above: wl.list.Head(Subsurface, "parent_pending_link"),
 
     current_outputs: wl.list.Head(Surface.Output, "link"),
 

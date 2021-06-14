@@ -7,7 +7,10 @@ pub const Renderer = extern struct {
     const Impl = opaque {};
 
     impl: *const Impl,
+
     rendering: bool,
+    rendering_with_buffer: bool,
+
     events: extern struct {
         destroy: wl.Signal(*Renderer),
     },
@@ -21,6 +24,9 @@ pub const Renderer = extern struct {
 
     extern fn wlr_renderer_begin(renderer: *Renderer, width: u32, height: u32) void;
     pub const begin = wlr_renderer_begin;
+
+    extern fn wlr_renderer_begin_with_buffer(renderer: *Renderer, buffer: *wlr.Buffer) bool;
+    pub const beginWithBuffer = wlr_renderer_begin_with_buffer;
 
     pub extern fn wlr_renderer_end(renderer: *Renderer) void;
     pub const end = wlr_renderer_end;
@@ -75,13 +81,6 @@ pub const Renderer = extern struct {
         data: [*]u8,
     ) bool;
     pub const readPixels = wlr_renderer_read_pixels;
-
-    extern fn wlr_renderer_blit_dmabuf(
-        renderer: *Renderer,
-        dst: *wlr.DmabufAttributes,
-        src: *wlr.DmabufAttributes,
-    ) bool;
-    pub const blitDmabuf = wlr_renderer_blit_dmabuf;
 
     extern fn wlr_renderer_get_drm_fd(renderer: *Renderer) c_int;
     pub const getDrmFd = wlr_renderer_get_drm_fd;
@@ -159,19 +158,4 @@ pub const Renderer = extern struct {
         matrix: *const [9]f32,
     ) void;
     pub const renderQuadWithMatrix = wlr_render_quad_with_matrix;
-
-    extern fn wlr_render_ellipse(
-        renderer: *Renderer,
-        box: *const wlr.Box,
-        color: *const [4]f32,
-        projection: *const [9]f32,
-    ) void;
-    pub const renderEllipse = wlr_render_ellipse;
-
-    extern fn wlr_render_ellipse_with_matrix(
-        renderer: *Renderer,
-        color: *const [4]f32,
-        matrix: *const [9]f32,
-    ) void;
-    pub const renderEllipseWithMatrix = wlr_render_ellipse_with_matrix;
 };

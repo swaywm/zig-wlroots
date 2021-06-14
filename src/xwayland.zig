@@ -196,6 +196,7 @@ pub const XwaylandSurface = extern struct {
     surface_id: u32,
 
     link: wl.list.Link,
+    stack_link: wl.list.Link,
     unpaired_link: wl.list.Link,
 
     surface: ?*wlr.Surface,

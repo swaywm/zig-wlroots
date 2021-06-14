@@ -1,13 +1,25 @@
 const wlr = @import("../wlroots.zig");
 
+const os = @import("std").os;
 const wl = @import("wayland").server.wl;
-
 const pixman = @import("pixman");
+
+pub const ShmAttributes = extern struct {
+    fd: c_int,
+    format: u32,
+    width: c_int,
+    height: c_int,
+    stride: c_int,
+    offset: os.off_t,
+};
 
 pub const Buffer = extern struct {
     pub const Impl = extern struct {
         destroy: fn (buffer: *Buffer) callconv(.C) void,
         get_dmabuf: fn (buffer: *Buffer, attribs: *wlr.DmabufAttributes) callconv(.C) bool,
+        get_shm: fn (buffer: *Buffer, attribs: *wlr.ShmAttributes) callconv(.C) bool,
+        begin_data_ptr_access: fn (buffer: *Buffer, data: **c_void, format: *u32, stride: *usize) callconv(.C) bool,
+        end_data_ptr_access: fn (buffer: *Buffer) callconv(.C) void,
     };
 
     impl: *const Impl,
@@ -17,6 +29,8 @@ pub const Buffer = extern struct {
 
     dropped: bool,
     n_locks: usize,
+
+    accessing_data_ptr: bool,
 
     events: extern struct {
         destroy: wl.Signal(void),
@@ -37,6 +51,9 @@ pub const Buffer = extern struct {
 
     extern fn wlr_buffer_get_dmabuf(buffer: *Buffer, attribs: *wlr.DmabufAttributes) bool;
     pub const getDmabuf = wlr_buffer_get_dmabuf;
+
+    extern fn wlr_buffer_get_shm(buffer: *Buffer, attribs: *wlr.ShmAttributes) bool;
+    pub const getShm = wlr_buffer_get_shm;
 };
 
 pub const ClientBuffer = extern struct {

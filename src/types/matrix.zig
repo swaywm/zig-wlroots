@@ -24,8 +24,5 @@ pub const rotate = wlr_matrix_rotate;
 extern fn wlr_matrix_transform(mat: *[9]f32, transform: wl.Output.Transform) void;
 pub const transform = wlr_matrix_transform;
 
-extern fn wlr_matrix_projection(mat: *[9]f32, width: c_int, height: c_int, transform: wl.Output.Transform) void;
-pub const projection = wlr_matrix_projection;
-
 extern fn wlr_matrix_project_box(mat: *[9]f32, box: *const wlr.Box, transform: wl.Output.Transform, rotation: f32, projection: *const [9]f32) void;
 pub const projectBox = wlr_matrix_project_box;

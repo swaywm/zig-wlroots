@@ -5,25 +5,24 @@ const wl = wayland.server.wl;
 
 pub const Device = extern struct {
     fd: c_int,
+    device_id: c_int,
     dev: os.dev_t,
     /// Session.devices
     link: wl.list.Link,
 
     events: extern struct {
         change: wl.Signal(void),
+        remove: wl.Signal(void),
     },
 };
 
 pub const Session = extern struct {
-    const Impl = opaque {};
-
     pub const event = struct {
         pub const Add = extern struct {
             path: [*:0]const u8,
         };
     };
 
-    impl: *const Impl,
     active: bool,
 
     vtnr: c_uint,
@@ -33,6 +32,9 @@ pub const Session = extern struct {
     udev: *opaque {},
     udev_monitor: *opaque {},
     udev_event: *wl.EventSource,
+
+    seat_handle: *opaque {},
+    libseat_event: *wl.EventSource,
 
     devices: wl.list.Head(Device, "link"),
 

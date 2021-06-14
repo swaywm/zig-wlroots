@@ -97,6 +97,9 @@ pub const XdgPopup = extern struct {
         wlr_xdg_popup_destroy(popup.base);
     }
 
+    extern fn wlr_xdg_popup_get_position(popup: *XdgPopup, popup_sx: *f64, popup_sy: *f64) void;
+    pub const getPosition = wlr_xdg_popup_get_position;
+
     extern fn wlr_xdg_popup_get_anchor_point(popup: *XdgPopup, toplevel_sx: *c_int, toplevel_sy: *c_int) void;
     pub const getAnchorPoint = wlr_xdg_popup_get_anchor_point;
 

@@ -6,12 +6,16 @@ pub const Session = @import("backend/session.zig").Session;
 pub const DmabufAttributes = @import("render/dmabuf.zig").DmabufAttributes;
 pub const Renderer = @import("render/renderer.zig").Renderer;
 pub const Texture = @import("render/texture.zig").Texture;
+pub const Allocator = opaque {};
+pub const Swapchain = opaque {};
 
+pub const ShmAttributes = @import("types/buffer.zig").ShmAttributes;
 pub const Buffer = @import("types/buffer.zig").Buffer;
 pub const ClientBuffer = @import("types/buffer.zig").ClientBuffer;
 
 pub const DmabufBufferV1 = @import("types/linux_dmabuf_v1.zig").DmabufBufferV1;
 pub const LinuxDmabufV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufV1;
+pub const LinuxDmabufParamsV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufParamsV1;
 
 pub const Compositor = @import("types/compositor.zig").Compositor;
 pub const Subcompositor = @import("types/compositor.zig").Subcompositor;

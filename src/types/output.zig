@@ -175,7 +175,12 @@ pub const Output = extern struct {
     cursors: wl.list.Head(OutputCursor, "link"),
 
     hardware_cursor: ?*OutputCursor,
+    cursor_swapchain: ?*wlr.Swapchain,
+    cursor_front_buffer: ?*wlr.Buffer,
     software_cursor_locks: c_int,
+
+    swapchain: ?*wlr.Swapchain,
+    back_buffer: ?*wlr.Buffer,
 
     server_destroy: wl.Listener(*wl.Server),
 

@@ -13,6 +13,10 @@ pub const Backend = extern struct {
         new_output: wl.Signal(*wlr.Output),
     },
 
+    // Private state
+    renderer: ?*wlr.Renderer,
+    allocator: ?*wlr.Allocator,
+
     // backend.h
 
     extern fn wlr_backend_autocreate(server: *wl.Server) ?*Backend;
@@ -35,6 +39,9 @@ pub const Backend = extern struct {
 
     extern fn wlr_backend_get_session(backend: *Backend) ?*wlr.Session;
     pub const getSession = wlr_backend_get_session;
+
+    extern fn wlr_backend_get_drm_fd(backend: *Backend) c_int;
+    pub const getDrmFd = wlr_backend_get_drm_fd;
 
     // backend/multi.h
 
