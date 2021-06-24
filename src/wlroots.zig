@@ -148,3 +148,4 @@ pub const ForeignToplevelManagerV1 = @import("types/foreign_toplevel_management_
 pub const ForeignToplevelHandleV1 = @import("types/foreign_toplevel_management_v1.zig").ForeignToplevelHandleV1;
 
 pub const config = @import("config.zig");
+pub const version = @import("version.zig");

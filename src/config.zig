@@ -1,6 +1,4 @@
-const c = @cImport({
-    @cInclude("wlr/config.h");
-});
+const c = @cImport(@cInclude("wlr/config.h"));
 
 pub const has_x11_backend = c.WLR_HAS_X11_BACKEND != 0;
 
