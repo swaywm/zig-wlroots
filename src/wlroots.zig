@@ -26,6 +26,10 @@ pub const Subsurface = @import("types/surface.zig").Subsurface;
 pub const Viewporter = @import("types/viewporter.zig").Viewporter;
 pub const Viewport = @import("types/viewporter.zig").Viewport;
 
+pub const Presentation = @import("types/presentation_time.zig").Presentation;
+pub const PresentationFeedback = @import("types/presentation_time.zig").PresentationFeedback;
+pub const PresentationEvent = @import("types/presentation_time.zig").PresentationEvent;
+
 pub const XdgShell = @import("types/xdg_shell.zig").XdgShell;
 pub const XdgClient = @import("types/xdg_shell.zig").XdgClient;
 pub const XdgSurface = @import("types/xdg_shell.zig").XdgSurface;
