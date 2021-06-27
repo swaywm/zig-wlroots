@@ -19,7 +19,7 @@ pub const XdgActivationV1 = extern struct {
 
     events: extern struct {
         destroy: wl.Signal(*XdgActivationV1),
-        request_activate: wl.Signal(*XdgActivationV1.RequestActivate.event),
+        request_activate: wl.Signal(*XdgActivationV1.event.RequestActivate),
     },
 
     // Private state
