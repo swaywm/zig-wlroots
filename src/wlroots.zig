@@ -47,6 +47,8 @@ pub const XdgActivationTokenV1 = @import("types/xdg_activation_v1.zig").XdgActiv
 pub const LayerShellV1 = @import("types/layer_shell_v1.zig").LayerShellV1;
 pub const LayerSurfaceV1 = @import("types/layer_shell_v1.zig").LayerSurfaceV1;
 
+pub const FullscreenShellV1 = @import("types/fullscreen_shell_v1.zig").FullscreenShellV1;
+
 pub const Seat = @import("types/seat.zig").Seat;
 pub const SerialRange = @import("types/seat.zig").SerialRange;
 pub const SerialRingset = @import("types/seat.zig").SerialRingset;
