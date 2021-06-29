@@ -61,6 +61,8 @@ pub const TextInputManagerV3 = @import("types/text_input_v3.zig").TextInputManag
 
 pub const Keyboard = @import("types/keyboard.zig").Keyboard;
 pub const KeyboardGroup = @import("types/keyboard_group.zig").KeyboardGroup;
+pub const KeyboardShortcutsInhibitorV1 = @import("types/keyboard_shortcuts_inhibit_v1.zig").KeyboardShortcutsInhibitorV1;
+pub const KeyboardShortcutsInhibitManagerV1 = @import("types/keyboard_shortcuts_inhibit_v1.zig").KeyboardShortcutsInhibitManagerV1;
 
 pub const Cursor = @import("types/cursor.zig").Cursor;
 pub const Pointer = @import("types/pointer.zig").Pointer;
