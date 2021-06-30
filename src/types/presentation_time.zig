@@ -1,4 +1,4 @@
-const wlr = @import("wlroots.zig");
+const wlr = @import("../wlroots.zig");
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
@@ -16,8 +16,8 @@ pub const Presentation = extern struct {
     server_destroy: wl.Listener(*wl.Server),
 
     extern fn wlr_presentation_create(server: *wl.Server, backend: *wlr.Backend) ?*wlr.Presentation;
-    pub fn create(server: *wl.Server) !*wlr.Presentation {
-        return wlr_presentation_create(server) orelse error.OutOfMemory;
+    pub fn create(server: *wl.Server, backend: *wlr.Backend) !*wlr.Presentation {
+        return wlr_presentation_create(server, backend) orelse error.OutOfMemory;
     }
 
     extern fn wlr_presentation_surface_sampled(presentation: *wlr.Presentation, surface: *wlr.Surface) ?*wlr.PresentationFeedback;
@@ -30,7 +30,7 @@ pub const Presentation = extern struct {
 pub const PresentationFeedback = extern struct {
     presentation: *wlr.Presentation,
     surface: ?*wlr.Surface,
-    link: wl.List.Link,
+    link: wl.list.Link,
     resources: wl.list.Head(wl.Resource, null),
 
     committed: bool,
@@ -41,11 +41,11 @@ pub const PresentationFeedback = extern struct {
     output_committed: bool,
     output_commit_seq: u32,
 
-    surface_commit: wl.Listener(*wl.Surface),
-    surface_destroy: wl.Listener(*wl.Surface),
-    output_commit: wl.Listener(*wl.Output.event.Commit),
-    output_present: wl.Listener(*wl.Output.event.Present),
-    output_destroy: wl.Listener(*wl.Output),
+    surface_commit: wl.Listener(*wlr.Surface),
+    surface_destroy: wl.Listener(*wlr.Surface),
+    output_commit: wl.Listener(*wlr.Output.event.Commit),
+    output_present: wl.Listener(*wlr.Output.event.Present),
+    output_destroy: wl.Listener(*wlr.Output),
 
     extern fn wlr_presentation_feedback_send_presented(feedback: *wlr.PresentationFeedback, event: *wlr.PresentationEvent) void;
     pub const sendPresented = wlr_presentation_feedback_send_presented;
