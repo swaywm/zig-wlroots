@@ -114,7 +114,7 @@ pub const Xwayland = extern struct {
 };
 
 pub const XwaylandSurface = extern struct {
-    pub const IccmInputModel = extern enum {
+    pub const IcccmInputModel = extern enum {
         none = 0,
         passive = 1,
         local = 2,
@@ -302,6 +302,6 @@ pub const XwaylandSurface = extern struct {
     extern fn wlr_xwayland_or_surface_wants_focus(surface: *const XwaylandSurface) bool;
     pub const overrideRedirectWantsFocus = wlr_xwayland_or_surface_wants_focus;
 
-    extern fn wlr_xwayland_iccm_input_model(surface: *const XwaylandSurface) IccmInputModel;
-    pub const iccmInputModel = wlr_xwayland_iccm_input_model;
+    extern fn wlr_xwayland_icccm_input_model(surface: *const XwaylandSurface) IcccmInputModel;
+    pub const icccmInputModel = wlr_xwayland_icccm_input_model;
 };
