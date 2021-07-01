@@ -52,7 +52,7 @@ pub const TextInputV3 = extern struct {
     };
 
     seat: *wlr.Seat,
-    ressource: *wl.Ressource,
+    ressource: *wl.Resource,
     focused_surface: ?*wlr.Surface,
     pending: wlr.TextInputV3.State,
     current: wlr.TextInputV3.State,
