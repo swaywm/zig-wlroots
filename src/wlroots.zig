@@ -1,3 +1,5 @@
+const std = @import("std");
+
 pub const Backend = @import("backend.zig").Backend;
 
 pub const Device = @import("backend/session.zig").Device;
@@ -161,4 +163,8 @@ comptime {
     if (version.major != 0 or version.minor != 14) {
         @compileError("zig-wlroots requires wlroots version 0.14");
     }
+}
+
+test {
+    std.testing.refAllDecls(@This());
 }
