@@ -51,8 +51,8 @@ pub const IdleTimeout = extern struct {
     data: usize,
 
     extern fn wlr_idle_timeout_create(idle: *Idle, seat: *wlr.Seat, timeout: u32) ?*IdleTimeout;
-    pub fn create(idle: *Idle) !*IdleTimeout {
-        return wlr_idle_timeout_create(idle) orelse error.OutOfMemory;
+    pub fn create(idle: *Idle, seat: *wlr.Seat, timeout: u32) !*IdleTimeout {
+        return wlr_idle_timeout_create(idle, seat, timeout) orelse error.OutOfMemory;
     }
 
     extern fn wlr_idle_timeout_destroy(timeout: *IdleTimeout) void;
