@@ -1,5 +1,3 @@
-const std = @import("std");
-
 pub const Backend = @import("backend.zig").Backend;
 
 pub const Device = @import("backend/session.zig").Device;
@@ -165,6 +163,20 @@ comptime {
     }
 }
 
+fn refAllDeclsRecursive(comptime T: type) void {
+    comptime {
+        for (@import("std").meta.declarations(T)) |decl| {
+            if (decl.is_pub) {
+                switch (decl.data) {
+                    .Type => |T2| refAllDeclsRecursive(T2),
+                    else => _ = decl,
+                }
+            }
+        }
+    }
+}
+
 test {
-    std.testing.refAllDecls(@This());
+    @setEvalBranchQuota(100000);
+    refAllDeclsRecursive(@This());
 }
