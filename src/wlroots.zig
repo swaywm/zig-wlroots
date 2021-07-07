@@ -106,6 +106,7 @@ pub const PrimarySelectionDeviceManagerV1 = @import("types/primary_selection_v1.
 pub const PrimarySelectionDeviceV1 = @import("types/primary_selection_v1.zig").PrimarySelectionDeviceV1;
 
 pub const Output = @import("types/output.zig").Output;
+pub const OutputCursor = @import("types/output.zig").OutputCursor;
 pub const OutputDamage = @import("types/output_damage.zig").OutputDamage;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 
