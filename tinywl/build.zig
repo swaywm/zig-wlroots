@@ -11,12 +11,21 @@ pub fn build(b: *Builder) void {
     const scanner = ScanProtocolsStep.create(b);
     scanner.addSystemProtocol("stable/xdg-shell/xdg-shell.xml");
 
-    const wayland = scanner.getPkg();
-    const xkbcommon = Pkg{ .name = "xkbcommon", .path = "deps/zig-xkbcommon/src/xkbcommon.zig" };
-    const pixman = Pkg{ .name = "pixman", .path = "deps/zig-pixman/pixman.zig" };
+    const wayland = Pkg{
+        .name = "wayland",
+        .path = .{ .generated = &scanner.result },
+    };
+    const xkbcommon = Pkg{
+        .name = "xkbcommon",
+        .path = .{ .path = "deps/zig-xkbcommon/src/xkbcommon.zig" },
+    };
+    const pixman = Pkg{
+        .name = "pixman",
+        .path = .{ .path = "deps/zig-pixman/pixman.zig" },
+    };
     const wlroots = Pkg{
         .name = "wlroots",
-        .path = "../src/wlroots.zig",
+        .path = .{ .path = "../src/wlroots.zig" },
         .dependencies = &[_]Pkg{ wayland, xkbcommon, pixman },
     };
 

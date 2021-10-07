@@ -3,14 +3,14 @@ const wlr = @import("../wlroots.zig");
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
-pub const AxisSource = extern enum {
+pub const AxisSource = enum(c_int) {
     wheel,
     finger,
     continuous,
     wheel_tilt,
 };
 
-pub const AxisOrientation = extern enum {
+pub const AxisOrientation = enum(c_int) {
     vertical,
     horizontal,
 };
@@ -125,5 +125,5 @@ pub const Pointer = extern struct {
 
         hold_begin: wl.Signal(*event.HoldBegin),
         hold_end: wl.Signal(*event.HoldEnd),
-    }
+    },
 };

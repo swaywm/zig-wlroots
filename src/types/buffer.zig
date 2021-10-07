@@ -23,7 +23,7 @@ pub const Buffer = extern struct {
         destroy: fn (buffer: *Buffer) callconv(.C) void,
         get_dmabuf: fn (buffer: *Buffer, attribs: *wlr.DmabufAttributes) callconv(.C) bool,
         get_shm: fn (buffer: *Buffer, attribs: *wlr.ShmAttributes) callconv(.C) bool,
-        begin_data_ptr_access: fn (buffer: *Buffer, flags: u32, data: **c_void, format: *u32, stride: *usize) callconv(.C) bool,
+        begin_data_ptr_access: fn (buffer: *Buffer, flags: u32, data: **anyopaque, format: *u32, stride: *usize) callconv(.C) bool,
         end_data_ptr_access: fn (buffer: *Buffer) callconv(.C) void,
     };
 
@@ -74,7 +74,7 @@ pub const Buffer = extern struct {
     extern fn wlr_buffer_from_resource(resource: *wl.Buffer) ?*Buffer;
     pub const fromWlBuffer = wlr_buffer_from_resource;
 
-    extern fn wlr_buffer_begin_data_ptr_access(buffer: *Buffer, flags: u32, data: **c_void, format: *u32, stride: *usize) bool;
+    extern fn wlr_buffer_begin_data_ptr_access(buffer: *Buffer, flags: u32, data: **anyopaque, format: *u32, stride: *usize) bool;
     pub const beginDataPtrAccess = wlr_buffer_begin_data_ptr_access;
 
     extern fn wlr_buffer_end_data_ptr_access(buffer: *Buffer) void;

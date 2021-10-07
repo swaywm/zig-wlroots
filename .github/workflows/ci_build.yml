@@ -10,7 +10,7 @@ name: voidlinux glibc
 
 jobs:
   default_build:
-    name: test, tinywl build, zig fmt
+    name: test/tinywl build/fmt
     runs-on: ubuntu-latest
     container: voidlinux/voidlinux:latest
 
@@ -25,7 +25,7 @@ jobs:
             libffi-devel wayland-protocols xcb-util-errors-devel xcb-util-wm-devel \
             xcb-util-renderutil-devel libxcb-devel xcb-util-cursor-devel xcb-util-devel \
             xcb-util-image-devel xcb-util-keysyms-devel xcb-util-xrm-devel \
-            xorg-server-xwayland pkg-config meson git gcc zig pkgconf scdoc
+            xorg-server-xwayland pkg-config meson git gcc pkgconf scdoc wget tar xz
 
           git clone https://gitlab.freedesktop.org/wayland/wayland.git
           cd wayland
@@ -40,6 +40,13 @@ jobs:
           meson build --auto-features=enabled -Drenderers=gles2 -Dexamples=false \
             -Dwerror=false -Db_ndebug=false --prefix /usr
           ninja -C build install
+
+          wget https://ziglang.org/download/0.9.0/zig-linux-x86_64-0.9.0.tar.xz
+          tar -xvf zig-linux-x86_64-0.9.0.tar.xz
+          mv zig-linux-x86_64-0.9.0/zig /usr/bin/
+          mv zig-linux-x86_64-0.9.0/lib /usr/lib/zig
+          zig env
+
       - name: checkout
         uses: actions/checkout@v2
         with:
@@ -58,3 +65,4 @@ jobs:
         run: |
           zig fmt --check src/
           zig fmt --check tinywl/
+          zig fmt --check build.zig

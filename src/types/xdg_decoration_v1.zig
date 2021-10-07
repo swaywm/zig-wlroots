@@ -23,7 +23,7 @@ pub const XdgDecorationManagerV1 = extern struct {
 };
 
 pub const XdgToplevelDecorationV1 = extern struct {
-    pub const Mode = extern enum {
+    pub const Mode = enum(c_int) {
         none = 0,
         client_side = 1,
         server_side = 2,

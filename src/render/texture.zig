@@ -10,7 +10,7 @@ pub const Texture = extern struct {
     width: u32,
     height: u32,
 
-    extern fn wlr_texture_from_pixels(renderer: *wlr.Renderer, wl_fmt: wl.Shm.Format, stride: u32, width: u32, height: u32, data: *const c_void) ?*Texture;
+    extern fn wlr_texture_from_pixels(renderer: *wlr.Renderer, wl_fmt: wl.Shm.Format, stride: u32, width: u32, height: u32, data: *const anyopaque) ?*Texture;
     pub const fromPixels = wlr_texture_from_pixels;
 
     extern fn wlr_texture_from_dmabuf(renderer: *wlr.Renderer, attribs: *wlr.DmabufAttributes) ?*Texture;
@@ -19,7 +19,7 @@ pub const Texture = extern struct {
     extern fn wlr_texture_is_opaque(texture: *Texture) bool;
     pub const isOpaque = wlr_texture_is_opaque;
 
-    extern fn wlr_texture_write_pixels(texture: *Texture, stride: u32, width: u32, height: u32, src_x: u32, src_y: u32, dst_x: u32, dst_y: u32, data: *const c_void) bool;
+    extern fn wlr_texture_write_pixels(texture: *Texture, stride: u32, width: u32, height: u32, src_x: u32, src_y: u32, dst_x: u32, dst_y: u32, data: *const anyopaque) bool;
     pub const writePixels = wlr_texture_write_pixels;
 
     extern fn wlr_texture_destroy(texture: *Texture) void;

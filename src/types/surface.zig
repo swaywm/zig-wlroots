@@ -91,7 +91,7 @@ pub const Surface = extern struct {
     cached: wl.list.Head(Surface.State, "cached_state_link"),
 
     role: ?*const Role,
-    role_data: ?*c_void,
+    role_data: ?*anyopaque,
 
     events: extern struct {
         commit: wl.Signal(*wlr.Surface),
@@ -120,7 +120,7 @@ pub const Surface = extern struct {
     extern fn wlr_surface_set_role(
         surface: *Surface,
         role: *const Role,
-        role_data: ?*c_void,
+        role_data: ?*anyopaque,
         error_resource: ?*wl.Resource,
         error_code: u32,
     ) bool;
@@ -158,8 +158,8 @@ pub const Surface = extern struct {
 
     extern fn wlr_surface_for_each_surface(
         surface: *Surface,
-        iterator: fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
-        user_data: ?*c_void,
+        iterator: fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachSurface(
         surface: *Surface,
@@ -169,7 +169,7 @@ pub const Surface = extern struct {
     ) void {
         wlr_surface_for_each_surface(
             surface,
-            @ptrCast(fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void, iterator),
+            @ptrCast(fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void, iterator),
             data,
         );
     }

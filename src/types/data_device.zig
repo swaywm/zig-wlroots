@@ -22,7 +22,7 @@ pub const DataDeviceManager = extern struct {
 };
 
 pub const DataOffer = extern struct {
-    pub const Type = extern enum {
+    pub const Type = enum(c_int) {
         selection,
         drag,
     };
@@ -103,7 +103,7 @@ pub const Drag = extern struct {
         data: usize,
     };
 
-    pub const GrabType = extern enum {
+    pub const GrabType = enum(c_int) {
         keyboard,
         keyboard_pointer,
         keyboard_touch,

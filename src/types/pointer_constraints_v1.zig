@@ -27,7 +27,7 @@ pub const PointerConstraintV1 = extern struct {
             y: f64,
         },
     };
-    pub const Type = extern enum {
+    pub const Type = enum(c_int) {
         locked,
         confined,
     };

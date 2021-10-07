@@ -17,7 +17,7 @@ pub const Output = extern struct {
         link: wl.list.Link,
     };
 
-    pub const AdaptiveSyncStatus = extern enum {
+    pub const AdaptiveSyncStatus = enum(c_int) {
         disabled,
         enabled,
         unknown,
@@ -36,7 +36,7 @@ pub const Output = extern struct {
             pub const render_format = 1 << 8;
         };
 
-        pub const ModeType = extern enum {
+        pub const ModeType = enum(c_int) {
             fixed,
             custom,
         };

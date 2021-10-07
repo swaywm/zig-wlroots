@@ -14,7 +14,7 @@ const xcb = struct {
     const Window = u32;
     const Atom = u32;
 
-    const StackMode = extern enum {
+    const StackMode = enum(c_int) {
         above = 0,
         below = 1,
         top_if = 2,
@@ -121,7 +121,7 @@ pub const Xwayland = extern struct {
 };
 
 pub const XwaylandSurface = extern struct {
-    pub const IcccmInputModel = extern enum {
+    pub const IcccmInputModel = enum(c_int) {
         none = 0,
         passive = 1,
         local = 2,

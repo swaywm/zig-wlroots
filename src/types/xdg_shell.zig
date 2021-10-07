@@ -240,7 +240,7 @@ pub const XdgToplevel = extern struct {
 };
 
 pub const XdgSurface = extern struct {
-    pub const Role = extern enum {
+    pub const Role = enum(c_int) {
         none,
         toplevel,
         popup,
@@ -324,8 +324,8 @@ pub const XdgSurface = extern struct {
 
     extern fn wlr_xdg_surface_for_each_surface(
         surface: *wlr.XdgSurface,
-        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
-        user_data: ?*c_void,
+        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachSurface(
         surface: *wlr.XdgSurface,
@@ -335,15 +335,15 @@ pub const XdgSurface = extern struct {
     ) void {
         wlr_xdg_surface_for_each_surface(
             surface,
-            @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void, iterator),
+            @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void, iterator),
             data,
         );
     }
 
     extern fn wlr_xdg_surface_for_each_popup_surface(
         surface: *wlr.XdgSurface,
-        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void,
-        user_data: ?*c_void,
+        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachPopupSurface(
         surface: *wlr.XdgSurface,
@@ -353,7 +353,7 @@ pub const XdgSurface = extern struct {
     ) void {
         wlr_xdg_surface_for_each_popup_surface(
             surface,
-            @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*c_void) callconv(.C) void, iterator),
+            @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void, iterator),
             data,
         );
     }

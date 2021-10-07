@@ -6,7 +6,7 @@ const wl = wayland.server.wl;
 pub const Device = extern struct {
     pub const event = struct {
         pub const Change = extern struct {
-            pub const Type = extern enum {
+            pub const Type = enum(c_int) {
                 hotplug = 1,
                 lease,
             };

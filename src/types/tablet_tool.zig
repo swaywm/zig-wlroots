@@ -3,7 +3,7 @@ const wlr = @import("../wlroots.zig");
 const wl = @import("wayland").server.wl;
 
 pub const TabletTool = extern struct {
-    pub const Type = extern enum {
+    pub const Type = enum(c_int) {
         pen = 1,
         eraser,
         brush,
@@ -58,7 +58,7 @@ pub const Tablet = extern struct {
         };
 
         pub const Proximity = extern struct {
-            pub const State = extern enum {
+            pub const State = enum(c_int) {
                 out,
                 in,
             };
@@ -73,7 +73,7 @@ pub const Tablet = extern struct {
         };
 
         pub const Tip = extern struct {
-            pub const State = extern enum {
+            pub const State = enum(c_int) {
                 up,
                 down,
             };

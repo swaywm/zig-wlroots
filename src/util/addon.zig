@@ -11,7 +11,7 @@ pub const AddonSet = extern struct {
     extern fn wlr_addon_set_finish(set: *AddonSet) void;
     pub const deinit = wlr_addon_set_finish;
 
-    extern fn wlr_addon_find(set: *AddonSet, owner: ?*const c_void, impl: *const Addon.Interface) ?*Addon;
+    extern fn wlr_addon_find(set: *AddonSet, owner: ?*const anyopaque, impl: *const Addon.Interface) ?*Addon;
     pub const find = wlr_addon_find;
 };
 
@@ -25,10 +25,10 @@ pub const Addon = extern struct {
 
     // private state
 
-    owner: ?*const c_void,
+    owner: ?*const anyopaque,
     link: wl.list.Link,
 
-    extern fn wlr_addon_init(addon: *Addon, set: *AddonSet, owner: ?*const c_void, impl: *const Interface) void;
+    extern fn wlr_addon_init(addon: *Addon, set: *AddonSet, owner: ?*const anyopaque, impl: *const Interface) void;
     pub const init = wlr_addon_init;
 
     extern fn wlr_addon_finish(addon: *Addon) void;

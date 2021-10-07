@@ -4,7 +4,7 @@ const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
 pub const InputDevice = extern struct {
-    pub const Type = extern enum {
+    pub const Type = enum(c_int) {
         keyboard,
         pointer,
         touch,
@@ -28,7 +28,7 @@ pub const InputDevice = extern struct {
 
     /// InputDevice.type determines which of these is active
     device: extern union {
-        _device: ?*c_void,
+        _device: ?*anyopaque,
         keyboard: *wlr.Keyboard,
         pointer: *wlr.Pointer,
         // TODO:

@@ -102,8 +102,8 @@ pub const LayerSurfaceV1 = extern struct {
 
     extern fn wlr_layer_surface_v1_for_each_surface(
         surface: *LayerSurfaceV1,
-        iterator: fn (*wlr.Surface, c_int, c_int, ?*c_void) callconv(.C) void,
-        user_data: ?*c_void,
+        iterator: fn (*wlr.Surface, c_int, c_int, ?*anyopaque) callconv(.C) void,
+        user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachSurface(
         surface: *LayerSurfaceV1,
@@ -113,15 +113,15 @@ pub const LayerSurfaceV1 = extern struct {
     ) void {
         wlr_layer_surface_v1_for_each_surface(
             surface,
-            @ptrCast(fn (*wlr.Surface, c_int, c_int, ?*c_void) callconv(.C) void, iterator),
+            @ptrCast(fn (*wlr.Surface, c_int, c_int, ?*anyopaque) callconv(.C) void, iterator),
             data,
         );
     }
 
     extern fn wlr_layer_surface_v1_for_each_popup_surface(
         surface: *LayerSurfaceV1,
-        iterator: fn (*wlr.Surface, c_int, c_int, ?*c_void) callconv(.C) void,
-        user_data: ?*c_void,
+        iterator: fn (*wlr.Surface, c_int, c_int, ?*anyopaque) callconv(.C) void,
+        user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachPopupSurface(
         surface: *LayerSurfaceV1,
@@ -131,7 +131,7 @@ pub const LayerSurfaceV1 = extern struct {
     ) void {
         wlr_layer_surface_v1_for_each_popup_surface(
             surface,
-            @ptrCast(fn (*wlr.Surface, c_int, c_int, ?*c_void) callconv(.C) void, iterator),
+            @ptrCast(fn (*wlr.Surface, c_int, c_int, ?*anyopaque) callconv(.C) void, iterator),
             data,
         );
     }
