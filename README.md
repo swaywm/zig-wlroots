@@ -29,5 +29,5 @@ are not part of zig-wlroots and are released under the Zero Clause BSD license.
 ## TODO
 
 - [x] Bind enough to port [tinywl](https://github.com/swaywm/wlroots/tree/master/tinywl)
-- [x] Bind enough to port [river](https://github.com/ifreund/river)
+- [x] Bind enough to port [river](https://github.com/riverwm/river)
 - [ ] Complete bindings
