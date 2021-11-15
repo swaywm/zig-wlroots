@@ -76,7 +76,7 @@ pub const InputMethodV2 = extern struct {
     client_active: bool,
     current_serial: u32,
 
-    keyboard_grab: KeyboardGrab,
+    keyboard_grab: *KeyboardGrab,
 
     link: wl.list.Link,
 
