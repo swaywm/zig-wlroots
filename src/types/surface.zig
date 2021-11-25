@@ -178,9 +178,9 @@ pub const Surface = extern struct {
         return wlr_surface_accepts_touch(seat, surface);
     }
 
-    extern fn wlr_surface_accepts_tablet_v2(tablet: *TabletV2, surface: *Surface) bool;
-    pub fn acceptsTablet(surface: *Surface, tablet: *TabletV2) bool {
-        return wlr_surface_accepts_touch(tablet, surface);
+    extern fn wlr_surface_accepts_tablet_v2(tablet: *wlr.TabletV2, surface: *Surface) bool;
+    pub fn acceptsTablet(surface: *Surface, tablet: *wlr.TabletV2) bool {
+        return wlr_surface_accepts_tablet_v2(tablet, surface);
     }
 
     extern fn wlr_surface_is_xdg_surface(surface: *Surface) bool;

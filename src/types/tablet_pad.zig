@@ -2,8 +2,6 @@ const wlr = @import("../wlroots.zig");
 
 const wl = @import("wayland").server.wl;
 
-const TabletTool = @import("tablet_tool").TabletTool;
-
 pub const TabletPad = extern struct {
     pub const event = struct {
         pub const Button = extern struct {
@@ -49,7 +47,7 @@ pub const TabletPad = extern struct {
         button: wl.Signal(*event.Button),
         ring: wl.Signal(*event.Ring),
         strip: wl.Signal(*event.Strip),
-        attach_tablet: wl.Signal(*TabletTool),
+        attach_tablet: wl.Signal(*wlr.TabletTool),
     },
 
     button_count: usize,

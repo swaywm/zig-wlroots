@@ -16,6 +16,7 @@ pub fn build(b: *Builder) void {
     scanner.addSystemProtocol("unstable/pointer-constraints/pointer-constraints-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/pointer-gestures/pointer-gestures-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/xdg-output/xdg-output-unstable-v1.xml");
+    scanner.addSystemProtocol("unstable/tablet/tablet-unstable-v2.xml");
 
     const wayland = scanner.getPkg();
     const xkbcommon = Pkg{ .name = "xkbcommon", .path = "tinywl/deps/zig-xkbcommon/src/xkbcommon.zig" };

@@ -79,6 +79,13 @@ pub const Touch = @import("types/touch.zig").Touch;
 
 pub const Tablet = @import("types/tablet_tool.zig").Tablet;
 pub const TabletTool = @import("types/tablet_tool.zig").TabletTool;
+pub const TabletPad = @import("types/tablet_pad.zig").TabletPad;
+
+pub const TabletV2 = @import("types/tablet_v2.zig").TabletV2;
+pub const TabletSeatV2 = @import("types/tablet_v2.zig").TabletSeatV2;
+pub const TabletToolV2 = @import("types/tablet_v2.zig").TabletToolV2;
+pub const TabletPadV2 = @import("types/tablet_v2.zig").TabletPadV2;
+pub const TabletManagerV2 = @import("types/tablet_v2.zig").TabletManagerV2;
 
 pub const VirtualPointerManagerV1 = @import("types/virtual_pointer_v1.zig").VirtualPointerManagerV1;
 pub const VirtualPointerV1 = @import("types/virtual_pointer_v1.zig").VirtualPointerV1;
