@@ -14,6 +14,28 @@ pub const TabletTool = extern struct {
         totem,
     };
 
+    pub const Axis = extern enum {
+        x = 1 << 0,
+        y = 1 << 1,
+        distance = 1 << 2,
+        pressure = 1 << 3,
+        tilt_x = 1 << 4,
+        tilt_y = 1 << 5,
+        rotation = 1 << 6,
+        slider = 1 << 7,
+        wheel = 1 << 8,
+    };
+
+    pub const ProximityState = extern enum {
+        out,
+        in,
+    };
+
+    pub const TipState = extern enum {
+        up,
+        down,
+    };
+
     type: Type,
     hardware_serial: u64,
     hardware_wacom: u64,

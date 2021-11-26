@@ -180,6 +180,11 @@ pub const TabletManagerV2 = extern struct {
     },
 
     data: usize,
+
+    extern fn wlr_tablet_v2_create(server: *wl.Server) ?*TabletManagerV2;
+    pub fn create(server: *wl.Server) !*TabletManagerV2 {
+        return wlr_tablet_v2_create(display) orelse error.OutOfMemory;
+    }
 };
 
 pub const TabletV2 = extern struct {
