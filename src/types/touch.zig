@@ -46,6 +46,7 @@ pub const Touch = extern struct {
         up: wl.Signal(*event.Up),
         motion: wl.Signal(*event.Motion),
         cancel: wl.Signal(*event.Cancel),
+        frame: wl.Signal(void),
     },
 
     data: usize,

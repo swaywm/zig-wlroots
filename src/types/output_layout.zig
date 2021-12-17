@@ -14,6 +14,7 @@ pub const OutputLayout = extern struct {
         link: wl.list.Link,
         state: *State,
 
+        addon: wlr.Addon,
         events: extern struct {
             destroy: wl.Signal(*OutputLayout.Output),
         },

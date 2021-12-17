@@ -10,7 +10,6 @@ pub fn build(b: *Builder) void {
 
     const scanner = ScanProtocolsStep.create(b);
     scanner.addSystemProtocol("stable/xdg-shell/xdg-shell.xml");
-    scanner.addProtocolPath("protocol/wayland-drm.xml");
     scanner.addProtocolPath("protocol/wlr-layer-shell-unstable-v1.xml");
     scanner.addProtocolPath("protocol/wlr-output-power-management-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/pointer-constraints/pointer-constraints-unstable-v1.xml");

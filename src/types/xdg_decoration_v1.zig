@@ -29,6 +29,10 @@ pub const XdgToplevelDecorationV1 = extern struct {
         server_side = 2,
     };
 
+    pub const State = extern struct {
+        mode: Mode,
+    };
+
     pub const Configure = extern struct {
         /// XdgToplevelDecorationV1.configure_list
         link: wl.list.Link,
@@ -42,10 +46,13 @@ pub const XdgToplevelDecorationV1 = extern struct {
     /// XdgDecorationManagerV1.decorations
     link: wl.list.Link,
 
+    current: State,
+    pending: State,
+
+    scheduled_mode: Mode,
+    requested_mode: Mode,
+
     added: bool,
-    current_mode: Mode,
-    client_pending_mode: Mode,
-    server_pending_mode: Mode,
 
     configure_list: wl.list.Head(XdgToplevelDecorationV1.Configure, "link"),
 

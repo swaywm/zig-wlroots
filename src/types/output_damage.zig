@@ -14,7 +14,7 @@ pub const OutputDamage = extern struct {
     previous: [2]pixman.Region32,
     previous_idx: usize,
 
-    pending_buffer_type: wlr.Output.State.BufferType,
+    pending_attach_render: bool,
 
     events: extern struct {
         frame: wl.Signal(*OutputDamage),

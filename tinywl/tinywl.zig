@@ -39,6 +39,7 @@ const Server = struct {
     wl_server: *wl.Server,
     backend: *wlr.Backend,
     renderer: *wlr.Renderer,
+    allocator: *wlr.Allocator,
 
     output_layout: *wlr.OutputLayout,
     new_output: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(newOutput),
@@ -71,10 +72,13 @@ const Server = struct {
     fn init(server: *Server) !void {
         const wl_server = try wl.Server.create();
         const backend = try wlr.Backend.autocreate(wl_server);
+        const renderer = try wlr.Renderer.autocreate(backend);
         server.* = .{
             .wl_server = wl_server,
             .backend = backend,
-            .renderer = backend.getRenderer() orelse return error.GetRendererFailed,
+            .renderer = renderer,
+            .allocator = try wlr.Allocator.autocreate(backend, renderer),
+
             .output_layout = try wlr.OutputLayout.create(),
             .xdg_shell = try wlr.XdgShell.create(wl_server),
             .seat = try wlr.Seat.create(wl_server, "default"),
@@ -113,6 +117,8 @@ const Server = struct {
 
     fn newOutput(listener: *wl.Listener(*wlr.Output), wlr_output: *wlr.Output) void {
         const server = @fieldParentPtr(Server, "new_output", listener);
+
+        if (!wlr_output.initRender(server.allocator, server.renderer)) return;
 
         if (wlr_output.preferredMode()) |mode| {
             wlr_output.setMode(mode);
@@ -455,8 +461,8 @@ const View = struct {
     fn map(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "map", listener);
         view.server.views.prepend(view);
-        view.x -= xdg_surface.geometry.x;
-        view.y -= xdg_surface.geometry.y;
+        view.x = -xdg_surface.current.geometry.x;
+        view.y = -xdg_surface.current.geometry.y;
         view.server.focusView(view, xdg_surface.surface);
     }
 

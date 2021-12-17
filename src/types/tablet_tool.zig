@@ -110,7 +110,7 @@ pub const Tablet = extern struct {
     },
 
     name: [*:0]u8,
-    paths: wlr.List,
+    paths: wl.Array,
 
     data: usize,
 };

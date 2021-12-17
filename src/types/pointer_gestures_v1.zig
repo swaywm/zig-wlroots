@@ -9,6 +9,7 @@ pub const PointerGesturesV1 = extern struct {
     global: *wl.Global,
     swipes: wl.list.Head(zwp.PointerGestureSwipeV1, null),
     pinches: wl.list.Head(zwp.PointerGesturePinchV1, null),
+    holds: wl.list.Head(zwp.PointerGestureHoldV1, null),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -74,4 +75,20 @@ pub const PointerGesturesV1 = extern struct {
         cancelled: bool,
     ) void;
     pub const sendPinchEnd = wlr_pointer_gestures_v1_send_pinch_end;
+
+    extern fn wlr_pointer_gestures_v1_send_hold_begin(
+        pointer_gestures: *PointerGesturesV1,
+        seat: *wlr.Seat,
+        time_msec: u32,
+        fingers: u32,
+    ) void;
+    pub const sendHoldBegin = wlr_pointer_gestures_v1_send_hold_begin;
+
+    extern fn wlr_pointer_gestures_v1_send_hold_end(
+        pointer_gestures: *PointerGesturesV1,
+        seat: *wlr.Seat,
+        time_msec: u32,
+        cancelled: bool,
+    ) void;
+    pub const sendHoldEnd = wlr_pointer_gestures_v1_send_hold_end;
 };

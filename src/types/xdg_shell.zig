@@ -123,6 +123,22 @@ pub const XdgToplevel = extern struct {
         max_height: u32,
         min_width: u32,
         min_height: u32,
+    };
+
+    pub const Configure = extern struct {
+        maximized: bool,
+        fullscreen: bool,
+        resizing: bool,
+        activated: bool,
+        tiled: wlr.Edges,
+        width: u32,
+        height: u32,
+    };
+
+    pub const Requested = extern struct {
+        maximized: bool,
+        minimized: bool,
+        fullscreen: bool,
 
         fullscreen_output: ?*wlr.Output,
         fullscreen_output_destroy: wl.Listener(*wlr.Output),
@@ -162,10 +178,12 @@ pub const XdgToplevel = extern struct {
     added: bool,
     parent: ?*wlr.XdgSurface,
     parent_unmap: wl.Listener(*XdgSurface),
-    client_pending: State,
-    server_pending: State,
-    last_acked: State,
+
     current: State,
+    pending: State,
+    scheduled: Configure,
+    requested: Requested,
+
     title: ?[*:0]u8,
     app_id: ?[*:0]u8,
     events: extern struct {
@@ -228,12 +246,17 @@ pub const XdgSurface = extern struct {
         popup,
     };
 
+    pub const State = extern struct {
+        configure_serial: u32,
+        geometry: wlr.Box,
+    };
+
     pub const Configure = extern struct {
         surface: *wlr.XdgSurface,
         /// XdgSurface.configure_list
         link: wl.list.Link,
         serial: u32,
-        toplevel_state: *wlr.XdgToplevel.State,
+        toplevel_configure: *wlr.XdgToplevel.Configure,
     };
 
     client: *wlr.XdgClient,
@@ -253,14 +276,12 @@ pub const XdgSurface = extern struct {
     added: bool,
     configured: bool,
     mapped: bool,
-    configure_serial: u32,
     configure_idle: ?*wl.EventSource,
-    configure_next_serial: u32,
+    scheduled_serial: u32,
     configure_list: wl.list.Head(XdgSurface.Configure, "link"),
 
-    has_next_geometry: bool,
-    next_geometry: wlr.Box,
-    geometry: wlr.Box,
+    current: State,
+    pending: State,
 
     surface_destroy: wl.Listener(*wlr.Surface),
     surface_commit: wl.Listener(*wlr.Surface),

@@ -76,6 +76,7 @@ pub const InputMethodV2 = extern struct {
     client_active: bool,
     current_serial: u32,
 
+    popup_surfaces: wl.list.Head(InputPopupSurfaceV2, "link"),
     keyboard_grab: ?*KeyboardGrab,
 
     link: wl.list.Link,
@@ -84,6 +85,7 @@ pub const InputMethodV2 = extern struct {
 
     events: extern struct {
         commit: wl.Signal(*wlr.InputMethodV2),
+        new_popup_surface: wl.Signal(*wlr.InputPopupSurfaceV2),
         grab_keyboard: wl.Signal(*wlr.InputMethodV2.KeyboardGrab),
         destroy: wl.Signal(*wlr.InputMethodV2),
     },
@@ -108,4 +110,23 @@ pub const InputMethodV2 = extern struct {
 
     extern fn wlr_input_method_v2_send_unavailable(input_method: *wlr.InputMethodV2) void;
     pub const sendUnavailable = wlr_input_method_v2_send_unavailable;
+};
+
+pub const InputPopupSurfaceV2 = extern struct {
+    resource: *wl.Resource,
+    input_method: *InputMethodV2,
+    link: wl.list.Link,
+    mapped: bool,
+
+    surface: *wlr.Surface,
+
+    surface_destroy: wl.Listener(*wlr.Surface),
+
+    events: extern struct {
+        map: wl.Signal(void),
+        unmap: wl.Signal(void),
+        destroy: wl.Signal(void),
+    },
+
+    data: usize,
 };

@@ -14,12 +14,23 @@ pub const ShmAttributes = extern struct {
 };
 
 pub const Buffer = extern struct {
+    pub const data_ptr_access_flag = struct {
+        pub const read = 1 << 0;
+        pub const write = 1 << 1;
+    };
+
     pub const Impl = extern struct {
         destroy: fn (buffer: *Buffer) callconv(.C) void,
         get_dmabuf: fn (buffer: *Buffer, attribs: *wlr.DmabufAttributes) callconv(.C) bool,
         get_shm: fn (buffer: *Buffer, attribs: *wlr.ShmAttributes) callconv(.C) bool,
-        begin_data_ptr_access: fn (buffer: *Buffer, data: **c_void, format: *u32, stride: *usize) callconv(.C) bool,
+        begin_data_ptr_access: fn (buffer: *Buffer, flags: u32, data: **c_void, format: *u32, stride: *usize) callconv(.C) bool,
         end_data_ptr_access: fn (buffer: *Buffer) callconv(.C) void,
+    };
+
+    pub const ResourceInterface = extern struct {
+        name: [*:0]const u8,
+        is_instance: fn (resource: *wl.Resource) callconv(.C) bool,
+        from_resource: fn (resource: *wl.Resource) callconv(.C) ?*Buffer,
     };
 
     impl: *const Impl,
@@ -36,6 +47,8 @@ pub const Buffer = extern struct {
         destroy: wl.Signal(void),
         release: wl.Signal(void),
     },
+
+    addons: wlr.AddonSet,
 
     extern fn wlr_buffer_init(buffer: *Buffer, impl: *const Buffer.Impl, width: c_int, height: c_int) void;
     pub const init = wlr_buffer_init;
@@ -54,24 +67,38 @@ pub const Buffer = extern struct {
 
     extern fn wlr_buffer_get_shm(buffer: *Buffer, attribs: *wlr.ShmAttributes) bool;
     pub const getShm = wlr_buffer_get_shm;
+
+    extern fn wlr_buffer_register_resource_interface(iface: *const ResourceInterface) void;
+    pub const registerResourceInterface = wlr_buffer_register_resource_interface;
+
+    extern fn wlr_buffer_from_resource(resource: *wl.Buffer) ?*Buffer;
+    pub const fromWlBuffer = wlr_buffer_from_resource;
+
+    extern fn wlr_buffer_begin_data_ptr_access(buffer: *Buffer, flags: u32, data: **c_void, format: *u32, stride: *usize) bool;
+    pub const beginDataPtrAccess = wlr_buffer_begin_data_ptr_access;
+
+    extern fn wlr_buffer_end_data_ptr_access(buffer: *Buffer) void;
+    pub const endDataPtrAccess = wlr_buffer_end_data_ptr_access;
 };
 
 pub const ClientBuffer = extern struct {
     base: Buffer,
 
-    resource: ?*wl.Buffer,
-    resource_released: bool,
     texture: ?*wlr.Texture,
+    source: ?*wlr.Buffer,
 
-    resource_destroy: wl.Listener(*wl.Buffer),
-    release: wl.Listener(void),
+    // private state
+
+    source_destroy: wl.Listener(void),
+
+    shm_source_format: u32,
+
+    extern fn wlr_client_buffer_create(buffer: *wlr.Buffer, renderer: *wlr.Renderer) ?*ClientBuffer;
+    pub const create = wlr_client_buffer_create;
 
     extern fn wlr_client_buffer_get(buffer: *wlr.Buffer) ?*ClientBuffer;
     pub const get = wlr_client_buffer_get;
 
-    extern fn wlr_client_buffer_import(renderer: *wlr.Renderer, resource: *wl.Buffer) ?*ClientBuffer;
-    pub const import = wlr_client_buffer_import;
-
-    extern fn wlr_client_buffer_apply_damage(buffer: *ClientBuffer, resource: *wl.Buffer, damage: *pixman.Region32) ?*ClientBuffer;
+    extern fn wlr_client_buffer_apply_damage(buffer: *ClientBuffer, next: *wlr.Buffer, damage: *pixman.Region32) bool;
     pub const applyDamage = wlr_client_buffer_apply_damage;
 };

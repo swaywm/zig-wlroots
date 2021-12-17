@@ -33,11 +33,7 @@ pub const Output = extern struct {
             pub const transform = 1 << 5;
             pub const adaptive_sync_enabled = 1 << 6;
             pub const gamma_lut = 1 << 7;
-        };
-
-        pub const BufferType = extern enum {
-            render,
-            scanout,
+            pub const render_format = 1 << 8;
         };
 
         pub const ModeType = extern enum {
@@ -52,9 +48,9 @@ pub const Output = extern struct {
         scale: f32,
         transform: wl.Output.Transform,
         adaptive_sync_enabled: bool,
+        render_format: u32,
 
         // if (committed & field.buffer)
-        buffer_type: BufferType,
         buffer: ?*wlr.Buffer,
 
         // if (committed & field.mode)
@@ -87,6 +83,8 @@ pub const Output = extern struct {
             output: *wlr.Output,
             /// This is a bitfield of State.field members
             comitted: u32,
+            when: *os.timespec,
+            buffer: ?*wlr.Buffer,
         };
 
         pub const Present = extern struct {
@@ -99,6 +97,7 @@ pub const Output = extern struct {
 
             output: *wlr.Output,
             commit_seq: u32,
+            presented: bool,
             when: *os.timespec,
             seq: c_uint,
             refresh: c_int,
@@ -122,7 +121,7 @@ pub const Output = extern struct {
     resources: wl.list.Head(wl.Output, null),
 
     /// This contains a 0 terminated string, use std.mem.sliceTo(name, 0)
-    name: [24]u8,
+    name: [*:0]u8,
     description: ?[*:0]u8,
     /// This contains a 0 terminated string, use std.mem.sliceTo(make, 0)
     make: [56]u8,
@@ -144,10 +143,13 @@ pub const Output = extern struct {
     subpixel: wl.Output.Subpixel,
     transform: wl.Output.Transform,
     adaptive_sync_status: AdaptiveSyncStatus,
+    render_format: u32,
 
     needs_frame: bool,
     frame_pending: bool,
     transform_matrix: [9]f32,
+
+    non_desktop: bool,
 
     pending: State,
 
@@ -179,10 +181,14 @@ pub const Output = extern struct {
     cursor_front_buffer: ?*wlr.Buffer,
     software_cursor_locks: c_int,
 
+    allocator: ?*wlr.Allocator,
+    renderer: ?*wlr.Renderer,
     swapchain: ?*wlr.Swapchain,
     back_buffer: ?*wlr.Buffer,
 
     server_destroy: wl.Listener(*wl.Server),
+
+    addons: wlr.AddonSet,
 
     data: usize,
 
@@ -194,6 +200,9 @@ pub const Output = extern struct {
 
     extern fn wlr_output_destroy_global(output: *Output) void;
     pub const destroyGlobal = wlr_output_destroy_global;
+
+    extern fn wlr_output_init_render(output: *Output, allocator: *wlr.Allocator, renderer: *wlr.Renderer) bool;
+    pub const initRender = wlr_output_init_render;
 
     extern fn wlr_output_preferred_mode(output: *Output) ?*Mode;
     pub const preferredMode = wlr_output_preferred_mode;
@@ -210,11 +219,17 @@ pub const Output = extern struct {
     extern fn wlr_output_enable_adaptive_sync(output: *Output, enabled: bool) void;
     pub const enableAdaptiveSync = wlr_output_enable_adaptive_sync;
 
+    extern fn wlr_output_set_render_format(output: *Output, format: u32) void;
+    pub const setRenderFormat = wlr_output_set_render_format;
+
     extern fn wlr_output_set_scale(output: *Output, scale: f32) void;
     pub const setScale = wlr_output_set_scale;
 
     extern fn wlr_output_set_subpixel(output: *Output, subpixel: wl.Output.Subpixel) void;
     pub const setSubpixel = wlr_output_set_subpixel;
+
+    extern fn wlr_output_set_name(output: *Output, name: [*:0]const u8) void;
+    pub const setName = wlr_output_set_name;
 
     extern fn wlr_output_set_description(output: *Output, desc: [*:0]const u8) void;
     pub const setDescription = wlr_output_set_description;
@@ -265,9 +280,6 @@ pub const Output = extern struct {
     extern fn wlr_output_set_gamma(output: *Output, size: usize, r: [*]const u16, g: [*]const u16, b: [*]const u16) void;
     pub const setGamma = wlr_output_set_gamma;
 
-    extern fn wlr_output_export_dmabuf(output: *Output, attribs: *wlr.DmabufAttributes) bool;
-    pub const exportDmabuf = wlr_output_export_dmabuf;
-
     extern fn wlr_output_from_resource(resource: *wl.Output) ?*Output;
     pub const fromWlOutput = wlr_output_from_resource;
 
@@ -286,8 +298,6 @@ pub const Output = extern struct {
     extern fn wlr_output_transform_compose(tr_a: wl.Output.Transform, tr_b: wl.Output.Transform) wl.Output.Transform;
     pub const transformCompose = wlr_output_transform_compose;
 
-    extern fn wlr_output_is_noop(output: *Output) bool;
-    pub const isNoop = wlr_output_is_noop;
 
     extern fn wlr_output_is_wl(output: *Output) bool;
     pub const isWl = wlr_output_is_wl;

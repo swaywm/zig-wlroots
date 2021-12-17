@@ -30,6 +30,7 @@ pub const XwaylandServer = extern struct {
     pub const Options = extern struct {
         lazy: bool,
         enable_wm: bool,
+        no_touch_pointer_emulation: bool,
     };
 
     pub const event = struct {
@@ -50,8 +51,7 @@ pub const XwaylandServer = extern struct {
     display_name: [16]u8,
     x_fd: [2]c_int,
     x_fd_read_event: [2]?*wl.EventSource,
-    lazy: bool,
-    enable_wm: bool,
+    options: Options,
 
     wl_server: *wl.Server,
 
@@ -75,6 +75,12 @@ pub const XwaylandServer = extern struct {
 };
 
 pub const Xwayland = extern struct {
+    pub const event = struct {
+        pub const RemoveStartupInfo = extern struct {
+            id: [*:0]const u8,
+            window: xcb.Window,
+        };
+    };
     server: *XwaylandServer,
     xwm: ?*Xwm,
     cursor: ?*XwaylandCursor,
@@ -88,6 +94,7 @@ pub const Xwayland = extern struct {
     events: extern struct {
         ready: wl.Signal(void),
         new_surface: wl.Signal(*XwaylandSurface),
+        remove_startup_info: wl.Signal(*event.RemoveStartupInfo),
     },
 
     user_event_handler: ?fn (*Xwm, *xcb.GenericEvent) callconv(.C) c_int,
@@ -213,6 +220,7 @@ pub const XwaylandSurface = extern struct {
     class: ?[*:0]u8,
     instance: ?[*:0]u8,
     role: ?[*:0]u8,
+    startup_id: ?[*:0]u8,
     pid: os.pid_t,
     has_utf8_title: bool,
 
@@ -260,6 +268,7 @@ pub const XwaylandSurface = extern struct {
         set_role: wl.Signal(*XwaylandSurface),
         set_parent: wl.Signal(*XwaylandSurface),
         set_pid: wl.Signal(*XwaylandSurface),
+        set_startup_id: wl.Signal(*XwaylandSurface),
         set_window_type: wl.Signal(*XwaylandSurface),
         set_hints: wl.Signal(*XwaylandSurface),
         set_decorations: wl.Signal(*XwaylandSurface),

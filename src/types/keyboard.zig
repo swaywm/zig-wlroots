@@ -56,6 +56,7 @@ pub const Keyboard = extern struct {
 
     keymap_string: [*:0]u8,
     keymap_size: usize,
+    keymap_fd: c_int,
     keymap: ?*xkb.Keymap,
     xkb_state: ?*xkb.State,
     led_indexes: [3]xkb.LED_Index,

@@ -6,8 +6,9 @@ pub const Session = @import("backend/session.zig").Session;
 pub const DmabufAttributes = @import("render/dmabuf.zig").DmabufAttributes;
 pub const Renderer = @import("render/renderer.zig").Renderer;
 pub const Texture = @import("render/texture.zig").Texture;
-pub const Allocator = opaque {};
+pub const Allocator = @import("render/allocator.zig").Allocator;
 pub const Swapchain = opaque {};
+pub const DrmFormat = opaque {};
 
 pub const ShmAttributes = @import("types/buffer.zig").ShmAttributes;
 pub const Buffer = @import("types/buffer.zig").Buffer;
@@ -15,7 +16,6 @@ pub const ClientBuffer = @import("types/buffer.zig").ClientBuffer;
 
 pub const DmabufBufferV1 = @import("types/linux_dmabuf_v1.zig").DmabufBufferV1;
 pub const LinuxDmabufV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufV1;
-pub const LinuxDmabufParamsV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufParamsV1;
 
 pub const Compositor = @import("types/compositor.zig").Compositor;
 pub const Subcompositor = @import("types/compositor.zig").Subcompositor;
@@ -24,7 +24,6 @@ pub const Surface = @import("types/surface.zig").Surface;
 pub const Subsurface = @import("types/surface.zig").Subsurface;
 
 pub const Viewporter = @import("types/viewporter.zig").Viewporter;
-pub const Viewport = @import("types/viewporter.zig").Viewport;
 
 pub const Presentation = @import("types/presentation_time.zig").Presentation;
 pub const PresentationFeedback = @import("types/presentation_time.zig").PresentationFeedback;
@@ -55,6 +54,7 @@ pub const TouchPoint = @import("types/seat.zig").TouchPoint;
 pub const InputDevice = @import("types/input_device.zig").InputDevice;
 pub const InputMethodV2 = @import("types/input_method_v2.zig").InputMethodV2;
 pub const InputMethodManagerV2 = @import("types/input_method_v2.zig").InputMethodManagerV2;
+pub const InputPopupSurfaceV2 = @import("types/input_method_v2.zig").InputPopupSurfaceV2;
 
 pub const TextInputV3 = @import("types/text_input_v3.zig").TextInputV3;
 pub const TextInputManagerV3 = @import("types/text_input_v3.zig").TextInputManagerV3;
@@ -141,11 +141,12 @@ pub const XwaylandSurface = @import("xwayland.zig").XwaylandSurface;
 pub const XwaylandCursor = @import("xwayland.zig").XwaylandCursor;
 pub const Xwm = @import("xwayland.zig").Xwm;
 
-pub const List = @import("types/list.zig").List;
-pub const Box = @import("types/box.zig").Box;
-pub const FBox = @import("types/box.zig").FBox;
 pub const matrix = @import("types/matrix.zig");
 
+pub const AddonSet = @import("util/addon.zig").AddonSet;
+pub const Addon = @import("util/addon.zig").Addon;
+pub const Box = @import("util/box.zig").Box;
+pub const FBox = @import("util/box.zig").FBox;
 pub const Edges = @import("util/edges.zig").Edges;
 pub const log = @import("util/log.zig");
 pub const region = @import("util/region.zig");
@@ -161,8 +162,8 @@ pub const config = @import("config.zig");
 pub const version = @import("version.zig");
 
 comptime {
-    if (version.major != 0 or version.minor != 14) {
-        @compileError("zig-wlroots requires wlroots version 0.14");
+    if (version.major != 0 or version.minor != 15) {
+        @compileError("zig-wlroots requires wlroots version 0.15");
     }
 }
 

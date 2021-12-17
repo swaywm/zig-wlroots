@@ -13,10 +13,6 @@ pub const Backend = extern struct {
         new_output: wl.Signal(*wlr.Output),
     },
 
-    // Private state
-    renderer: ?*wlr.Renderer,
-    allocator: ?*wlr.Allocator,
-
     // backend.h
 
     extern fn wlr_backend_autocreate(server: *wl.Server) ?*Backend;
@@ -33,9 +29,6 @@ pub const Backend = extern struct {
 
     extern fn wlr_backend_destroy(backend: *Backend) void;
     pub const destroy = wlr_backend_destroy;
-
-    extern fn wlr_backend_get_renderer(backend: *Backend) ?*wlr.Renderer;
-    pub const getRenderer = wlr_backend_get_renderer;
 
     extern fn wlr_backend_get_session(backend: *Backend) ?*wlr.Session;
     pub const getSession = wlr_backend_get_session;
@@ -64,19 +57,4 @@ pub const Backend = extern struct {
 
     extern fn wlr_multi_for_each_backend(backend: *Backend, callback: fn (backend: *Backend, data: ?*c_void) callconv(.C) void, data: ?*c_void) void;
     pub const multiForEachBackend = wlr_multi_for_each_backend;
-
-    // backend/noop.h
-
-    extern fn wlr_noop_backend_create(server: *wl.Server) ?*Backend;
-    pub fn createNoop(server: *wl.Server) !*Backend {
-        return wlr_noop_backend_create(server) orelse error.BackendCreateFailed;
-    }
-
-    extern fn wlr_noop_add_output(noop: *Backend) ?*wlr.Output;
-    pub fn noopAddOutput(noop: *Backend) !*wlr.Output {
-        return wlr_noop_add_output(noop) orelse error.OutOfMemory;
-    }
-
-    extern fn wlr_backend_is_noop(backend: *Backend) bool;
-    pub const isNoop = wlr_backend_is_noop;
 };

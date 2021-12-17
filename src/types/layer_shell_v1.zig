@@ -24,6 +24,17 @@ pub const LayerShellV1 = extern struct {
 
 pub const LayerSurfaceV1 = extern struct {
     pub const State = extern struct {
+        pub const field = struct {
+            pub const desired_size = 1 << 0;
+            pub const anchor = 1 << 1;
+            pub const exclusive_zone = 1 << 2;
+            pub const margin = 1 << 3;
+            pub const keyboard_inteactivity = 1 << 4;
+            pub const layer = 1 << 5;
+        };
+
+        /// Bitmask of State.field values
+        comitted: u32,
         anchor: zwlr.LayerSurfaceV1.Anchor,
         exclusive_zone: i32,
         margin: extern struct {
@@ -35,16 +46,20 @@ pub const LayerSurfaceV1 = extern struct {
         keyboard_interactive: zwlr.LayerSurfaceV1.KeyboardInteractivity,
         desired_width: u32,
         desired_height: u32,
+        layer: zwlr.LayerShellV1.Layer,
+
+        configure_serial: u32,
         actual_width: u32,
         actual_height: u32,
-        layer: zwlr.LayerShellV1.Layer,
     };
 
     pub const Configure = extern struct {
         /// LayerSurfaceV1.configure_list
         link: wl.list.Link,
         serial: u32,
-        state: State,
+
+        width: u32,
+        height: u32,
     };
 
     surface: *wlr.Surface,
@@ -59,17 +74,11 @@ pub const LayerSurfaceV1 = extern struct {
     added: bool,
     configured: bool,
     mapped: bool,
-    closed: bool,
 
-    configure_serial: u32,
-    configure_next_serial: u32,
     configure_list: wl.list.Head(LayerSurfaceV1.Configure, "link"),
 
-    acked_configure: ?*Configure,
-
-    client_pending: State,
-    server_pending: State,
     current: State,
+    pending: State,
 
     surface_destroy: wl.Listener(*wlr.Surface),
 
@@ -82,11 +91,11 @@ pub const LayerSurfaceV1 = extern struct {
 
     data: usize,
 
-    extern fn wlr_layer_surface_v1_configure(surface: *LayerSurfaceV1, width: u32, height: u32) void;
+    extern fn wlr_layer_surface_v1_configure(surface: *LayerSurfaceV1, width: u32, height: u32) u32;
     pub const configure = wlr_layer_surface_v1_configure;
 
-    extern fn wlr_layer_surface_v1_close(surface: *LayerSurfaceV1) void;
-    pub const close = wlr_layer_surface_v1_close;
+    extern fn wlr_layer_surface_v1_destroy(surface: *LayerSurfaceV1) void;
+    pub const close = wlr_layer_surface_v1_destroy;
 
     extern fn wlr_layer_surface_v1_from_wlr_surface(surface: *wlr.Surface) *LayerSurfaceV1;
     pub const fromWlrSurface = wlr_layer_surface_v1_from_wlr_surface;

@@ -41,12 +41,7 @@ pub const TextInputV3 = extern struct {
             purpose: u32,
         },
 
-        cursor_rectangle: extern struct {
-            x: i32,
-            y: i32,
-            width: i32,
-            height: i32,
-        },
+        cursor_rectangle: wlr.Box,
 
         features: u32,
     };
@@ -79,7 +74,7 @@ pub const TextInputV3 = extern struct {
     extern fn wlr_text_input_v3_send_leave(text_input: *wlr.TextInputV3) void;
     pub const sendLeave = wlr_text_input_v3_send_leave;
 
-    extern fn wlr_text_input_v3_send_preedit_string(text_input: *wlr.TextInputV3, text: [*:0]const u8, cursor_begin: u32, cursor_end: u32) void;
+    extern fn wlr_text_input_v3_send_preedit_string(text_input: *wlr.TextInputV3, text: [*:0]const u8, cursor_begin: i32, cursor_end: i32) void;
     pub const sendPreeditString = wlr_text_input_v3_send_preedit_string;
 
     extern fn wlr_text_input_v3_send_commit_string(text_input: *wlr.TextInputV3, text: [*:0]const u8) void;

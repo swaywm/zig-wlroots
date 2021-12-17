@@ -17,11 +17,3 @@ pub const Viewporter = extern struct {
         return wlr_viewporter_create(server) orelse error.OutOfMemory;
     }
 };
-
-pub const Viewport = extern struct {
-    resource: *wl.Resource,
-    surface: *wlr.Surface,
-
-    surface_destroy: wl.Listener(*wlr.Surface),
-    surface_commit: wl.Listener(*wlr.Surface),
-};

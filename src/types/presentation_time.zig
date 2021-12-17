@@ -5,7 +5,6 @@ const wl = wayland.server.wl;
 
 pub const Presentation = extern struct {
     global: *wl.Global,
-    feedbacks: wl.list.Head(PresentationFeedback, "link"),
     // TODO: use std.os.clockid_t when available.
     clock: c_int,
 
@@ -28,21 +27,12 @@ pub const Presentation = extern struct {
 };
 
 pub const PresentationFeedback = extern struct {
-    presentation: *wlr.Presentation,
-    surface: ?*wlr.Surface,
-    link: wl.list.Link,
     resources: wl.list.Head(wl.Resource, null),
-
-    committed: bool,
-    sampled: bool,
-    presented: bool,
 
     output: ?*wlr.Output,
     output_committed: bool,
     output_commit_seq: u32,
 
-    surface_commit: wl.Listener(*wlr.Surface),
-    surface_destroy: wl.Listener(*wlr.Surface),
     output_commit: wl.Listener(*wlr.Output.event.Commit),
     output_present: wl.Listener(*wlr.Output.event.Present),
     output_destroy: wl.Listener(*wlr.Output),

@@ -25,7 +25,7 @@ pub const Surface = extern struct {
         committed: u32,
         seq: u32,
 
-        buffer_resource: ?*wl.Buffer,
+        buffer: ?*wlr.Buffer,
         dx: i32,
         dy: i32,
         surface_damage: pixman.Region32,
@@ -41,6 +41,9 @@ pub const Surface = extern struct {
         buffer_width: c_int,
         buffer_height: c_int,
 
+        subsurfaces_below: wl.list.Head(Subsurface.ParentState, "link"),
+        subsurfaces_above: wl.list.Head(Subsurface.ParentState, "link"),
+
         viewport: extern struct {
             has_src: bool,
             has_dst: bool,
@@ -48,8 +51,6 @@ pub const Surface = extern struct {
             dst_width: c_int,
             dst_height: c_int,
         },
-
-        buffer_destroy: wl.Listener(*wl.Buffer),
 
         cached_state_locks: usize,
         cached_state_link: wl.list.Link,
@@ -80,12 +81,12 @@ pub const Surface = extern struct {
     sy: c_int,
 
     buffer_damage: pixman.Region32,
+    external_damage: pixman.Region32,
     opaque_region: pixman.Region32,
     input_region: pixman.Region32,
 
     current: State,
     pending: State,
-    previous: State,
 
     cached: wl.list.Head(Surface.State, "cached_state_link"),
 
@@ -98,17 +99,23 @@ pub const Surface = extern struct {
         destroy: wl.Signal(*wlr.Surface),
     },
 
-    subsurfaces_below: wl.list.Head(Subsurface, "parent_link"),
-    subsurfaces_above: wl.list.Head(Subsurface, "parent_link"),
-
-    subsurfaces_pending_below: wl.list.Head(Subsurface, "parent_pending_link"),
-    subsurfaces_pending_above: wl.list.Head(Subsurface, "parent_pending_link"),
-
     current_outputs: wl.list.Head(Surface.Output, "link"),
+
+    addons: wlr.AddonSet,
+    data: usize,
+
+    // private state
 
     renderer_destroy: wl.Listener(*wlr.Renderer),
 
-    data: usize,
+    previous: extern struct {
+        scale: i32,
+        transform: wl.Output.Transform,
+        width: c_int,
+        height: c_int,
+        buffer_width: c_int,
+        buffer_height: c_int,
+    },
 
     extern fn wlr_surface_set_role(
         surface: *Surface,
@@ -195,17 +202,19 @@ pub const Surface = extern struct {
 };
 
 pub const Subsurface = extern struct {
-    pub const State = extern struct {
+    pub const ParentState = extern struct {
         x: i32,
         y: i32,
+        /// Surface.State.subsurfaces_above/subsurfaces_below
+        link: wl.list.Link,
     };
 
     resource: *wl.Subsurface,
     surface: *Surface,
     parent: ?*Surface,
 
-    current: State,
-    pending: State,
+    current: ParentState,
+    pending: ParentState,
 
     cached_seq: u32,
     has_cache: bool,
@@ -213,11 +222,7 @@ pub const Subsurface = extern struct {
     synchronized: bool,
     reordered: bool,
     mapped: bool,
-
-    /// Surface.subsurfaces
-    parent_link: wl.list.Link,
-    /// Surface.subsurface_pending_list
-    parent_pending_link: wl.list.Link,
+    added: bool,
 
     surface_destroy: wl.Listener(*Surface),
     parent_destroy: wl.Listener(*Surface),
@@ -229,21 +234,4 @@ pub const Subsurface = extern struct {
     },
 
     data: usize,
-
-    extern fn wlr_subsurface_create(
-        surface: *Surface,
-        parent: *Surface,
-        version: u32,
-        id: u32,
-        resource_list: ?*wl.list.Head(wl.Subsurface, null),
-    ) ?*Subsurface;
-    pub fn create(
-        surface: *Surface,
-        parent: *Surface,
-        version: u32,
-        id: u32,
-        resource_list: ?*wl.list.Head(wl.Subsurface, null),
-    ) !*Subsurface {
-        return wlr_subsurface_create(surface, parent, version, id, resource_list) orelse error.OutOfMemory;
-    }
 };

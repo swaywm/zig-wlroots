@@ -1,14 +1,7 @@
 pub const DmabufAttributes = extern struct {
-    pub const Flags = extern enum {
-        y_invert = 1,
-        interlaced = 2,
-        bottom_first = 4,
-    };
-
     width: i32,
     height: i32,
     format: u32,
-    flags: u32,
     modifier: u64,
 
     n_planes: c_int,

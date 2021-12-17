@@ -4,6 +4,25 @@ const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
 pub const Device = extern struct {
+    pub const event = struct {
+        pub const Change = extern struct {
+            pub const Type = extern enum {
+                hotplug = 1,
+                lease,
+            };
+
+            type: Type,
+            event: extern union {
+                hotplug: Hotplug,
+            },
+        };
+
+        pub const Hotplug = extern struct {
+            connector_id: u32,
+            prop_id: u32,
+        };
+    };
+
     fd: c_int,
     device_id: c_int,
     dev: os.dev_t,
@@ -11,7 +30,7 @@ pub const Device = extern struct {
     link: wl.list.Link,
 
     events: extern struct {
-        change: wl.Signal(void),
+        change: wl.Signal(*event.Change),
         remove: wl.Signal(void),
     },
 };

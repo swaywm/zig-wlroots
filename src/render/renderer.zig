@@ -41,27 +41,11 @@ pub const Renderer = extern struct {
         }
     }
 
-    extern fn wlr_resource_get_buffer_size(resource: *wl.Buffer, renderer: *wlr.Renderer, width: *c_int, height: *c_int) bool;
-    pub inline fn getBufferSize(renderer: *wlr.Renderer, resource: *wl.Buffer, width: *c_int, height: *c_int) bool {
-        return wlr_resource_get_buffer_size(resource, renderer, width, height);
-    }
-
     extern fn wlr_renderer_scissor(renderer: *Renderer, box: ?*wlr.Box) void;
     pub const scissor = wlr_renderer_scissor;
 
     extern fn wlr_renderer_get_shm_texture_formats(renderer: *Renderer, len: *usize) [*]const u32;
     pub const getShmTextureFormats = wlr_renderer_get_shm_texture_formats;
-
-    extern fn wlr_renderer_resource_is_wl_drm_buffer(renderer: *Renderer, buffer: *wl.Buffer) bool;
-    pub const resourceIsWlDrmBuffer = wlr_renderer_resource_is_wl_drm_buffer;
-
-    extern fn wlr_renderer_wl_drm_buffer_get_size(
-        renderer: *Renderer,
-        buffer: *wl.Buffer,
-        width: *c_int,
-        height: *c_int,
-    ) void;
-    pub const wlDrmBufferGetSize = wlr_renderer_wl_drm_buffer_get_size;
 
     // TODO:
     //extern fn wlr_renderer_get_dmabuf_texture_formats(renderer: *Renderer) [*c]const struct_wlr_drm_format_set;
