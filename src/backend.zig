@@ -57,4 +57,24 @@ pub const Backend = extern struct {
 
     extern fn wlr_multi_for_each_backend(backend: *Backend, callback: fn (backend: *Backend, data: ?*c_void) callconv(.C) void, data: ?*c_void) void;
     pub const multiForEachBackend = wlr_multi_for_each_backend;
+
+    // backend/headless.h
+
+    extern fn wlr_headless_backend_create(server: *wl.Server) ?*Backend;
+    pub fn createHeadless(server: *wl.Server) !*Backend {
+        return wlr_headless_backend_create(server) orelse error.BackendCreateFailed;
+    }
+
+    extern fn wlr_headless_add_output(headless: *Backend) ?*wlr.Output;
+    pub fn headlessAddOutput(headless: *Backend) !*wlr.Output {
+        return wlr_headless_add_output(headless) orelse error.OutOfMemory;
+    }
+
+    extern fn wlr_headless_add_input_device(headless: *Backend) ?*wlr.InputDevice;
+    pub fn headlessAddInputDevice(headless: *Backend) !*wlr.InputDevice {
+        return wlr_headless_add_input_device(headless) orelse error.OutOfMemory;
+    }
+
+    extern fn wlr_backend_is_headless(backend: *Backend) bool;
+    pub const isHeadless = wlr_backend_is_headless;
 };
