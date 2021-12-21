@@ -29,12 +29,12 @@ pub const LayerSurfaceV1 = extern struct {
             pub const anchor = 1 << 1;
             pub const exclusive_zone = 1 << 2;
             pub const margin = 1 << 3;
-            pub const keyboard_inteactivity = 1 << 4;
+            pub const keyboard_interactivity = 1 << 4;
             pub const layer = 1 << 5;
         };
 
         /// Bitmask of State.field values
-        comitted: u32,
+        committed: u32,
         anchor: zwlr.LayerSurfaceV1.Anchor,
         exclusive_zone: i32,
         margin: extern struct {
