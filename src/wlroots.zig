@@ -158,6 +158,14 @@ pub const OutputConfigurationV1 = @import("types/output_management_v1.zig").Outp
 pub const ForeignToplevelManagerV1 = @import("types/foreign_toplevel_management_v1.zig").ForeignToplevelManagerV1;
 pub const ForeignToplevelHandleV1 = @import("types/foreign_toplevel_management_v1.zig").ForeignToplevelHandleV1;
 
+pub const SceneNode = @import("types/scene.zig").SceneNode;
+pub const Scene = @import("types/scene.zig").Scene;
+pub const SceneTree = @import("types/scene.zig").SceneTree;
+pub const SceneSurface = @import("types/scene.zig").SceneSurface;
+pub const SceneRect = @import("types/scene.zig").SceneRect;
+pub const SceneBuffer = @import("types/scene.zig").SceneBuffer;
+pub const SceneOutput = @import("types/scene.zig").SceneOutput;
+
 pub const config = @import("config.zig");
 pub const version = @import("version.zig");
 
