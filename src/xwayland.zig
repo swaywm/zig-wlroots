@@ -284,7 +284,7 @@ pub const XwaylandSurface = extern struct {
     extern fn wlr_xwayland_surface_activate(surface: *XwaylandSurface, activated: bool) void;
     pub const activate = wlr_xwayland_surface_activate;
 
-    extern fn wlr_xwayland_surface_restack(surface: *XwaylandSurface, sibling: *XwaylandSurface, mode: xcb.StackMode) void;
+    extern fn wlr_xwayland_surface_restack(surface: *XwaylandSurface, sibling: ?*XwaylandSurface, mode: xcb.StackMode) void;
     pub const restack = wlr_xwayland_surface_restack;
 
     extern fn wlr_xwayland_surface_configure(surface: *XwaylandSurface, x: i16, y: i16, width: u16, height: u16) void;
