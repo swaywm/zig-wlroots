@@ -109,7 +109,7 @@ pub const SceneNode = extern struct {
         return wlr_scene_subsurface_tree_create(parent, surface) orelse error.OutOfMemory;
     }
 
-    extern fn wlr_scene_xdg_surface_create(parent: *SceneNode, xdg_surface: ?*wlr.XdgSurface) ?*SceneNode;
+    extern fn wlr_scene_xdg_surface_create(parent: *SceneNode, xdg_surface: *wlr.XdgSurface) ?*SceneNode;
     pub fn createSceneXdgSurface(parent: *SceneNode, xdg_surface: *wlr.XdgSurface) !*SceneNode {
         return wlr_scene_xdg_surface_create(parent, xdg_surface) orelse error.OutOfMemory;
     }

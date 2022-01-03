@@ -40,6 +40,7 @@ const Server = struct {
     backend: *wlr.Backend,
     renderer: *wlr.Renderer,
     allocator: *wlr.Allocator,
+    scene: *wlr.Scene,
 
     output_layout: *wlr.OutputLayout,
     new_output: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(newOutput),
@@ -78,6 +79,7 @@ const Server = struct {
             .backend = backend,
             .renderer = renderer,
             .allocator = try wlr.Allocator.autocreate(backend, renderer),
+            .scene = try wlr.Scene.create(),
 
             .output_layout = try wlr.OutputLayout.create(),
             .xdg_shell = try wlr.XdgShell.create(wl_server),
@@ -87,6 +89,7 @@ const Server = struct {
         };
 
         try server.renderer.initServer(wl_server);
+        try server.scene.attachOutputLayout(server.output_layout);
 
         _ = try wlr.Compositor.create(server.wl_server, server.renderer);
         _ = try wlr.DataDeviceManager.create(server.wl_server);
@@ -144,24 +147,48 @@ const Server = struct {
     fn newXdgSurface(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const server = @fieldParentPtr(Server, "new_xdg_surface", listener);
 
-        if (xdg_surface.role != .toplevel) return;
+        switch (xdg_surface.role) {
+            .toplevel => {
+                // Don't add the view to server.views until it is mapped
+                const view = gpa.create(View) catch {
+                    std.log.err("failed to allocate new view", .{});
+                    return;
+                };
 
-        // Don't add the view to server.views until it is mapped
-        const view = gpa.create(View) catch {
-            std.log.err("failed to allocate new view", .{});
-            return;
-        };
+                view.* = .{
+                    .server = server,
+                    .xdg_surface = xdg_surface,
+                    .scene_node = server.scene.node.createSceneXdgSurface(xdg_surface) catch {
+                        gpa.destroy(view);
+                        std.log.err("failed to allocate new view", .{});
+                        return;
+                    },
+                };
+                view.scene_node.data = @ptrToInt(view);
+                xdg_surface.data = @ptrToInt(view.scene_node);
 
-        view.* = .{
-            .server = server,
-            .xdg_surface = xdg_surface,
-        };
-
-        xdg_surface.events.map.add(&view.map);
-        xdg_surface.events.unmap.add(&view.unmap);
-        xdg_surface.events.destroy.add(&view.destroy);
-        xdg_surface.role_data.toplevel.events.request_move.add(&view.request_move);
-        xdg_surface.role_data.toplevel.events.request_resize.add(&view.request_resize);
+                xdg_surface.events.map.add(&view.map);
+                xdg_surface.events.unmap.add(&view.unmap);
+                xdg_surface.events.destroy.add(&view.destroy);
+                xdg_surface.role_data.toplevel.events.request_move.add(&view.request_move);
+                xdg_surface.role_data.toplevel.events.request_resize.add(&view.request_resize);
+            },
+            .popup => {
+                // These asserts are fine since tinywl.zig doesn't support anything else that can
+                // make xdg popups (e.g. layer shell).
+                const parent = wlr.XdgSurface.fromWlrSurface(xdg_surface.role_data.popup.parent.?);
+                const parent_node = @intToPtr(?*wlr.SceneNode, parent.data) orelse {
+                    // The xdg surface user data could be left null due to allocation failure.
+                    return;
+                };
+                const scene_node = parent_node.createSceneXdgSurface(xdg_surface) catch {
+                    std.log.err("failed to allocate xdg popup node", .{});
+                    return;
+                };
+                xdg_surface.data = @ptrToInt(scene_node);
+            },
+            .none => unreachable,
+        }
     }
 
     const ViewAtResult = struct {
@@ -172,19 +199,22 @@ const Server = struct {
     };
 
     fn viewAt(server: *Server, lx: f64, ly: f64) ?ViewAtResult {
-        var it = server.views.iterator(.forward);
-        while (it.next()) |view| {
-            var sx: f64 = undefined;
-            var sy: f64 = undefined;
-            const x = lx - @intToFloat(f64, view.x);
-            const y = ly - @intToFloat(f64, view.y);
-            if (view.xdg_surface.surfaceAt(x, y, &sx, &sy)) |surface| {
-                return ViewAtResult{
-                    .view = view,
-                    .surface = surface,
-                    .sx = sx,
-                    .sy = sy,
-                };
+        var sx: f64 = undefined;
+        var sy: f64 = undefined;
+        if (server.scene.node.at(lx, ly, &sx, &sy)) |node| {
+            if (node.type != .surface) return null;
+            const surface = wlr.SceneSurface.fromNode(node).surface;
+
+            var it: ?*wlr.SceneNode = node;
+            while (it) |n| : (it = n.parent) {
+                if (@intToPtr(?*View, n.data)) |view| {
+                    return ViewAtResult{
+                        .view = view,
+                        .surface = surface,
+                        .sx = sx,
+                        .sy = sy,
+                    };
+                }
             }
         }
         return null;
@@ -199,6 +229,7 @@ const Server = struct {
             }
         }
 
+        view.scene_node.raiseToTop();
         view.link.remove();
         server.views.prepend(view);
 
@@ -275,8 +306,10 @@ const Server = struct {
                 server.seat.pointerClearFocus();
             },
             .move => {
-                server.grabbed_view.?.x = @floatToInt(i32, server.cursor.x - server.grab_x);
-                server.grabbed_view.?.y = @floatToInt(i32, server.cursor.y - server.grab_y);
+                const view = server.grabbed_view.?;
+                view.x = @floatToInt(i32, server.cursor.x - server.grab_x);
+                view.y = @floatToInt(i32, server.cursor.y - server.grab_y);
+                view.scene_node.setPosition(view.x, view.y);
             },
             .resize => {
                 const view = server.grabbed_view.?;
@@ -312,6 +345,7 @@ const Server = struct {
                 view.xdg_surface.getGeometry(&geo_box);
                 view.x = new_left - geo_box.x;
                 view.y = new_top - geo_box.y;
+                view.scene_node.setPosition(view.x, view.y);
 
                 const new_width = @intCast(u32, new_right - new_left);
                 const new_height = @intCast(u32, new_bottom - new_top);
@@ -347,8 +381,7 @@ const Server = struct {
         );
     }
 
-    fn cursorFrame(listener: *wl.Listener(*wlr.Cursor), wlr_cursor: *wlr.Cursor) void {
-        _ = wlr_cursor;
+    fn cursorFrame(listener: *wl.Listener(*wlr.Cursor), _: *wlr.Cursor) void {
         const server = @fieldParentPtr(Server, "cursor_frame", listener);
         server.seat.pointerNotifyFrame();
     }
@@ -372,76 +405,20 @@ const Server = struct {
 };
 
 const Output = struct {
-    const RenderData = struct {
-        wlr_output: *wlr.Output,
-        view: *View,
-        renderer: *wlr.Renderer,
-        when: *os.timespec,
-    };
-
     server: *Server,
     wlr_output: *wlr.Output,
 
     frame: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(frame),
 
-    fn frame(listener: *wl.Listener(*wlr.Output), wlr_output: *wlr.Output) void {
+    fn frame(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
         const output = @fieldParentPtr(Output, "frame", listener);
-        const server = output.server;
+
+        const scene_output = output.server.scene.getSceneOutput(output.wlr_output).?;
+        _ = scene_output.commit();
 
         var now: os.timespec = undefined;
         os.clock_gettime(os.CLOCK.MONOTONIC, &now) catch @panic("CLOCK_MONOTONIC not supported");
-
-        wlr_output.attachRender(null) catch return;
-
-        server.renderer.begin(@intCast(u32, wlr_output.width), @intCast(u32, wlr_output.height));
-
-        const color = [4]f32{ 0.3, 0.3, 0.3, 1.0 };
-        server.renderer.clear(&color);
-
-        // In reverse order to render views at the front of the list on top
-        var it = server.views.iterator(.reverse);
-        while (it.next()) |view| {
-            var rdata = RenderData{
-                .wlr_output = wlr_output,
-                .view = view,
-                .renderer = server.renderer,
-                .when = &now,
-            };
-            view.xdg_surface.forEachSurface(*RenderData, renderSurface, &rdata);
-        }
-
-        wlr_output.renderSoftwareCursors(null);
-
-        server.renderer.end();
-
-        // Pending changes are automatically rolled back on failure
-        wlr_output.commit() catch {};
-    }
-
-    fn renderSurface(surface: *wlr.Surface, sx: c_int, sy: c_int, rdata: *RenderData) callconv(.C) void {
-        const wlr_output = rdata.wlr_output;
-        const texture = surface.getTexture() orelse return;
-
-        var ox: f64 = 0;
-        var oy: f64 = 0;
-        rdata.view.server.output_layout.outputCoords(wlr_output, &ox, &oy);
-        ox += @intToFloat(f64, rdata.view.x + sx);
-        oy += @intToFloat(f64, rdata.view.y + sy);
-
-        var box = wlr.Box{
-            .x = @floatToInt(c_int, ox * wlr_output.scale),
-            .y = @floatToInt(c_int, oy * wlr_output.scale),
-            .width = @floatToInt(c_int, @intToFloat(f32, surface.current.width) * wlr_output.scale),
-            .height = @floatToInt(c_int, @intToFloat(f32, surface.current.height) * wlr_output.scale),
-        };
-
-        var matrix: [9]f32 = undefined;
-        const transform = wlr.Output.transformInvert(surface.current.transform);
-        wlr.matrix.projectBox(&matrix, &box, transform, 0, &wlr_output.transform_matrix);
-
-        // wlroots will log an error for us
-        rdata.renderer.renderTextureWithMatrix(texture, &matrix, 1) catch {};
-        surface.sendFrameDone(rdata.when);
+        scene_output.sendFrameDone(&now);
     }
 };
 
@@ -449,6 +426,7 @@ const View = struct {
     server: *Server,
     link: wl.list.Link = undefined,
     xdg_surface: *wlr.XdgSurface,
+    scene_node: *wlr.SceneNode,
 
     x: i32 = 0,
     y: i32 = 0,
@@ -462,19 +440,15 @@ const View = struct {
     fn map(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "map", listener);
         view.server.views.prepend(view);
-        view.x = -xdg_surface.current.geometry.x;
-        view.y = -xdg_surface.current.geometry.y;
         view.server.focusView(view, xdg_surface.surface);
     }
 
-    fn unmap(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
-        _ = xdg_surface;
+    fn unmap(listener: *wl.Listener(*wlr.XdgSurface), _: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "unmap", listener);
         view.link.remove();
     }
 
-    fn destroy(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
-        _ = xdg_surface;
+    fn destroy(listener: *wl.Listener(*wlr.XdgSurface), _: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "destroy", listener);
 
         view.map.link.remove();
@@ -488,9 +462,8 @@ const View = struct {
 
     fn requestMove(
         listener: *wl.Listener(*wlr.XdgToplevel.event.Move),
-        event: *wlr.XdgToplevel.event.Move,
+        _: *wlr.XdgToplevel.event.Move,
     ) void {
-        _ = event;
         const view = @fieldParentPtr(View, "request_move", listener);
         const server = view.server;
         server.grabbed_view = view;
