@@ -312,6 +312,22 @@ pub const Output = extern struct {
 
     extern fn wlr_x11_output_set_title(output: *Output, title: ?[*:0]const u8) void;
     pub const x11SetTitle = wlr_x11_output_set_title;
+
+    // wlr/backend/drm.h
+    extern fn wlr_output_is_drm(output: *Output) bool;
+    pub const isDrm = wlr_output_is_drm;
+
+    extern fn wlr_drm_connector_get_id(output: *Output) u32;
+    pub const drmConnectorGetId = wlr_drm_connector_get_id;
+
+    // TODO:
+    // typedef struct _drmModeModeInfo drmModeModeInfo;
+    // struct wlr_output_mode *wlr_drm_connector_add_mode(struct wlr_output *output,
+    //         const drmModeModeInfo *mode);
+    // extern fn wlr_drm_connector_add_mode(output: *Output, mode: *drmModeModeInfo) *Mode;
+
+    extern fn wlr_drm_connector_get_panel_orientation(output: *Output) wl.Output.Transform;
+    pub const getPanelOrientation = wlr_drm_connector_get_panel_orientation;
 };
 
 pub const OutputCursor = extern struct {

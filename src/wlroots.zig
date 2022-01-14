@@ -1,4 +1,5 @@
 pub const Backend = @import("backend.zig").Backend;
+pub const DrmLease = @import("backend.zig").DrmLease;
 
 pub const Device = @import("backend/session.zig").Device;
 pub const Session = @import("backend/session.zig").Session;

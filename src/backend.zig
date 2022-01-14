@@ -36,6 +36,19 @@ pub const Backend = extern struct {
     extern fn wlr_backend_get_drm_fd(backend: *Backend) c_int;
     pub const getDrmFd = wlr_backend_get_drm_fd;
 
+    // /backend/drm.h
+
+    extern fn wlr_drm_backend_create(server: *wl.Server, session: *wlr.Session, dev: *wlr.Device, parent: *Backend) ?*Backend;
+    pub fn createDrm(server: *wl.Server, session: *wlr.Session, dev: *wlr.Device, parent: *Backend) !*Backend {
+        return wlr_drm_backend_create(server, session, dev, parent) orelse error.BackendCreateFailed;
+    }
+
+    extern fn wlr_backend_is_drm(backend: *Backend) bool;
+    pub const isDrm = wlr_backend_is_drm;
+
+    extern fn wlr_drm_backend_get_non_master_fd(backend: *Backend) c_int;
+    pub const drmGetNonMasterFd = wlr_drm_backend_get_non_master_fd;
+
     // backend/multi.h
 
     extern fn wlr_multi_backend_create(server: *wl.Server) ?*Backend;
@@ -77,4 +90,24 @@ pub const Backend = extern struct {
 
     extern fn wlr_backend_is_headless(backend: *Backend) bool;
     pub const isHeadless = wlr_backend_is_headless;
+};
+
+pub const DrmLease = extern struct {
+    fd: c_int,
+    lessee_id: u32,
+    backend: *Backend,
+
+    events: extern struct {
+        destroy: wl.Signal(*DrmLease),
+    },
+
+    data: usize,
+
+    extern fn wlr_drm_create_lease(outputs: [*]*wlr.Output, n_outputs: usize, lease_fd: *c_int) ?*DrmLease;
+    pub fn create(outputs: [*]*wlr.Output, n_outputs: usize, lease_fd: *c_int) !*DrmLease {
+        return wlr_drm_create_lease(outputs, n_outputs, lease_fd) orelse error.DrmLeaseCreateFailed;
+    }
+
+    extern fn wlr_drm_lease_terminate(lease: *DrmLease) void;
+    pub const terminate = wlr_drm_lease_terminate;
 };
