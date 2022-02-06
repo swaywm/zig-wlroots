@@ -120,7 +120,6 @@ pub const Output = extern struct {
     global: *wl.Global,
     resources: wl.list.Head(wl.Output, null),
 
-    /// This contains a 0 terminated string, use std.mem.sliceTo(name, 0)
     name: [*:0]u8,
     description: ?[*:0]u8,
     /// This contains a 0 terminated string, use std.mem.sliceTo(make, 0)
