@@ -80,6 +80,8 @@ pub const Touch = @import("types/touch.zig").Touch;
 pub const Tablet = @import("types/tablet_tool.zig").Tablet;
 pub const TabletTool = @import("types/tablet_tool.zig").TabletTool;
 
+pub const Switch = @import("types/switch.zig").Switch;
+
 pub const VirtualPointerManagerV1 = @import("types/virtual_pointer_v1.zig").VirtualPointerManagerV1;
 pub const VirtualPointerV1 = @import("types/virtual_pointer_v1.zig").VirtualPointerV1;
 

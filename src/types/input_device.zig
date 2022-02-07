@@ -31,8 +31,7 @@ pub const InputDevice = extern struct {
         _device: ?*anyopaque,
         keyboard: *wlr.Keyboard,
         pointer: *wlr.Pointer,
-        // TODO:
-        //switch_device: *wlr.Switch,
+        switch_device: *wlr.Switch,
         touch: *wlr.Touch,
         tablet: *wlr.Tablet,
         // TODO:
