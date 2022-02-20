@@ -47,9 +47,8 @@ pub const Renderer = extern struct {
     extern fn wlr_renderer_get_shm_texture_formats(renderer: *Renderer, len: *usize) [*]const u32;
     pub const getShmTextureFormats = wlr_renderer_get_shm_texture_formats;
 
-    // TODO:
-    //extern fn wlr_renderer_get_dmabuf_texture_formats(renderer: *Renderer) [*c]const struct_wlr_drm_format_set;
-    //pub const getDmabufFormats = wlr_renderer_get_dmabuf_formats;
+    extern fn wlr_renderer_get_dmabuf_texture_formats(renderer: *Renderer) *const wlr.DrmFormatSet;
+    pub const getDmabufFormats = wlr_renderer_get_dmabuf_texture_formats;
 
     extern fn wlr_renderer_read_pixels(
         renderer: *Renderer,
