@@ -8,7 +8,8 @@ pub const Renderer = @import("render/renderer.zig").Renderer;
 pub const Texture = @import("render/texture.zig").Texture;
 pub const Allocator = @import("render/allocator.zig").Allocator;
 pub const Swapchain = opaque {};
-pub const DrmFormat = opaque {};
+pub const DrmFormat = @import("render/drm_format_set.zig").DrmFormat;
+pub const DrmFormatSet = @import("render/drm_format_set.zig").DrmFormatSet;
 
 pub const ShmAttributes = @import("types/buffer.zig").ShmAttributes;
 pub const Buffer = @import("types/buffer.zig").Buffer;
