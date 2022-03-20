@@ -199,6 +199,9 @@ pub const Surface = extern struct {
 
     extern fn wlr_surface_unlock_cached(surface: *Surface, seq: u32) void;
     pub const unlockCached = wlr_surface_unlock_cached;
+
+    extern fn wlr_surface_is_subsurface(surface: *Surface) bool;
+    pub const isSubsurface = wlr_surface_is_subsurface;
 };
 
 pub const Subsurface = extern struct {
@@ -234,4 +237,7 @@ pub const Subsurface = extern struct {
     },
 
     data: usize,
+
+    extern fn wlr_subsurface_from_wlr_surface(surface: *Surface) ?*wlr.Subsurface;
+    pub const fromWlrSurface = wlr_subsurface_from_wlr_surface;
 };
