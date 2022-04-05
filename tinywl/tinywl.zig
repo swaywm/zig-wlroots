@@ -118,11 +118,20 @@ const Server = struct {
         server.wl_server.destroy();
     }
 
+    /// This event is raised by the backend when a new output (aka a display or
+    /// monitor) becomes available.
     fn newOutput(listener: *wl.Listener(*wlr.Output), wlr_output: *wlr.Output) void {
         const server = @fieldParentPtr(Server, "new_output", listener);
 
+        // Configures the output created by the backend to use our allocator
+        // and our renderer. Must be done once, before commiting the output
         if (!wlr_output.initRender(server.allocator, server.renderer)) return;
 
+        // Some backends don't have modes. DRM+KMS does, and we need to set a mode
+        // before we can use the output. The mode is a tuple of (width, height,
+        // refresh rate), and each monitor supports only a specific set of modes. We
+        // just pick the monitor's preferred mode, a more sophisticated compositor
+        // would let the user configure it.
         if (wlr_output.preferredMode()) |mode| {
             wlr_output.setMode(mode);
             wlr_output.enable(true);
@@ -139,16 +148,29 @@ const Server = struct {
             .wlr_output = wlr_output,
         };
 
+        // Sets up a listener for the frame notify event.
         wlr_output.events.frame.add(&output.frame);
 
+        // Adds this to the output layout. The add_auto function arranges outputs
+        // from left-to-right in the order they appear. A more sophisticated
+        // compositor would let the user configure the arrangement of outputs in the
+        // layout.
+        //
+        // The output layout utility automatically adds a wl_output global to the
+        // display, which Wayland clients can see to find out information about the
+        // output (such as DPI, scale factor, manufacturer, etc).
         server.output_layout.addAuto(wlr_output);
     }
 
+    // This event is raised when wlr_xdg_shell receives a new xdg surface from a
+    // client, either a toplevel (application window) or popup.
     fn newXdgSurface(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const server = @fieldParentPtr(Server, "new_xdg_surface", listener);
 
         switch (xdg_surface.role) {
             .toplevel => {
+                // Allocate a View for this surface
+                //
                 // Don't add the view to server.views until it is mapped
                 const view = gpa.create(View) catch {
                     std.log.err("failed to allocate new view", .{});
@@ -167,6 +189,7 @@ const Server = struct {
                 view.scene_node.data = @ptrToInt(view);
                 xdg_surface.data = @ptrToInt(view.scene_node);
 
+                // Listen to the various events the surface can emit
                 xdg_surface.events.map.add(&view.map);
                 xdg_surface.events.unmap.add(&view.unmap);
                 xdg_surface.events.destroy.add(&view.destroy);
@@ -174,6 +197,12 @@ const Server = struct {
                 xdg_surface.role_data.toplevel.events.request_resize.add(&view.request_resize);
             },
             .popup => {
+                // We must add xdg popups to the scene graph so they get rendered. The
+                // wlroots scene graph provides a helper for this, but to use it we must
+                // provide the proper parent scene node of the xdg popup. To enable this,
+                // we always set the user data field of xdg_surfaces to the corresponding
+                // scene node.
+                //
                 // These asserts are fine since tinywl.zig doesn't support anything else that can
                 // make xdg popups (e.g. layer shell).
                 const parent = wlr.XdgSurface.fromWlrSurface(xdg_surface.role_data.popup.parent.?);
@@ -192,12 +221,15 @@ const Server = struct {
     }
 
     const ViewAtResult = struct {
-        view: *View,
+        view: ?*View,
         surface: *wlr.Surface,
         sx: f64,
         sy: f64,
     };
 
+    /// This returns the topmost node in the scene at the given layout coords.
+    /// we only care about surface nodes as we are specifically looking for a
+    /// surface in the surface tree of a tinywl_view.
     fn viewAt(server: *Server, lx: f64, ly: f64) ?ViewAtResult {
         var sx: f64 = undefined;
         var sy: f64 = undefined;
@@ -207,6 +239,8 @@ const Server = struct {
 
             var it: ?*wlr.SceneNode = node;
             while (it) |n| : (it = n.parent) {
+                // Find the node corresponding to the View at the root of this
+                // surface tree, it is the only one for which we set the data field.
                 if (@intToPtr(?*View, n.data)) |view| {
                     return ViewAtResult{
                         .view = view,
@@ -216,25 +250,40 @@ const Server = struct {
                     };
                 }
             }
+            return ViewAtResult{
+                .view = null,
+                .surface = surface,
+                .sx = sx,
+                .sy = sy,
+            };
         }
         return null;
     }
 
     fn focusView(server: *Server, view: *View, surface: *wlr.Surface) void {
         if (server.seat.keyboard_state.focused_surface) |previous_surface| {
+            // Don't re-focus an already focused surface.
             if (previous_surface == surface) return;
             if (previous_surface.isXdgSurface()) {
+                // Deactivate the previously focused surface. This lets the client know
+                // it no longer has focus and the client will repaint accordingly, e.g.
+                // stop displaying a caret.
                 const xdg_surface = wlr.XdgSurface.fromWlrSurface(previous_surface);
                 _ = xdg_surface.role_data.toplevel.setActivated(false);
             }
         }
 
+        // Move the view to the front
         view.scene_node.raiseToTop();
         view.link.remove();
         server.views.prepend(view);
 
+        // Activate the new surface
         _ = view.xdg_surface.role_data.toplevel.setActivated(true);
 
+        // Tell the seat to have the keyboard enter this surface. wlroots will keep
+        // track of this and automatically send key events to the appropriate
+        // clients without additional work on your part.
         const wlr_keyboard = server.seat.getKeyboard() orelse return;
         server.seat.keyboardNotifyEnter(
             surface,
@@ -244,6 +293,8 @@ const Server = struct {
         );
     }
 
+    // This event is raised by the backend when a new input device becomes
+    // available.
     fn newInput(listener: *wl.Listener(*wlr.InputDevice), device: *wlr.InputDevice) void {
         const server = @fieldParentPtr(Server, "new_input", listener);
         switch (device.type) {
@@ -255,21 +306,34 @@ const Server = struct {
             else => {},
         }
 
+        // We need to let the wlr_seat know what our capabilities are, which is
+        // communiciated to the client. In TinyWL we always have a cursor, even if
+        // there are no pointer devices, so we always include that capability.
         server.seat.setCapabilities(.{
             .pointer = true,
             .keyboard = server.keyboards.length() > 0,
         });
     }
 
+    /// This event is raised by the seat when a client provides a cursor image
     fn requestSetCursor(
         listener: *wl.Listener(*wlr.Seat.event.RequestSetCursor),
         event: *wlr.Seat.event.RequestSetCursor,
     ) void {
         const server = @fieldParentPtr(Server, "request_set_cursor", listener);
+        // This can be sent by any client, so we check to make sure this one is
+        // actually has pointer focus first. */
         if (event.seat_client == server.seat.pointer_state.focused_client)
+            // Once we've vetted the client, we can tell the cursor to use the
+            // provided surface as the cursor image. It will set the hardware cursor
+            // on the output that it's currently on and continue to do so as the
+            // cursor moves between outputs.
             server.cursor.setSurface(event.surface, event.hotspot_x, event.hotspot_y);
     }
 
+    /// This event is raised by the seat when a client wants to set the selection,
+    /// usually when the user copies something. wlroots allows compositors to
+    /// ignore such requests if they so choose, but in tinywl we always honor
     fn requestSetSelection(
         listener: *wl.Listener(*wlr.Seat.event.RequestSetSelection),
         event: *wlr.Seat.event.RequestSetSelection,
@@ -278,15 +342,28 @@ const Server = struct {
         server.seat.setSelection(event.source, event.serial);
     }
 
+    /// This event is forwarded by the cursor when a pointer emits a _relative_
+    /// pointer motion event (i.e. a delta)
     fn cursorMotion(
         listener: *wl.Listener(*wlr.Pointer.event.Motion),
         event: *wlr.Pointer.event.Motion,
     ) void {
         const server = @fieldParentPtr(Server, "cursor_motion", listener);
+        // The cursor doesn't move unless we tell it to. The cursor automatically
+        // handles constraining the motion to the output layout, as well as any
+        // special configuration applied for the specific input device which
+        // generated the event. You can pass NULL for the device if you want to move
+        // the cursor around without any input.
         server.cursor.move(event.device, event.delta_x, event.delta_y);
         server.processCursorMotion(event.time_msec);
     }
 
+    // This event is forwarded by the cursor when a pointer emits an _absolute_
+    // motion event, from 0..1 on each axis. This happens, for example, when
+    // wlroots is running under a Wayland window rather than KMS+DRM, and you
+    // move the mouse over the window. You could enter the window from any edge,
+    // so we have to warp the mouse there. There is also some hardware which
+    // emits these events.
     fn cursorMotionAbsolute(
         listener: *wl.Listener(*wlr.Pointer.event.MotionAbsolute),
         event: *wlr.Pointer.event.MotionAbsolute,
@@ -299,19 +376,48 @@ const Server = struct {
     fn processCursorMotion(server: *Server, time_msec: u32) void {
         switch (server.cursor_mode) {
             .passthrough => if (server.viewAt(server.cursor.x, server.cursor.y)) |res| {
-                server.seat.pointerNotifyEnter(res.surface, res.sx, res.sy);
-                server.seat.pointerNotifyMotion(time_msec, res.sx, res.sy);
+                // Send pointer enter and motion events.
+                //
+                // The enter event gives the surface "pointer focus", which is distinct
+                // from keyboard focus. You get pointer focus by moving the pointer over
+                // a window.
+                //
+                // Note that wlroots will avoid sending duplicate enter/motion events if
+                // the surface has already has pointer focus or if the client is already
+                // aware of the coordinates passed.
+                if (res.view) |_| {
+                    server.seat.pointerNotifyEnter(res.surface, res.sx, res.sy);
+                } else {
+                    // Clear pointer focus so future button events and such are not sent to
+                    // the last client to have the cursor over it.
+                    //
+                    // Note that tinywl's desktop_view_at may return no view but a surface.
+                    // In zig TinyWL there is no such thing. Is it a bug ?
+                    server.seat.pointerNotifyMotion(time_msec, res.sx, res.sy);
+                }
             } else {
+                // If there's no view under the cursor, set the cursor image to a
+                // default. This is what makes the cursor image appear when you move it
+                // around the screen, not over any views.
                 server.cursor_mgr.setCursorImage("left_ptr", server.cursor);
                 server.seat.pointerClearFocus();
             },
             .move => {
+                // Move the grabbed view to the new position.
                 const view = server.grabbed_view.?;
                 view.x = @floatToInt(i32, server.cursor.x - server.grab_x);
                 view.y = @floatToInt(i32, server.cursor.y - server.grab_y);
                 view.scene_node.setPosition(view.x, view.y);
             },
             .resize => {
+                // Resizing the grabbed view can be a little bit complicated, because we
+                // could be resizing from any corner or edge. This not only resizes the view
+                // on one or two axes, but can also move the view if you resize from the top
+                // or left edges (or top-left corner).
+                //
+                // Note that I took some shortcuts here. In a more fleshed-out compositor,
+                // you'd wait for the client to prepare a buffer at the new size, then
+                // commit any movement that was prepared.
                 const view = server.grabbed_view.?;
                 const border_x = @floatToInt(i32, server.cursor.x - server.grab_x);
                 const border_y = @floatToInt(i32, server.cursor.y - server.grab_y);
@@ -354,24 +460,34 @@ const Server = struct {
         }
     }
 
+    /// This event is forwarded by the cursor when a pointer emits a button
+    /// event.
     fn cursorButton(
         listener: *wl.Listener(*wlr.Pointer.event.Button),
         event: *wlr.Pointer.event.Button,
     ) void {
         const server = @fieldParentPtr(Server, "cursor_button", listener);
+        // Notify the client with pointer focus that a button press has occurred
         _ = server.seat.pointerNotifyButton(event.time_msec, event.button, event.state);
         if (event.state == .released) {
+            // If you released any buttons, we exit interactive move/resize mode.
             server.cursor_mode = .passthrough;
         } else if (server.viewAt(server.cursor.x, server.cursor.y)) |res| {
-            server.focusView(res.view, res.surface);
+            // Focus that client if the button was _pressed_
+            if (res.view) |view| {
+                server.focusView(view, res.surface);
+            }
         }
     }
 
+    /// This event is forwarded by the cursor when a pointer emits an axis event,
+    /// for example when you move the scroll wheel.
     fn cursorAxis(
         listener: *wl.Listener(*wlr.Pointer.event.Axis),
         event: *wlr.Pointer.event.Axis,
     ) void {
         const server = @fieldParentPtr(Server, "cursor_axis", listener);
+        // Notify the client with pointer focus of the axis event.
         server.seat.pointerNotifyAxis(
             event.time_msec,
             event.orientation,
@@ -381,8 +497,13 @@ const Server = struct {
         );
     }
 
+    /// This event is forwarded by the cursor when a pointer emits an frame
+    /// event. Frame events are sent after regular pointer events to group
+    /// multiple events together. For instance, two axis events may happen at the
+    /// same time, in which case a frame event won't be sent in between.
     fn cursorFrame(listener: *wl.Listener(*wlr.Cursor), _: *wlr.Cursor) void {
         const server = @fieldParentPtr(Server, "cursor_frame", listener);
+        // Notify the client with pointer focus of the frame event.
         server.seat.pointerNotifyFrame();
     }
 
@@ -410,10 +531,13 @@ const Output = struct {
 
     frame: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(frame),
 
+    // This function is called every time an output is ready to display a frame,
+    // generally at the output's refresh rate (e.g. 60Hz).
     fn frame(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
         const output = @fieldParentPtr(Output, "frame", listener);
 
         const scene_output = output.server.scene.getSceneOutput(output.wlr_output).?;
+        // Render the scene if needed and commit the output
         _ = scene_output.commit();
 
         var now: os.timespec = undefined;
@@ -437,17 +561,20 @@ const View = struct {
     request_move: wl.Listener(*wlr.XdgToplevel.event.Move) = wl.Listener(*wlr.XdgToplevel.event.Move).init(requestMove),
     request_resize: wl.Listener(*wlr.XdgToplevel.event.Resize) = wl.Listener(*wlr.XdgToplevel.event.Resize).init(requestResize),
 
+    // Called when the surface is mapped, or ready to display on-screen.
     fn map(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "map", listener);
         view.server.views.prepend(view);
         view.server.focusView(view, xdg_surface.surface);
     }
 
+    // Called when the surface is unmapped, and should no longer be shown.
     fn unmap(listener: *wl.Listener(*wlr.XdgSurface), _: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "unmap", listener);
         view.link.remove();
     }
 
+    // Called when the surface is destroyed and should never be shown again.
     fn destroy(listener: *wl.Listener(*wlr.XdgSurface), _: *wlr.XdgSurface) void {
         const view = @fieldParentPtr(View, "destroy", listener);
 
@@ -460,6 +587,11 @@ const View = struct {
         gpa.destroy(view);
     }
 
+    /// This event is raised when a client would like to begin an interactive
+    /// move, typically because the user clicked on their client-side
+    /// decorations. Note that a more sophisticated compositor should check the
+    /// provided serial against a list of button press serials sent to this
+    /// client, to prevent the client from requesting this whenever they want.
     fn requestMove(
         listener: *wl.Listener(*wlr.XdgToplevel.event.Move),
         _: *wlr.XdgToplevel.event.Move,
@@ -472,6 +604,11 @@ const View = struct {
         server.grab_y = server.cursor.y - @intToFloat(f64, view.y);
     }
 
+    /// This event is raised when a client would like to begin an interactive
+    /// resize, typically because the user clicked on their client-side
+    /// decorations. Note that a more sophisticated compositor should check the
+    /// provided serial against a list of button press serials sent to this
+    /// client, to prevent the client from requesting this whenever they want.
     fn requestResize(
         listener: *wl.Listener(*wlr.XdgToplevel.event.Resize),
         event: *wlr.XdgToplevel.event.Resize,
@@ -530,12 +667,15 @@ const Keyboard = struct {
         server.keyboards.append(keyboard);
     }
 
+    /// This event is raised when a modifier key, such as shift or alt, is
+    /// pressed. We simply communicate this to the client.
     fn modifiers(listener: *wl.Listener(*wlr.Keyboard), wlr_keyboard: *wlr.Keyboard) void {
         const keyboard = @fieldParentPtr(Keyboard, "modifiers", listener);
         keyboard.server.seat.setKeyboard(keyboard.device);
         keyboard.server.seat.keyboardNotifyModifiers(&wlr_keyboard.modifiers);
     }
 
+    /// This event is raised when a key is pressed or released.
     fn key(listener: *wl.Listener(*wlr.Keyboard.event.Key), event: *wlr.Keyboard.event.Key) void {
         const keyboard = @fieldParentPtr(Keyboard, "key", listener);
         const wlr_keyboard = keyboard.device.device.keyboard;
@@ -544,8 +684,10 @@ const Keyboard = struct {
         const keycode = event.keycode + 8;
 
         var handled = false;
+        // Check if the modifier is pressed.
         if (wlr_keyboard.getModifiers().alt and event.state == .pressed) {
             for (wlr_keyboard.xkb_state.?.keyGetSyms(keycode)) |sym| {
+                // Atempt to process the key as a compositor keybinding
                 if (keyboard.server.handleKeybind(sym)) {
                     handled = true;
                     break;
@@ -554,6 +696,7 @@ const Keyboard = struct {
         }
 
         if (!handled) {
+            // Otherwise, we pass it along to the client.
             keyboard.server.seat.setKeyboard(keyboard.device);
             keyboard.server.seat.keyboardNotifyKey(event.time_msec, event.keycode, event.state);
         }
