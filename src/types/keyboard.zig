@@ -97,4 +97,21 @@ pub const Keyboard = extern struct {
     pub fn getModifiers(keyboard: *Keyboard) ModifierMask {
         return @bitCast(ModifierMask, wlr_keyboard_get_modifiers(keyboard));
     }
+
+    extern fn wlr_keyboard_notify_modifiers(
+        keyboard: *Keyboard,
+        mods_depressed: u32,
+        mods_latched: u32,
+        mods_locked: u32,
+        group: u32,
+    ) void;
+    pub fn notifyModifiers(keyboard: *Keyboard, modifiers: Modifiers) void {
+        wlr_keyboard_notify_modifiers(
+            keyboard,
+            modifiers.depressed,
+            modifiers.latched,
+            modifiers.locked,
+            modifiers.group,
+        );
+    }
 };
