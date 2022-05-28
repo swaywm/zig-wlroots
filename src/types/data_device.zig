@@ -98,8 +98,6 @@ pub const Drag = extern struct {
             destroy: wl.Signal(*Drag.Icon),
         },
 
-        surface_destroy: wl.Listener(*wlr.Surface),
-
         data: usize,
     };
 

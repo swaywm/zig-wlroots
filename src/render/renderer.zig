@@ -53,7 +53,6 @@ pub const Renderer = extern struct {
     extern fn wlr_renderer_read_pixels(
         renderer: *Renderer,
         fmt: u32,
-        flags: ?*u32,
         stride: u32,
         width: u32,
         height: u32,

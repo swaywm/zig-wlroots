@@ -14,8 +14,6 @@ pub const OutputDamage = extern struct {
     previous: [2]pixman.Region32,
     previous_idx: usize,
 
-    pending_attach_render: bool,
-
     events: extern struct {
         frame: wl.Signal(*OutputDamage),
         destroy: wl.Signal(*OutputDamage),
@@ -26,7 +24,6 @@ pub const OutputDamage = extern struct {
     output_needs_frame: wl.Listener(*wlr.Output),
     output_damage: wl.Listener(*wlr.Output.event.Damage),
     output_frame: wl.Listener(*wlr.Output),
-    output_precommit: wl.Listener(*wlr.Output.event.Precommit),
     output_commit: wl.Listener(*wlr.Output.event.Commit),
 
     extern fn wlr_output_damage_create(output: *wlr.Output) ?*OutputDamage;

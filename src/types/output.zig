@@ -9,10 +9,19 @@ const wl = wayland.server.wl;
 
 pub const Output = extern struct {
     pub const Mode = extern struct {
+        pub const AspectRatio = enum(c_int) {
+            none,
+            @"4_3",
+            @"16_9",
+            @"64_27",
+            @"256_135",
+        };
+
         width: i32,
         height: i32,
         refresh: i32,
         preferred: bool,
+        picture_aspect_ratio: AspectRatio,
         /// Output.modes
         link: wl.list.Link,
     };
@@ -20,7 +29,6 @@ pub const Output = extern struct {
     pub const AdaptiveSyncStatus = enum(c_int) {
         disabled,
         enabled,
-        unknown,
     };
 
     pub const State = extern struct {
@@ -34,6 +42,7 @@ pub const Output = extern struct {
             pub const adaptive_sync_enabled = 1 << 6;
             pub const gamma_lut = 1 << 7;
             pub const render_format = 1 << 8;
+            pub const subpixel = 1 << 9;
         };
 
         pub const ModeType = enum(c_int) {
@@ -43,12 +52,14 @@ pub const Output = extern struct {
 
         /// This is a bitfield of State.field members
         committed: u32,
+        allow_artifacts: bool,
         damage: pixman.Region32,
         enabled: bool,
         scale: f32,
         transform: wl.Output.Transform,
         adaptive_sync_enabled: bool,
         render_format: u32,
+        subpixel: wl.Output.Subpixel,
 
         // if (committed & field.buffer)
         buffer: ?*wlr.Buffer,
@@ -65,6 +76,30 @@ pub const Output = extern struct {
         // if (committed & field.gamma_lut)
         gamma_lut: ?[*]u16,
         gamma_lut_size: usize,
+
+        extern fn wlr_output_state_set_enabled(state: *State, enabled: bool) void;
+        pub const setEnabled = wlr_output_state_set_enabled;
+
+        extern fn wlr_output_state_set_mode(state: *State, mode: *Mode) void;
+        pub const setMode = wlr_output_state_set_mode;
+
+        extern fn wlr_output_state_set_custom_mode(state: *State, width: i32, height: i32, refresh: i32) void;
+        pub const setCustomMode = wlr_output_state_set_custom_mode;
+
+        extern fn wlr_output_state_set_scale(state: *State, scale: f32) void;
+        pub const setScale = wlr_output_state_set_scale;
+
+        extern fn wlr_output_state_set_transform(state: *State, transform: wl.Output.Transform) void;
+        pub const setTransform = wlr_output_state_set_transform;
+
+        extern fn wlr_output_state_set_adaptive_sync_enabled(state: *State, enabled: bool) void;
+        pub const setAdaptiveSyncEnabled = wlr_output_state_set_adaptive_sync_enabled;
+
+        extern fn wlr_output_state_set_render_format(state: *State, format: u32) void;
+        pub const setRenderFormat = wlr_output_state_set_render_format;
+
+        extern fn wlr_output_state_set_subpixel(state: *State, subpixel: wl.Output.Subpixel) void;
+        pub const setSubpixel = wlr_output_state_set_subpixel;
     };
 
     pub const event = struct {
@@ -77,6 +112,7 @@ pub const Output = extern struct {
         pub const Precommit = extern struct {
             output: *wlr.Output,
             when: *os.timespec,
+            state: *const State,
         };
 
         pub const Commit = extern struct {
@@ -122,12 +158,9 @@ pub const Output = extern struct {
 
     name: [*:0]u8,
     description: ?[*:0]u8,
-    /// This contains a 0 terminated string, use std.mem.sliceTo(make, 0)
-    make: [56]u8,
-    /// This contains a 0 terminated string, use std.mem.sliceTo(model, 0)
-    model: [16]u8,
-    /// This contains a 0 terminated string, use std.mem.sliceTo(serial, 0)
-    serial: [16]u8,
+    make: ?*[*:0]u8,
+    model: ?*[*:0]u8,
+    serial: ?*[*:0]u8,
     phys_width: i32,
     phys_height: i32,
 
@@ -270,6 +303,12 @@ pub const Output = extern struct {
     extern fn wlr_output_rollback(output: *Output) void;
     pub const rollback = wlr_output_rollback;
 
+    extern fn wlr_output_test_state(output: *Output) void;
+    pub const testState = wlr_output_test_state;
+
+    extern fn wlr_output_commit_state(output: *Output) void;
+    pub const commitState = wlr_output_commit_state;
+
     extern fn wlr_output_schedule_frame(output: *Output) void;
     pub const scheduleFrame = wlr_output_schedule_frame;
 
@@ -334,10 +373,6 @@ pub const OutputCursor = extern struct {
     surface_commit: wl.Listener(*wlr.Surface),
     surface_destroy: wl.Listener(*wlr.Surface),
 
-    events: extern struct {
-        destroy: wl.Signal(*OutputCursor),
-    },
-
     extern fn wlr_output_cursor_create(output: *Output) ?*OutputCursor;
     pub fn create(output: *Output) !*OutputCursor {
         return wlr_output_cursor_create(output) orelse error.OutOfMemory;
@@ -348,6 +383,9 @@ pub const OutputCursor = extern struct {
 
     extern fn wlr_output_cursor_set_surface(cursor: *OutputCursor, surface: ?*wlr.Surface, hotspot_x: i32, hotspot_y: i32) void;
     pub const setSurface = wlr_output_cursor_set_surface;
+
+    extern fn wlr_output_cursor_set_buffer(cursor: *OutputCursor, buffer: *wlr.Buffer, hotspot_x: i32, hotspot_y: i32) bool;
+    pub const setBuffer = wlr_output_cursor_set_buffer;
 
     extern fn wlr_output_cursor_move(cursor: *OutputCursor, x: f64, y: f64) bool;
     pub const move = wlr_output_cursor_move;

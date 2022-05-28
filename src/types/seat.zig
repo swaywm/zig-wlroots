@@ -58,6 +58,12 @@ pub const Seat = extern struct {
         serials: SerialRingset,
         needs_touch_frame: bool,
 
+        value120: extern struct {
+            acc_discrete: [2]i32,
+            last_discrete: [2]i32,
+            acc_axis: [2]f64,
+        },
+
         extern fn wlr_seat_client_next_serial(client: *Client) u32;
         pub const nextSerial = wlr_seat_client_next_serial;
 
@@ -132,6 +138,7 @@ pub const Seat = extern struct {
             enter: fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
             frame: ?fn (grab: *TouchGrab) callconv(.C) void,
             cancel: ?fn (grab: *TouchGrab) callconv(.C) void,
+            wl_cancel: ?fn (grab: *TouchGrab, surface: *wlr.Surface) callconv(.C) void,
         };
 
         interface: *const Interface,
@@ -366,7 +373,7 @@ pub const Seat = extern struct {
     extern fn wlr_seat_pointer_has_grab(seat: *Seat) bool;
     pub const pointerHasGrab = wlr_seat_pointer_has_grab;
 
-    extern fn wlr_seat_set_keyboard(seat: *Seat, dev: ?*wlr.InputDevice) void;
+    extern fn wlr_seat_set_keyboard(seat: *Seat, keyboard: ?*wlr.Keyboard) void;
     pub const setKeyboard = wlr_seat_set_keyboard;
 
     extern fn wlr_seat_get_keyboard(seat: *Seat) ?*wlr.Keyboard;
@@ -428,6 +435,9 @@ pub const Seat = extern struct {
     extern fn wlr_seat_touch_send_frame(seat: *Seat) void;
     pub const touchSendFrame = wlr_seat_touch_send_frame;
 
+    extern fn wlr_seat_touch_send_cancel(seat: *Seat, surface: *wlr.Surface) void;
+    pub const touchSendCancel = wlr_seat_touch_send_cancel;
+
     extern fn wlr_seat_touch_notify_down(seat: *Seat, surface: *wlr.Surface, time_msec: u32, touch_id: i32, sx: f64, sy: f64) u32;
     pub const touchNotifyDown = wlr_seat_touch_notify_down;
 
@@ -439,6 +449,9 @@ pub const Seat = extern struct {
 
     extern fn wlr_seat_touch_notify_frame(seat: *Seat) void;
     pub const touchNotifyFrame = wlr_seat_touch_notify_frame;
+
+    extern fn wlr_seat_touch_notify_cancel(seat: *Seat, surface: *wlr.Surface) void;
+    pub const touchNotifyCancel = wlr_seat_touch_notify_cancel;
 
     extern fn wlr_seat_touch_num_points(seat: *Seat) c_int;
     pub const touchNumPoints = wlr_seat_touch_num_points;

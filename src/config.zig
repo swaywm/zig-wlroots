@@ -8,4 +8,6 @@ pub const has_gles2_renderer = c.WLR_HAS_GLES2_RENDERER != 0;
 
 pub const has_vulkan_renderer = c.WLR_HAS_VULKAN_RENDERER != 0;
 
+pub const has_gbm_allocator = c.WLR_HAS_GBM_ALLOCATOR != 0;
+
 pub const has_xwayland = c.WLR_HAS_XWAYLAND != 0;

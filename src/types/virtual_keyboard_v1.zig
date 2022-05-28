@@ -21,15 +21,11 @@ pub const VirtualKeyboardManagerV1 = extern struct {
 };
 
 pub const VirtualKeyboardV1 = extern struct {
-    input_device: wlr.InputDevice,
+    keyboard: wlr.Keyboard,
     resource: *wl.Resource,
     seat: *wlr.Seat,
     has_keymap: bool,
 
     /// VirtualKeyboardManagerV1.virtual_keyboards
     link: wl.list.Link,
-
-    events: extern struct {
-        destroy: wl.Signal(*VirtualKeyboardV1),
-    },
 };

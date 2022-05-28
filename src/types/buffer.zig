@@ -13,6 +13,12 @@ pub const ShmAttributes = extern struct {
     offset: os.off_t,
 };
 
+pub const BufferCap = enum(c_int) {
+    data_ptr = 1 << 0,
+    dmabuf = 1 << 1,
+    shm = 1 << 2,
+};
+
 pub const Buffer = extern struct {
     pub const data_ptr_access_flag = struct {
         pub const read = 1 << 0;
@@ -91,7 +97,7 @@ pub const ClientBuffer = extern struct {
 
     source_destroy: wl.Listener(void),
 
-    shm_source_format: u32,
+    n_ignore_locks: usize,
 
     extern fn wlr_client_buffer_create(buffer: *wlr.Buffer, renderer: *wlr.Renderer) ?*ClientBuffer;
     pub const create = wlr_client_buffer_create;

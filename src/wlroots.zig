@@ -12,6 +12,7 @@ pub const DrmFormat = @import("render/drm_format_set.zig").DrmFormat;
 pub const DrmFormatSet = @import("render/drm_format_set.zig").DrmFormatSet;
 
 pub const ShmAttributes = @import("types/buffer.zig").ShmAttributes;
+pub const BufferCap = @import("types/buffer.zig").BufferCap;
 pub const Buffer = @import("types/buffer.zig").Buffer;
 pub const ClientBuffer = @import("types/buffer.zig").ClientBuffer;
 
@@ -19,10 +20,9 @@ pub const DmabufBufferV1 = @import("types/linux_dmabuf_v1.zig").DmabufBufferV1;
 pub const LinuxDmabufV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufV1;
 
 pub const Compositor = @import("types/compositor.zig").Compositor;
-pub const Subcompositor = @import("types/compositor.zig").Subcompositor;
-
-pub const Surface = @import("types/surface.zig").Surface;
-pub const Subsurface = @import("types/surface.zig").Subsurface;
+pub const Surface = @import("types/compositor.zig").Surface;
+pub const Subcompositor = @import("types/subcompositor.zig").Subcompositor;
+pub const Subsurface = @import("types/subcompositor.zig").Subsurface;
 
 pub const Viewporter = @import("types/viewporter.zig").Viewporter;
 
@@ -46,6 +46,10 @@ pub const XdgActivationTokenV1 = @import("types/xdg_activation_v1.zig").XdgActiv
 
 pub const LayerShellV1 = @import("types/layer_shell_v1.zig").LayerShellV1;
 pub const LayerSurfaceV1 = @import("types/layer_shell_v1.zig").LayerSurfaceV1;
+
+pub const SessionLockManagerV1 = @import("types/session_lock_v1.zig").SessionLockManagerV1;
+pub const SessionLockV1 = @import("types/session_lock_v1.zig").SessionLockV1;
+pub const SessionLockSurfaceV1 = @import("types/session_lock_v1.zig").SessionLockSurfaceV1;
 
 pub const Seat = @import("types/seat.zig").Seat;
 pub const SerialRange = @import("types/seat.zig").SerialRange;
@@ -115,6 +119,8 @@ pub const OutputCursor = @import("types/output.zig").OutputCursor;
 pub const OutputDamage = @import("types/output_damage.zig").OutputDamage;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 
+pub const DamageRing = @import("types/damage_ring.zig").DamageRing;
+
 pub const XdgOutputManagerV1 = @import("types/xdg_output_v1.zig").XdgOutputManagerV1;
 pub const XdgOutputV1 = @import("types/xdg_output_v1.zig").XdgOutputV1;
 
@@ -138,11 +144,11 @@ pub const XcursorTheme = @import("xcursor.zig").XcursorTheme;
 pub const XcursorManager = @import("types/xcursor_manager.zig").XcursorManager;
 pub const XcursorManagerTheme = @import("types/xcursor_manager.zig").XcursorManagerTheme;
 
-pub const Xwayland = @import("xwayland.zig").Xwayland;
-pub const XwaylandServer = @import("xwayland.zig").XwaylandServer;
-pub const XwaylandSurface = @import("xwayland.zig").XwaylandSurface;
-pub const XwaylandCursor = @import("xwayland.zig").XwaylandCursor;
-pub const Xwm = @import("xwayland.zig").Xwm;
+pub const XwaylandServer = @import("xwayland/server.zig").XwaylandServer;
+pub const Xwayland = @import("xwayland/xwayland.zig").Xwayland;
+pub const XwaylandSurface = @import("xwayland/xwayland.zig").XwaylandSurface;
+pub const XwaylandCursor = @import("xwayland/xwayland.zig").XwaylandCursor;
+pub const Xwm = @import("xwayland/xwayland.zig").Xwm;
 
 pub const matrix = @import("types/matrix.zig");
 
@@ -173,8 +179,8 @@ pub const config = @import("config.zig");
 pub const version = @import("version.zig");
 
 comptime {
-    if (version.major != 0 or version.minor != 15) {
-        @compileError("zig-wlroots requires wlroots version 0.15");
+    if (version.major != 0 or version.minor != 16) {
+        @compileError("zig-wlroots requires wlroots version 0.16");
     }
 }
 

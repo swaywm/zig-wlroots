@@ -1,4 +1,4 @@
-const wlr = @import("wlroots.zig");
+const wlr = @import("../wlroots.zig");
 
 const std = @import("std");
 const os = std.os;
@@ -21,58 +21,57 @@ const xcb = struct {
         bottom_if = 3,
         opposite = 4,
     };
+
+    pub const IcccmWmHints = extern struct {
+        flags: u32,
+
+        input: u32,
+        initial_state: i32,
+
+        icon_pixmap: xcb.Pixmap,
+        icon_window: xcb.Window,
+
+        icon_x: i32,
+        icon_y: i32,
+
+        icon_mask: xcb.Pixmap,
+
+        window_group: xcb.Window,
+    };
+
+    pub const SizeHints = extern struct {
+        flags: u32,
+
+        x: i32,
+        y: i32,
+
+        width: i32,
+        height: i32,
+
+        min_width: i32,
+        min_height: i32,
+
+        max_width: i32,
+        max_height: i32,
+
+        width_inc: i32,
+        height_inc: i32,
+
+        min_aspect_num: i32,
+        min_aspect_den: i32,
+
+        max_aspect_num: i32,
+        max_aspect_den: i32,
+
+        base_width: i32,
+        base_height: i32,
+
+        win_gravity: u32,
+    };
 };
 
 pub const Xwm = opaque {};
 pub const XwaylandCursor = opaque {};
-
-pub const XwaylandServer = extern struct {
-    pub const Options = extern struct {
-        lazy: bool,
-        enable_wm: bool,
-        no_touch_pointer_emulation: bool,
-    };
-
-    pub const event = struct {
-        pub const Ready = extern struct {
-            server: *XwaylandServer,
-            wm_fd: c_int,
-        };
-    };
-
-    pid: os.pid_t,
-    client: ?*wl.Client,
-    pipe_source: ?*wl.EventSource,
-    wm_fd: [2]c_int,
-    wl_fd: [2]c_int,
-
-    server_start: os.time_t,
-    display: c_int,
-    display_name: [16]u8,
-    x_fd: [2]c_int,
-    x_fd_read_event: [2]?*wl.EventSource,
-    options: Options,
-
-    wl_server: *wl.Server,
-
-    events: extern struct {
-        ready: wl.Signal(*event.Ready),
-        destroy: wl.Signal(void),
-    },
-
-    client_destroy: wl.Listener(*wl.Client),
-    display_destroy: wl.Listener(*wl.Server),
-
-    data: usize,
-
-    extern fn wlr_xwayland_server_create(server: *wl.Server, options: *Options) ?*XwaylandServer;
-    pub fn create(server: *wl.Server, options: *Options) !*XwaylandServer {
-        return wlr_xwayland_server_create(server, options) orelse error.XwaylandServerCreateFailed;
-    }
-
-    extern fn wlr_xwayland_server_destroy(server: *XwaylandServer) void;
-    pub const destroy = wlr_xwayland_server_destroy;
-};
 
 pub const Xwayland = extern struct {
     pub const event = struct {
@@ -81,7 +80,7 @@ pub const Xwayland = extern struct {
             window: xcb.Window,
         };
     };
-    server: *XwaylandServer,
+    server: *wlr.XwaylandServer,
     xwm: ?*Xwm,
     cursor: ?*XwaylandCursor,
 
@@ -99,7 +98,7 @@ pub const Xwayland = extern struct {
 
     user_event_handler: ?fn (*Xwm, *xcb.GenericEvent) callconv(.C) c_int,
 
-    server_ready: wl.Listener(*XwaylandServer.event.Ready),
+    server_ready: wl.Listener(*wlr.XwaylandServer.event.Ready),
     server_destroy: wl.Listener(void),
     seat_destroy: wl.Listener(*wlr.Seat),
 
@@ -138,39 +137,6 @@ pub const XwaylandSurface = extern struct {
             std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
             std.debug.assert(@alignOf(@This()) == @alignOf(u32));
         }
-    };
-
-    pub const Hints = extern struct {
-        flags: u32,
-        input: u32,
-        initial_state: i32,
-        icon_pixmap: xcb.Pixmap,
-        icon_window: xcb.Window,
-        icon_x: i32,
-        icon_y: i32,
-        icon_mask: xcb.Pixmap,
-        window_group: xcb.Window,
-    };
-
-    pub const SizeHints = extern struct {
-        flags: u32,
-        x: i32,
-        y: i32,
-        width: i32,
-        height: i32,
-        min_width: i32,
-        min_height: i32,
-        max_width: i32,
-        max_height: i32,
-        width_inc: i32,
-        height_inc: i32,
-        base_width: i32,
-        base_height: i32,
-        min_aspect_num: i32,
-        min_aspect_den: i32,
-        max_aspect_num: i32,
-        max_aspect_den: i32,
-        win_gravity: u32,
     };
 
     pub const event = struct {
@@ -236,9 +202,8 @@ pub const XwaylandSurface = extern struct {
     protocols_len: usize,
 
     decorations: Decorations,
-    hints: ?*Hints,
-    hints_urgency: u32,
-    size_hints: ?*SizeHints,
+    hints: ?*xcb.IcccmWmHints,
+    size_hints: ?*xcb.SizeHints,
 
     pinging: bool,
     ping_timer: *wl.EventSource,
@@ -276,8 +241,6 @@ pub const XwaylandSurface = extern struct {
         set_geometry: wl.Signal(*XwaylandSurface),
         ping_timeout: wl.Signal(*XwaylandSurface),
     },
-
-    surface_destroy: wl.Listener(*wlr.Surface),
 
     data: usize,
 

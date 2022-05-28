@@ -82,7 +82,7 @@ const Server = struct {
             .scene = try wlr.Scene.create(),
 
             .output_layout = try wlr.OutputLayout.create(),
-            .xdg_shell = try wlr.XdgShell.create(wl_server),
+            .xdg_shell = try wlr.XdgShell.create(wl_server, 2),
             .seat = try wlr.Seat.create(wl_server, "default"),
             .cursor = try wlr.Cursor.create(),
             .cursor_mgr = try wlr.XcursorManager.create(null, 24),
@@ -92,6 +92,7 @@ const Server = struct {
         try server.scene.attachOutputLayout(server.output_layout);
 
         _ = try wlr.Compositor.create(server.wl_server, server.renderer);
+        _ = try wlr.Subcompositor.create(server.wl_server);
         _ = try wlr.DataDeviceManager.create(server.wl_server);
 
         server.backend.events.new_output.add(&server.new_output);
@@ -158,14 +159,14 @@ const Server = struct {
                 view.* = .{
                     .server = server,
                     .xdg_surface = xdg_surface,
-                    .scene_node = server.scene.node.createSceneXdgSurface(xdg_surface) catch {
+                    .scene_tree = server.scene.tree.createSceneXdgSurface(xdg_surface) catch {
                         gpa.destroy(view);
                         std.log.err("failed to allocate new view", .{});
                         return;
                     },
                 };
-                view.scene_node.data = @ptrToInt(view);
-                xdg_surface.data = @ptrToInt(view.scene_node);
+                view.scene_tree.node.data = @ptrToInt(view);
+                xdg_surface.data = @ptrToInt(view.scene_tree);
 
                 xdg_surface.events.map.add(&view.map);
                 xdg_surface.events.unmap.add(&view.unmap);
@@ -177,15 +178,15 @@ const Server = struct {
                 // These asserts are fine since tinywl.zig doesn't support anything else that can
                 // make xdg popups (e.g. layer shell).
                 const parent = wlr.XdgSurface.fromWlrSurface(xdg_surface.role_data.popup.parent.?) orelse return;
-                const parent_node = @intToPtr(?*wlr.SceneNode, parent.data) orelse {
+                const parent_tree = @intToPtr(?*wlr.SceneTree, parent.data) orelse {
                     // The xdg surface user data could be left null due to allocation failure.
                     return;
                 };
-                const scene_node = parent_node.createSceneXdgSurface(xdg_surface) catch {
+                const scene_tree = parent_tree.createSceneXdgSurface(xdg_surface) catch {
                     std.log.err("failed to allocate xdg popup node", .{});
                     return;
                 };
-                xdg_surface.data = @ptrToInt(scene_node);
+                xdg_surface.data = @ptrToInt(scene_tree);
             },
             .none => unreachable,
         }
@@ -201,16 +202,17 @@ const Server = struct {
     fn viewAt(server: *Server, lx: f64, ly: f64) ?ViewAtResult {
         var sx: f64 = undefined;
         var sy: f64 = undefined;
-        if (server.scene.node.at(lx, ly, &sx, &sy)) |node| {
-            if (node.type != .surface) return null;
-            const surface = wlr.SceneSurface.fromNode(node).surface;
+        if (server.scene.tree.node.at(lx, ly, &sx, &sy)) |node| {
+            if (node.type != .buffer) return null;
+            const scene_buffer = wlr.SceneBuffer.fromNode(node);
+            const scene_surface = wlr.SceneSurface.fromBuffer(scene_buffer) orelse return null;
 
             var it: ?*wlr.SceneNode = node;
             while (it) |n| : (it = n.parent) {
                 if (@intToPtr(?*View, n.data)) |view| {
                     return ViewAtResult{
                         .view = view,
-                        .surface = surface,
+                        .surface = scene_surface.surface,
                         .sx = sx,
                         .sy = sy,
                     };
@@ -229,7 +231,7 @@ const Server = struct {
             }
         }
 
-        view.scene_node.raiseToTop();
+        view.scene_tree.node.raiseToTop();
         view.link.remove();
         server.views.prepend(view);
 
@@ -309,7 +311,7 @@ const Server = struct {
                 const view = server.grabbed_view.?;
                 view.x = @floatToInt(i32, server.cursor.x - server.grab_x);
                 view.y = @floatToInt(i32, server.cursor.y - server.grab_y);
-                view.scene_node.setPosition(view.x, view.y);
+                view.scene_tree.node.setPosition(view.x, view.y);
             },
             .resize => {
                 const view = server.grabbed_view.?;
@@ -345,10 +347,10 @@ const Server = struct {
                 view.xdg_surface.getGeometry(&geo_box);
                 view.x = new_left - geo_box.x;
                 view.y = new_top - geo_box.y;
-                view.scene_node.setPosition(view.x, view.y);
+                view.scene_tree.node.setPosition(view.x, view.y);
 
-                const new_width = @intCast(u32, new_right - new_left);
-                const new_height = @intCast(u32, new_bottom - new_top);
+                const new_width = new_right - new_left;
+                const new_height = new_bottom - new_top;
                 _ = view.xdg_surface.role_data.toplevel.setSize(new_width, new_height);
             },
         }
@@ -426,29 +428,29 @@ const View = struct {
     server: *Server,
     link: wl.list.Link = undefined,
     xdg_surface: *wlr.XdgSurface,
-    scene_node: *wlr.SceneNode,
+    scene_tree: *wlr.SceneTree,
 
     x: i32 = 0,
     y: i32 = 0,
 
-    map: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(map),
-    unmap: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(unmap),
-    destroy: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(destroy),
+    map: wl.Listener(void) = wl.Listener(void).init(map),
+    unmap: wl.Listener(void) = wl.Listener(void).init(unmap),
+    destroy: wl.Listener(void) = wl.Listener(void).init(destroy),
     request_move: wl.Listener(*wlr.XdgToplevel.event.Move) = wl.Listener(*wlr.XdgToplevel.event.Move).init(requestMove),
     request_resize: wl.Listener(*wlr.XdgToplevel.event.Resize) = wl.Listener(*wlr.XdgToplevel.event.Resize).init(requestResize),
 
-    fn map(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
+    fn map(listener: *wl.Listener(void)) void {
         const view = @fieldParentPtr(View, "map", listener);
         view.server.views.prepend(view);
-        view.server.focusView(view, xdg_surface.surface);
+        view.server.focusView(view, view.xdg_surface.surface);
     }
 
-    fn unmap(listener: *wl.Listener(*wlr.XdgSurface), _: *wlr.XdgSurface) void {
+    fn unmap(listener: *wl.Listener(void)) void {
         const view = @fieldParentPtr(View, "unmap", listener);
         view.link.remove();
     }
 
-    fn destroy(listener: *wl.Listener(*wlr.XdgSurface), _: *wlr.XdgSurface) void {
+    fn destroy(listener: *wl.Listener(void)) void {
         const view = @fieldParentPtr(View, "destroy", listener);
 
         view.map.link.remove();
@@ -519,26 +521,26 @@ const Keyboard = struct {
         const keymap = xkb.Keymap.newFromNames(context, null, .no_flags) orelse return error.KeymapFailed;
         defer keymap.unref();
 
-        const wlr_keyboard = device.device.keyboard;
+        const wlr_keyboard = device.toKeyboard();
         if (!wlr_keyboard.setKeymap(keymap)) return error.SetKeymapFailed;
         wlr_keyboard.setRepeatInfo(25, 600);
 
         wlr_keyboard.events.modifiers.add(&keyboard.modifiers);
         wlr_keyboard.events.key.add(&keyboard.key);
 
-        server.seat.setKeyboard(device);
+        server.seat.setKeyboard(wlr_keyboard);
         server.keyboards.append(keyboard);
     }
 
     fn modifiers(listener: *wl.Listener(*wlr.Keyboard), wlr_keyboard: *wlr.Keyboard) void {
         const keyboard = @fieldParentPtr(Keyboard, "modifiers", listener);
-        keyboard.server.seat.setKeyboard(keyboard.device);
+        keyboard.server.seat.setKeyboard(wlr_keyboard);
         keyboard.server.seat.keyboardNotifyModifiers(&wlr_keyboard.modifiers);
     }
 
     fn key(listener: *wl.Listener(*wlr.Keyboard.event.Key), event: *wlr.Keyboard.event.Key) void {
         const keyboard = @fieldParentPtr(Keyboard, "key", listener);
-        const wlr_keyboard = keyboard.device.device.keyboard;
+        const wlr_keyboard = keyboard.device.toKeyboard();
 
         // Translate libinput keycode -> xkbcommon
         const keycode = event.keycode + 8;
@@ -554,7 +556,7 @@ const Keyboard = struct {
         }
 
         if (!handled) {
-            keyboard.server.seat.setKeyboard(keyboard.device);
+            keyboard.server.seat.setKeyboard(wlr_keyboard);
             keyboard.server.seat.keyboardNotifyKey(event.time_msec, event.keycode, event.state);
         }
     }

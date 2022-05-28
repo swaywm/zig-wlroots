@@ -100,7 +100,12 @@ pub const Tablet = extern struct {
 
     const Impl = opaque {};
 
+    base: wlr.InputDevice,
+
     impl: *const Impl,
+
+    width_mm: f64,
+    height_mm: f64,
 
     events: extern struct {
         axis: wl.Signal(*event.Axis),
@@ -109,7 +114,6 @@ pub const Tablet = extern struct {
         button: wl.Signal(*event.Button),
     },
 
-    name: [*:0]u8,
     paths: wl.Array,
 
     data: usize,

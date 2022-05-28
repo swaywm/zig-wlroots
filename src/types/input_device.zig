@@ -13,36 +13,31 @@ pub const InputDevice = extern struct {
         switch_device,
     };
 
-    const Impl = opaque {};
-
-    impl: *const Impl,
-
     type: Type,
     vendor: c_uint,
     product: c_uint,
     name: [*:0]u8,
-
-    width_mm: f64,
-    height_mm: f64,
-    output_name: [*:0]u8,
-
-    /// InputDevice.type determines which of these is active
-    device: extern union {
-        _device: ?*anyopaque,
-        keyboard: *wlr.Keyboard,
-        pointer: *wlr.Pointer,
-        switch_device: *wlr.Switch,
-        touch: *wlr.Touch,
-        tablet: *wlr.Tablet,
-        // TODO:
-        //tablet_pad: *wlr.TabletPad,
-    },
 
     events: extern struct {
         destroy: wl.Signal(*InputDevice),
     },
 
     data: usize,
+
+    extern fn wlr_keyboard_from_input_device(wlr_dev: *InputDevice) *wlr.Keyboard;
+    pub const toKeyboard = wlr_keyboard_from_input_device;
+
+    extern fn wlr_pointer_from_input_device(wlr_dev: *InputDevice) *wlr.Pointer;
+    pub const toPointer = wlr_pointer_from_input_device;
+
+    extern fn wlr_touch_from_input_device(wlr_dev: *InputDevice) *wlr.Touch;
+    pub const toTouch = wlr_touch_from_input_device;
+
+    extern fn wlr_switch_from_input_device(wlr_dev: *InputDevice) *wlr.Switch;
+    pub const toSwitch = wlr_switch_from_input_device;
+
+    extern fn wlr_tablet_from_input_device(wlr_dev: *InputDevice) *wlr.Tablet;
+    pub const toTablet = wlr_tablet_from_input_device;
 
     extern fn wlr_input_device_get_virtual_keyboard(wlr_dev: *InputDevice) ?*wlr.VirtualKeyboardV1;
     pub const getVirtualKeyboard = wlr_input_device_get_virtual_keyboard;
@@ -55,9 +50,6 @@ pub const InputDevice = extern struct {
         if (!wlr_input_device_is_libinput(wlr_dev)) return null;
         return wlr_libinput_get_device_handle(wlr_dev);
     }
-
-    extern fn wlr_input_device_is_headless(wlr_dev: *InputDevice) bool;
-    pub const isHeadless = wlr_input_device_is_headless;
 };
 
 const LibinputDevice = opaque {};

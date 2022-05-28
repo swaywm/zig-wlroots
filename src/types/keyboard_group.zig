@@ -4,7 +4,6 @@ const wl = @import("wayland").server.wl;
 
 pub const KeyboardGroup = extern struct {
     keyboard: wlr.Keyboard,
-    input_device: *wlr.InputDevice,
 
     // these are technically list heads, but their usage is internal to wlroots
     devices: wl.list.Link,

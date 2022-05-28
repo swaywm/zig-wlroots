@@ -4,14 +4,13 @@ const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
 pub const SwitchType = enum(c_int) {
-    lid = 1,
+    lid,
     tablet_mode,
 };
 
 pub const SwitchState = enum(c_int) {
-    off = 0,
+    off,
     on,
-    toggle,
 };
 
 pub const Switch = extern struct {
@@ -25,6 +24,8 @@ pub const Switch = extern struct {
     };
 
     const Impl = opaque {};
+
+    base: wlr.InputDevice,
 
     impl: *const Impl,
 

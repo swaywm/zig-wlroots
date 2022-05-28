@@ -38,10 +38,10 @@ pub const LayerSurfaceV1 = extern struct {
         anchor: zwlr.LayerSurfaceV1.Anchor,
         exclusive_zone: i32,
         margin: extern struct {
-            top: u32,
-            right: u32,
-            bottom: u32,
-            left: u32,
+            top: i32,
+            right: i32,
+            bottom: i32,
+            left: i32,
         },
         keyboard_interactive: zwlr.LayerSurfaceV1.KeyboardInteractivity,
         desired_width: u32,
@@ -79,8 +79,6 @@ pub const LayerSurfaceV1 = extern struct {
 
     current: State,
     pending: State,
-
-    surface_destroy: wl.Listener(*wlr.Surface),
 
     events: extern struct {
         destroy: wl.Signal(*LayerSurfaceV1),
@@ -141,4 +139,7 @@ pub const LayerSurfaceV1 = extern struct {
 
     extern fn wlr_layer_surface_v1_popup_surface_at(surface: *LayerSurfaceV1, sx: f64, sy: f64, sub_x: *f64, sub_y: *f64) ?*wlr.Surface;
     pub const popupSurfaceAt = wlr_layer_surface_v1_popup_surface_at;
+
+    extern fn wlr_layer_surface_v1_from_resource(resource: *wl.Resource) ?*LayerSurfaceV1;
+    pub const fromResource = wlr_layer_surface_v1_from_resource;
 };

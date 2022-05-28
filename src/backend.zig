@@ -70,11 +70,6 @@ pub const Backend = extern struct {
         return wlr_headless_add_output(headless, width, height) orelse error.OutOfMemory;
     }
 
-    extern fn wlr_headless_add_input_device(headless: *Backend, device_type: wlr.InputDevice.Type) ?*wlr.InputDevice;
-    pub fn headlessAddInputDevice(headless: *Backend, device_type: wlr.InputDevice.Type) !*wlr.InputDevice {
-        return wlr_headless_add_input_device(headless, device_type) orelse error.OutOfMemory;
-    }
-
     extern fn wlr_backend_is_headless(backend: *Backend) bool;
     pub const isHeadless = wlr_backend_is_headless;
 };

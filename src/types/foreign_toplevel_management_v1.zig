@@ -38,9 +38,13 @@ pub const ForeignToplevelHandleV1 = extern struct {
 
     pub const Output = extern struct {
         link: wl.list.Link,
-        output_destroy: wl.Listener(*wlr.Output),
         output: *wlr.Output,
         toplevel: *ForeignToplevelHandleV1,
+
+        // private state
+
+        output_bind: wl.Listener(*wlr.Output.event.Bind),
+        output_destroy: wl.Listener(*wlr.Output),
     };
 
     pub const event = struct {

@@ -51,6 +51,8 @@ pub const Keyboard = extern struct {
 
     const Impl = opaque {};
 
+    base: wlr.InputDevice,
+
     impl: *const Impl,
     group: ?*wlr.KeyboardGroup,
 
@@ -76,7 +78,6 @@ pub const Keyboard = extern struct {
         modifiers: wl.Signal(*Keyboard),
         keymap: wl.Signal(*Keyboard),
         repeat_info: wl.Signal(*Keyboard),
-        destroy: wl.Signal(*Keyboard),
     },
 
     data: usize,

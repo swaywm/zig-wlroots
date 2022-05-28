@@ -120,8 +120,6 @@ pub const InputPopupSurfaceV2 = extern struct {
 
     surface: *wlr.Surface,
 
-    surface_destroy: wl.Listener(*wlr.Surface),
-
     events: extern struct {
         map: wl.Signal(void),
         unmap: wl.Signal(void),

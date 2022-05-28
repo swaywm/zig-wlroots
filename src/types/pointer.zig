@@ -106,7 +106,11 @@ pub const Pointer = extern struct {
 
     const Impl = opaque {};
 
+    base: wlr.InputDevice,
+
     impl: *const Impl,
+
+    output_name: [*:0]u8,
 
     events: extern struct {
         motion: wl.Signal(*event.Motion),

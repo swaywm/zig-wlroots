@@ -29,7 +29,7 @@ pub const VirtualPointerManagerV1 = extern struct {
 };
 
 pub const VirtualPointerV1 = extern struct {
-    input_device: wlr.InputDevice,
+    pointer: wlr.Pointer,
     resource: *wl.Resource,
 
     axis_event: [2]wlr.Pointer.event.Axis,
@@ -38,8 +38,4 @@ pub const VirtualPointerV1 = extern struct {
 
     /// VirtualPointerManagerV1.virtual_pointers
     link: wl.list.Link,
-
-    events: extern struct {
-        destroy: wl.Signal(*VirtualPointerV1),
-    },
 };

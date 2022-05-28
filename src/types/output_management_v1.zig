@@ -44,6 +44,10 @@ pub const OutputHeadV1 = extern struct {
         y: i32,
         transform: wl.Output.Transform,
         scale: f32,
+        adaptive_sync_enabled: bool,
+
+        extern fn wlr_output_head_v1_state_apply(head_state: *const OutputHeadV1.State, output_state: *wlr.Output.State) void;
+        pub const apply = wlr_output_head_v1_state_apply;
     };
 
     state: State,

@@ -21,6 +21,9 @@ pub const Box = extern struct {
 
     extern fn wlr_box_transform(dest: *Box, box: *const Box, transform: wl.Output.Transform, width: c_int, height: c_int) void;
     pub const transform = wlr_box_transform;
+
+    extern fn wlr_box_equal(a: *const Box, b: *const Box) bool;
+    pub const equal = wlr_box_equal;
 };
 
 pub const FBox = extern struct {
@@ -34,4 +37,7 @@ pub const FBox = extern struct {
 
     extern fn wlr_fbox_transform(dest: *FBox, box: *const FBox, transform: wl.Output.Transform, width: f64, height: f64) void;
     pub const transform = wlr_fbox_transform;
+
+    extern fn wlr_fbox_equal(a: *const FBox, b: *const FBox) bool;
+    pub const equal = wlr_fbox_equal;
 };

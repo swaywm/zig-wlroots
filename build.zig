@@ -15,6 +15,7 @@ pub fn build(b: *Builder) void {
     scanner.addSystemProtocol("unstable/pointer-constraints/pointer-constraints-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/pointer-gestures/pointer-gestures-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/xdg-output/xdg-output-unstable-v1.xml");
+    scanner.addSystemProtocol("staging/ext-session-lock/ext-session-lock-v1.xml");
 
     // These must be manually kept in sync with the versions wlroots supports
     // until wlroots gives the option to request a specific version.
@@ -26,6 +27,8 @@ pub fn build(b: *Builder) void {
     scanner.generate("wl_data_device_manager", 3);
 
     scanner.generate("xdg_wm_base", 2);
+
+    scanner.generate("ext_session_lock_manager_v1", 1);
 
     scanner.generate("zwp_pointer_gestures_v1", 3);
     scanner.generate("zwp_pointer_constraints_v1", 1);
