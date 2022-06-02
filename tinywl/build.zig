@@ -29,6 +29,16 @@ pub fn build(b: *Builder) void {
         .dependencies = &[_]Pkg{ wayland, xkbcommon, pixman },
     };
 
+    // These must be manually kept in sync with the versions wlroots supports
+    // until wlroots gives the option to request a specific version.
+    scanner.generate("wl_compositor", 4);
+    scanner.generate("wl_subcompositor", 1);
+    scanner.generate("wl_shm", 1);
+    scanner.generate("wl_output", 4);
+    scanner.generate("wl_seat", 7);
+    scanner.generate("wl_data_device_manager", 3);
+    scanner.generate("xdg_wm_base", 2);
+
     const exe = b.addExecutable("tinywl", "tinywl.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
