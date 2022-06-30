@@ -2,9 +2,11 @@ const wlr = @import("../wlroots.zig");
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
+const Texture = @import("texture.zig");
 
 pub const Renderer = extern struct {
     const Impl = opaque {};
+    pub const Egl = opaque {};
 
     impl: *const Impl,
 
@@ -16,6 +18,20 @@ pub const Renderer = extern struct {
     },
 
     // wlr_renderer functions:
+    extern fn wlr_gles2_renderer_create_with_drm_fd(drmFd: c_int) ?*Renderer;
+    pub fn createWithDrmFd(drmFd: c_int) !*Renderer {
+        return wlr_gles2_renderer_create_with_drm_fd(drmFd) orelse error.RendererCreateFailed;
+    }
+
+    extern fn wlr_gles2_renderer_create(egl: *Egl) ?*Renderer;
+    pub fn create(egl: *Egl) !*Renderer {
+        return wlr_gles2_renderer_create(egl) orelse error.RendererCreateFailed;
+    }
+
+    extern fn wlr_gles2_renderer_get_egl(renderer: *Renderer) ?*Egl;
+    pub fn getEgl(renderer: *Renderer) !*Egl {
+        return wlr_gles2_renderer_get_egl(renderer) orelse error.RendererCreateFailed;
+    }
 
     extern fn wlr_renderer_autocreate(backend: *wlr.Backend) ?*Renderer;
     pub fn autocreate(backend: *wlr.Backend) !*Renderer {
