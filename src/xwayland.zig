@@ -302,7 +302,7 @@ pub const XwaylandSurface = extern struct {
     extern fn wlr_xwayland_surface_set_fullscreen(surface: *XwaylandSurface, fullscreen: bool) void;
     pub const setFullscreen = wlr_xwayland_surface_set_fullscreen;
 
-    extern fn wlr_xwayland_surface_from_wlr_surface(surface: *wlr.Surface) *XwaylandSurface;
+    extern fn wlr_xwayland_surface_from_wlr_surface(surface: *wlr.Surface) ?*XwaylandSurface;
     pub const fromWlrSurface = wlr_xwayland_surface_from_wlr_surface;
 
     extern fn wlr_xwayland_surface_ping(surface: *XwaylandSurface) void;

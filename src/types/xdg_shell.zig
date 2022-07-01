@@ -316,7 +316,7 @@ pub const XdgSurface = extern struct {
     extern fn wlr_xdg_surface_popup_surface_at(surface: *wlr.XdgSurface, sx: f64, sy: f64, sub_x: *f64, sub_y: *f64) ?*wlr.Surface;
     pub const popupSurfaceAt = wlr_xdg_surface_popup_surface_at;
 
-    extern fn wlr_xdg_surface_from_wlr_surface(surface: *wlr.Surface) *wlr.XdgSurface;
+    extern fn wlr_xdg_surface_from_wlr_surface(surface: *wlr.Surface) ?*wlr.XdgSurface;
     pub const fromWlrSurface = wlr_xdg_surface_from_wlr_surface;
 
     extern fn wlr_xdg_surface_get_geometry(surface: *wlr.XdgSurface, box: *wlr.Box) void;
