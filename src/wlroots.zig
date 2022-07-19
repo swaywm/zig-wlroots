@@ -178,20 +178,9 @@ comptime {
     }
 }
 
-fn refAllDeclsRecursive(comptime T: type) void {
-    comptime {
-        for (@import("std").meta.declarations(T)) |decl| {
-            if (decl.is_pub) {
-                switch (decl.data) {
-                    .Type => |T2| refAllDeclsRecursive(T2),
-                    else => _ = decl,
-                }
-            }
-        }
-    }
-}
+const std = @import("std");
 
 test {
     @setEvalBranchQuota(100000);
-    refAllDeclsRecursive(@This());
+    std.testing.refAllDeclsRecursive(@This());
 }
