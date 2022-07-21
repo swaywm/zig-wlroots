@@ -11,7 +11,7 @@ pub const ServerDecorationManager = extern struct {
     };
 
     global: *wl.Global,
-    resources: wl.list.Head(wl.Resource, "link"),
+    resources: wl.list.Head(wl.Resource, null),
     decorations: wl.list.Head(ServerDecoration, "link"),
 
     default_mode: Mode,
