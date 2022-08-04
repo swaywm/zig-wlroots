@@ -176,7 +176,7 @@ const Server = struct {
             .popup => {
                 // These asserts are fine since tinywl.zig doesn't support anything else that can
                 // make xdg popups (e.g. layer shell).
-                const parent = wlr.XdgSurface.fromWlrSurface(xdg_surface.role_data.popup.parent.?);
+                const parent = wlr.XdgSurface.fromWlrSurface(xdg_surface.role_data.popup.parent.?) orelse return;
                 const parent_node = @intToPtr(?*wlr.SceneNode, parent.data) orelse {
                     // The xdg surface user data could be left null due to allocation failure.
                     return;
@@ -224,7 +224,7 @@ const Server = struct {
         if (server.seat.keyboard_state.focused_surface) |previous_surface| {
             if (previous_surface == surface) return;
             if (previous_surface.isXdgSurface()) {
-                const xdg_surface = wlr.XdgSurface.fromWlrSurface(previous_surface);
+                const xdg_surface = wlr.XdgSurface.fromWlrSurface(previous_surface) orelse return;
                 _ = xdg_surface.role_data.toplevel.setActivated(false);
             }
         }
