@@ -24,16 +24,12 @@ pub const ForeignToplevelManagerV1 = extern struct {
 };
 
 pub const ForeignToplevelHandleV1 = extern struct {
-    pub const State = packed struct {
-        maximized: bool align(@alignOf(u32)) = false,
+    pub const State = packed struct(u32) {
+        maximized: bool = false,
         minimized: bool = false,
         activated: bool = false,
         fullscreen: bool = false,
         _: u28 = 0,
-        comptime {
-            std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
-            std.debug.assert(@alignOf(@This()) == @alignOf(u32));
-        }
     };
 
     pub const Output = extern struct {

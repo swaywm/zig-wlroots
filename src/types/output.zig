@@ -32,17 +32,18 @@ pub const Output = extern struct {
     };
 
     pub const State = extern struct {
-        pub const field = struct {
-            pub const buffer = 1 << 0;
-            pub const damage = 1 << 1;
-            pub const mode = 1 << 2;
-            pub const enabled = 1 << 3;
-            pub const scale = 1 << 4;
-            pub const transform = 1 << 5;
-            pub const adaptive_sync_enabled = 1 << 6;
-            pub const gamma_lut = 1 << 7;
-            pub const render_format = 1 << 8;
-            pub const subpixel = 1 << 9;
+        pub const Fields = packed struct(u32) {
+            buffer: bool = false,
+            damage: bool = false,
+            mode: bool = false,
+            enabled: bool = false,
+            scale: bool = false,
+            transform: bool = false,
+            adaptive_sync_enabled: bool = false,
+            gamma_lut: bool = false,
+            render_format: bool = false,
+            subpixel: bool = false,
+            _: u22 = 0,
         };
 
         pub const ModeType = enum(c_int) {
@@ -50,8 +51,7 @@ pub const Output = extern struct {
             custom,
         };
 
-        /// This is a bitfield of State.field members
-        committed: u32,
+        committed: Fields,
         allow_artifacts: bool,
         damage: pixman.Region32,
         enabled: bool,
@@ -124,11 +124,12 @@ pub const Output = extern struct {
         };
 
         pub const Present = extern struct {
-            pub const flag = struct {
-                const vsync = 1 << 0;
-                const hw_clock = 1 << 1;
-                const hw_completion = 1 << 2;
-                const zero_copy = 1 << 3;
+            pub const Flags = packed struct(u32) {
+                vsync: bool = false,
+                hw_clock: bool = false,
+                hw_completion: bool = false,
+                zero_copy: bool = false,
+                _: u28 = 0,
             };
 
             output: *wlr.Output,
@@ -137,8 +138,7 @@ pub const Output = extern struct {
             when: *os.timespec,
             seq: c_uint,
             refresh: c_int,
-            /// This is a bitfield of Present.flag members
-            flags: u32,
+            flags: Flags,
         };
 
         pub const Bind = extern struct {

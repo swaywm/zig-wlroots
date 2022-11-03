@@ -38,15 +38,15 @@ pub fn build(b: *Builder) void {
 
     const wayland = Pkg{
         .name = "wayland",
-        .path = .{ .generated = &scanner.result },
+        .source = .{ .generated = &scanner.result },
     };
     const xkbcommon = Pkg{
         .name = "xkbcommon",
-        .path = .{ .path = "tinywl/deps/zig-xkbcommon/src/xkbcommon.zig" },
+        .source = .{ .path = "tinywl/deps/zig-xkbcommon/src/xkbcommon.zig" },
     };
     const pixman = Pkg{
         .name = "pixman",
-        .path = .{ .path = "tinywl/deps/zig-pixman/pixman.zig" },
+        .source = .{ .path = "tinywl/deps/zig-pixman/pixman.zig" },
     };
 
     const wlr_test = b.addTest("src/wlroots.zig");

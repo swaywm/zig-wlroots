@@ -14,16 +14,17 @@ pub const TabletTool = extern struct {
         totem,
     };
 
-    pub const Axes = struct {
-        pub const x = 1 << 0;
-        pub const y = 1 << 1;
-        pub const distance = 1 << 2;
-        pub const pressure = 1 << 3;
-        pub const tilt_x = 1 << 4;
-        pub const tilt_y = 1 << 5;
-        pub const rotation = 1 << 6;
-        pub const slider = 1 << 7;
-        pub const wheel = 1 << 8;
+    pub const Axes = packed struct(u32) {
+        x: bool = false,
+        y: bool = false,
+        distance: bool = false,
+        pressure: bool = false,
+        tilt_x: bool = false,
+        tilt_y: bool = false,
+        rotation: bool = false,
+        slider: bool = false,
+        wheel: bool = false,
+        _: u23 = 0,
     };
 
     type: Type,
@@ -51,7 +52,7 @@ pub const Tablet = extern struct {
             tool: *TabletTool,
 
             time_msec: u32,
-            updated_axes: u32,
+            updated_axes: wlr.TabletTool.Axes,
             /// From 0..1
             x: f64,
             /// From 0..1

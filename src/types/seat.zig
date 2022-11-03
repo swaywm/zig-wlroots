@@ -79,21 +79,21 @@ pub const Seat = extern struct {
 
     pub const PointerGrab = extern struct {
         pub const Interface = extern struct {
-            enter: fn (
+            enter: *const fn (
                 grab: *PointerGrab,
                 surface: *wlr.Surface,
                 sx: f64,
                 sy: f64,
             ) callconv(.C) void,
-            clear_focus: fn (grab: *PointerGrab) callconv(.C) void,
-            motion: fn (grab: *PointerGrab, time_msec: u32, sx: f64, sy: f64) callconv(.C) void,
-            button: fn (
+            clear_focus: *const fn (grab: *PointerGrab) callconv(.C) void,
+            motion: *const fn (grab: *PointerGrab, time_msec: u32, sx: f64, sy: f64) callconv(.C) void,
+            button: *const fn (
                 grab: *PointerGrab,
                 time_msec: u32,
                 button: u32,
                 state: wl.Pointer.ButtonState,
             ) callconv(.C) u32,
-            axis: fn (
+            axis: *const fn (
                 grab: *PointerGrab,
                 time_msec: u32,
                 orientation: wlr.AxisOrientation,
@@ -101,8 +101,8 @@ pub const Seat = extern struct {
                 value_discrete: i32,
                 source: wlr.AxisSource,
             ) callconv(.C) void,
-            frame: ?fn (grab: *PointerGrab) callconv(.C) void,
-            cancel: ?fn (grab: *PointerGrab) callconv(.C) void,
+            frame: ?*const fn (grab: *PointerGrab) callconv(.C) void,
+            cancel: ?*const fn (grab: *PointerGrab) callconv(.C) void,
         };
 
         interface: *const Interface,
@@ -112,17 +112,17 @@ pub const Seat = extern struct {
 
     pub const KeyboardGrab = extern struct {
         pub const Interface = extern struct {
-            enter: fn (
+            enter: *const fn (
                 grab: *KeyboardGrab,
                 surface: *wlr.Surface,
                 keycodes: ?[*]u32,
                 num_keycodes: usize,
                 modifiers: ?*wlr.Keyboard.Modifiers,
             ) callconv(.C) void,
-            clear_focus: fn (grab: *KeyboardGrab) callconv(.C) void,
-            key: fn (grab: *KeyboardGrab, time_msec: u32, key: u32, state: u32) callconv(.C) void,
-            modifiers: fn (grab: *KeyboardGrab, modifiers: ?*wlr.Keyboard.Modifiers) callconv(.C) void,
-            cancel: ?fn (grab: *KeyboardGrab) callconv(.C) void,
+            clear_focus: *const fn (grab: *KeyboardGrab) callconv(.C) void,
+            key: *const fn (grab: *KeyboardGrab, time_msec: u32, key: u32, state: u32) callconv(.C) void,
+            modifiers: *const fn (grab: *KeyboardGrab, modifiers: ?*wlr.Keyboard.Modifiers) callconv(.C) void,
+            cancel: ?*const fn (grab: *KeyboardGrab) callconv(.C) void,
         };
 
         interface: *const Interface,
@@ -132,13 +132,13 @@ pub const Seat = extern struct {
 
     pub const TouchGrab = extern struct {
         pub const Interface = extern struct {
-            down: fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) u32,
-            up: fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
-            motion: fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
-            enter: fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
-            frame: ?fn (grab: *TouchGrab) callconv(.C) void,
-            cancel: ?fn (grab: *TouchGrab) callconv(.C) void,
-            wl_cancel: ?fn (grab: *TouchGrab, surface: *wlr.Surface) callconv(.C) void,
+            down: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) u32,
+            up: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
+            motion: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
+            enter: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
+            frame: ?*const fn (grab: *TouchGrab) callconv(.C) void,
+            cancel: ?*const fn (grab: *TouchGrab) callconv(.C) void,
+            wl_cancel: ?*const fn (grab: *TouchGrab, surface: *wlr.Surface) callconv(.C) void,
         };
 
         interface: *const Interface,

@@ -14,8 +14,8 @@ pub const Keyboard = extern struct {
         pub const scroll_lock = 1 << 2;
     };
 
-    pub const ModifierMask = packed struct {
-        shift: bool align(@alignOf(u32)) = false,
+    pub const ModifierMask = packed struct(u32) {
+        shift: bool = false,
         caps: bool = false,
         ctrl: bool = false,
         alt: bool = false,
@@ -23,14 +23,7 @@ pub const Keyboard = extern struct {
         mod3: bool = false,
         logo: bool = false,
         mod5: bool = false,
-        // can't wait till stage2 fixes all the packed struct bugs
-        _: u16 = 0,
-        __: u8 = 0,
-
-        comptime {
-            std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
-            std.debug.assert(@alignOf(@This()) == @alignOf(u32));
-        }
+        _: u24 = 0,
     };
 
     pub const Modifiers = extern struct {

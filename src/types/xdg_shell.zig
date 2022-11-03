@@ -160,20 +160,22 @@ pub const XdgToplevel = extern struct {
         min_height: i32,
     };
 
-    pub const wm_capabilities = struct {
-        pub const window_menu = 1 << 0;
-        pub const maximize = 1 << 1;
-        pub const fullscreen = 1 << 2;
-        pub const minimize = 1 << 3;
+    pub const WmCapabilities = packed struct(u32) {
+        window_menu: bool = false,
+        maximize: bool = false,
+        fullscreen: bool = false,
+        minimize: bool = false,
+        _: u28 = 0,
     };
 
     pub const Configure = extern struct {
-        pub const field = struct {
-            pub const bounds = 1 << 0;
-            pub const wm_capabilities = 1 << 1;
+        pub const Fields = packed struct(u32) {
+            bounds: bool = false,
+            wm_capabilities: bool = false,
+            _: u30 = 0,
         };
 
-        fields: u32,
+        fields: Fields,
         maximized: bool,
         fullscreen: bool,
         resizing: bool,
@@ -185,7 +187,7 @@ pub const XdgToplevel = extern struct {
             width: i32,
             height: i32,
         },
-        wm_capabilities: u32,
+        wm_capabilities: WmCapabilities,
     };
 
     pub const Requested = extern struct {
@@ -271,7 +273,7 @@ pub const XdgToplevel = extern struct {
     extern fn wlr_xdg_toplevel_set_bounds(toplevel: *wlr.XdgToplevel, width: i32, height: i32) u32;
     pub const setBounds = wlr_xdg_toplevel_set_bounds;
 
-    extern fn wlr_xdg_toplevel_set_wm_capabilities(toplevel: *wlr.XdgToplevel, caps: u32) u32;
+    extern fn wlr_xdg_toplevel_set_wm_capabilities(toplevel: *wlr.XdgToplevel, caps: WmCapabilities) u32;
     pub const setWmCapabilities = wlr_xdg_toplevel_set_wm_capabilities;
 
     extern fn wlr_xdg_toplevel_send_close(toplevel: *wlr.XdgToplevel) void;
@@ -363,36 +365,44 @@ pub const XdgSurface = extern struct {
 
     extern fn wlr_xdg_surface_for_each_surface(
         surface: *wlr.XdgSurface,
-        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachSurface(
         surface: *wlr.XdgSurface,
         comptime T: type,
-        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
+        comptime iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) void,
         data: T,
     ) void {
         wlr_xdg_surface_for_each_surface(
             surface,
-            @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void, iterator),
+            struct {
+                fn wrapper(s: *wlr.Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                    iterator(s, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                }
+            }.wrapper,
             data,
         );
     }
 
     extern fn wlr_xdg_surface_for_each_popup_surface(
         surface: *wlr.XdgSurface,
-        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachPopupSurface(
         surface: *wlr.XdgSurface,
         comptime T: type,
-        iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
+        comptime iterator: fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: T) void,
         data: T,
     ) void {
         wlr_xdg_surface_for_each_popup_surface(
             surface,
-            @ptrCast(fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void, iterator),
+            struct {
+                fn wrapper(s: *wlr.Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                    iterator(s, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                }
+            }.wrapper,
             data,
         );
     }

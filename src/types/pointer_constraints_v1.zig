@@ -9,17 +9,13 @@ const zwp = wayland.server.zwp;
 
 pub const PointerConstraintV1 = extern struct {
     pub const State = extern struct {
-        pub const Field = packed struct {
-            region: bool align(@alignOf(u32)) = false,
+        pub const Fields = packed struct(u32) {
+            region: bool = false,
             cursor_hint: bool = false,
             _: u30 = 0,
-            comptime {
-                std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
-                std.debug.assert(@alignOf(@This()) == @alignOf(u32));
-            }
         };
 
-        committed: Field,
+        committed: Fields,
         region: pixman.Region32,
 
         cursor_hint: extern struct {

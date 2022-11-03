@@ -4,8 +4,8 @@ const wl = @import("wayland").server.wl;
 
 pub const PrimarySelectionSource = extern struct {
     pub const Impl = extern struct {
-        send: fn (source: *PrimarySelectionSource, mime_type: [*:0]const u8, fd: c_int) callconv(.C) void,
-        destroy: ?fn (source: *PrimarySelectionSource) callconv(.C) void,
+        send: *const fn (source: *PrimarySelectionSource, mime_type: [*:0]const u8, fd: c_int) callconv(.C) void,
+        destroy: ?*const fn (source: *PrimarySelectionSource) callconv(.C) void,
     };
 
     impl: *const Impl,

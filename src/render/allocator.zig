@@ -5,8 +5,8 @@ const wl = wayland.server.wl;
 
 pub const Allocator = extern struct {
     pub const Interface = extern struct {
-        create_buffer: fn (alloc: *wlr.Allocator, width: c_int, height: c_int, format: *const wlr.DrmFormat) callconv(.C) ?*wlr.Buffer,
-        destroy: fn (alloc: *wlr.Allocator) callconv(.C) void,
+        create_buffer: *const fn (alloc: *wlr.Allocator, width: c_int, height: c_int, format: *const wlr.DrmFormat) callconv(.C) ?*wlr.Buffer,
+        destroy: *const fn (alloc: *wlr.Allocator) callconv(.C) void,
     };
 
     impl: *const Interface,

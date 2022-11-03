@@ -21,10 +21,11 @@ pub const TextInputManagerV3 = extern struct {
 };
 
 pub const TextInputV3 = extern struct {
-    pub const features = struct {
-        pub const surrounding_text = 1 << 0;
-        pub const content_type = 1 << 1;
-        pub const cursor_rectangle = 1 << 2;
+    pub const Features = packed struct(u32) {
+        surrounding_text: bool = false,
+        content_type: bool = false,
+        cursor_rectangle: bool = false,
+        _: u29 = 0,
     };
 
     pub const State = extern struct {
@@ -43,7 +44,7 @@ pub const TextInputV3 = extern struct {
 
         cursor_rectangle: wlr.Box,
 
-        features: u32,
+        features: Features,
     };
 
     seat: *wlr.Seat,

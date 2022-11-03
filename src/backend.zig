@@ -55,7 +55,11 @@ pub const Backend = extern struct {
     extern fn wlr_multi_is_empty(backend: *Backend) bool;
     pub const multiIsEmpty = wlr_multi_is_empty;
 
-    extern fn wlr_multi_for_each_backend(backend: *Backend, callback: fn (backend: *Backend, data: ?*anyopaque) callconv(.C) void, data: ?*anyopaque) void;
+    extern fn wlr_multi_for_each_backend(
+        backend: *Backend,
+        callback: *const fn (backend: *Backend, data: ?*anyopaque) callconv(.C) void,
+        data: ?*anyopaque,
+    ) void;
     pub const multiForEachBackend = wlr_multi_for_each_backend;
 
     // backend/headless.h

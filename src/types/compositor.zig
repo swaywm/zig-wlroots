@@ -26,21 +26,21 @@ pub const Compositor = extern struct {
 
 pub const Surface = extern struct {
     pub const State = extern struct {
-        pub const field = struct {
-            pub const buffer = 1 << 0;
-            pub const surface_damage = 1 << 1;
-            pub const buffer_damage = 1 << 2;
-            pub const opaque_region = 1 << 3;
-            pub const input_region = 1 << 4;
-            pub const transform = 1 << 5;
-            pub const scale = 1 << 6;
-            pub const frame_callback_list = 1 << 7;
-            pub const viewport = 1 << 8;
-            pub const offset = 1 << 9;
+        pub const Fields = packed struct(u32) {
+            buffer: bool = false,
+            surface_damage: bool = false,
+            buffer_damage: bool = false,
+            opaque_region: bool = false,
+            input_region: bool = false,
+            transform: bool = false,
+            scale: bool = false,
+            frame_callback_list: bool = false,
+            viewport: bool = false,
+            offset: bool = false,
+            _: u22 = 0,
         };
 
-        /// This is a bitfield of State.field members
-        committed: u32,
+        committed: Fields,
         seq: u32,
 
         buffer: ?*wlr.Buffer,
@@ -76,9 +76,9 @@ pub const Surface = extern struct {
 
     pub const Role = extern struct {
         name: [*:0]const u8,
-        commit: ?fn (surface: *Surface) callconv(.C) void,
-        precommit: ?fn (surface: *Surface, state: *const State) callconv(.C) void,
-        destroy: ?fn (surface: *Surface) callconv(.C) void,
+        commit: ?*const fn (surface: *Surface) callconv(.C) void,
+        precommit: ?*const fn (surface: *Surface, state: *const State) callconv(.C) void,
+        destroy: ?*const fn (surface: *Surface) callconv(.C) void,
     };
 
     pub const Output = extern struct {
@@ -183,18 +183,22 @@ pub const Surface = extern struct {
 
     extern fn wlr_surface_for_each_surface(
         surface: *Surface,
-        iterator: fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachSurface(
         surface: *Surface,
         comptime T: type,
-        iterator: fn (surface: *Surface, sx: c_int, sy: c_int, data: T) callconv(.C) void,
+        comptime iterator: fn (surface: *Surface, sx: c_int, sy: c_int, data: T) void,
         data: T,
     ) void {
         wlr_surface_for_each_surface(
             surface,
-            @ptrCast(fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void, iterator),
+            struct {
+                fn wrapper(s: *Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                    iterator(s, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                }
+            }.wrapper,
             data,
         );
     }

@@ -42,12 +42,12 @@ pub const DataOffer = extern struct {
 
 pub const DataSource = extern struct {
     pub const Impl = extern struct {
-        send: fn (source: *DataSource, mime_type: [*:0]const u8, fd: i32) callconv(.C) void,
-        accept: ?fn (source: *DataSource, serial: u32, mime_type: ?[*:0]const u8) callconv(.C) void,
-        destroy: ?fn (source: *DataSource) callconv(.C) void,
-        dnd_drop: ?fn (source: *DataSource) callconv(.C) void,
-        dnd_finish: ?fn (source: *DataSource) callconv(.C) void,
-        dnd_action: ?fn (source: *DataSource, wl.DataDeviceManager.DndAction.Enum) callconv(.C) void,
+        send: *const fn (source: *DataSource, mime_type: [*:0]const u8, fd: i32) callconv(.C) void,
+        accept: ?*const fn (source: *DataSource, serial: u32, mime_type: ?[*:0]const u8) callconv(.C) void,
+        destroy: ?*const fn (source: *DataSource) callconv(.C) void,
+        dnd_drop: ?*const fn (source: *DataSource) callconv(.C) void,
+        dnd_finish: ?*const fn (source: *DataSource) callconv(.C) void,
+        dnd_action: ?*const fn (source: *DataSource, wl.DataDeviceManager.DndAction.Enum) callconv(.C) void,
     };
 
     impl: *const Impl,

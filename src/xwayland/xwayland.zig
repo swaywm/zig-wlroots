@@ -96,7 +96,7 @@ pub const Xwayland = extern struct {
         remove_startup_info: wl.Signal(*event.RemoveStartupInfo),
     },
 
-    user_event_handler: ?fn (*Xwm, *xcb.GenericEvent) callconv(.C) c_int,
+    user_event_handler: ?*const fn (*Xwm, *xcb.GenericEvent) callconv(.C) c_int,
 
     server_ready: wl.Listener(*wlr.XwaylandServer.event.Ready),
     server_destroy: wl.Listener(void),
@@ -128,15 +128,10 @@ pub const XwaylandSurface = extern struct {
     };
 
     /// Bitfield with the size/alignment of a u32
-    pub const Decorations = packed struct {
-        no_border: bool align(@alignOf(u32)) = false,
+    pub const Decorations = packed struct(u32) {
+        no_border: bool  = false,
         no_title: bool = false,
         _: u30 = 0,
-
-        comptime {
-            std.debug.assert(@sizeOf(@This()) == @sizeOf(u32));
-            std.debug.assert(@alignOf(@This()) == @alignOf(u32));
-        }
     };
 
     pub const event = struct {

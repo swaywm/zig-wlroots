@@ -20,8 +20,7 @@ pub fn main() anyerror!void {
 
     if (os.argv.len >= 2) {
         const cmd = std.mem.span(os.argv[1]);
-        var child = try std.ChildProcess.init(&[_][]const u8{ "/bin/sh", "-c", cmd }, gpa);
-        defer child.deinit();
+        var child = std.ChildProcess.init(&[_][]const u8{ "/bin/sh", "-c", cmd }, gpa);
         var env_map = try std.process.getEnvMap(gpa);
         defer env_map.deinit();
         try env_map.put("WAYLAND_DISPLAY", socket);

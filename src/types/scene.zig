@@ -47,18 +47,22 @@ pub const SceneNode = extern struct {
 
     extern fn wlr_scene_node_for_each_buffer(
         node: *SceneNode,
-        iterator: fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachBuffer(
         node: *SceneNode,
         comptime T: type,
-        iterator: fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: T) callconv(.C) void,
+        comptime iterator: fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: T) void,
         data: T,
     ) void {
         wlr_scene_node_for_each_buffer(
             node,
-            @ptrCast(fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void, iterator),
+            struct {
+                fn wrapper(b: *SceneBuffer, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                    iterator(b, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                }
+            }.wrapper,
             data,
         );
     }
@@ -211,7 +215,7 @@ pub const SceneBuffer = extern struct {
         frame_done: wl.Signal(*os.timespec),
     },
 
-    point_accepts_input: ?fn (buffer: *SceneBuffer, sx: c_int, sy: c_int) callconv(.C) bool,
+    point_accepts_input: ?*const fn (buffer: *SceneBuffer, sx: c_int, sy: c_int) callconv(.C) bool,
 
     primary_output: ?*wlr.Output,
 
@@ -289,18 +293,22 @@ pub const SceneOutput = extern struct {
 
     extern fn wlr_scene_output_for_each_buffer(
         scene_output: *SceneOutput,
-        iterator: fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachBuffer(
         scene_output: *SceneOutput,
         comptime T: type,
-        iterator: fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: T) callconv(.C) void,
+        comptime iterator: fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: T) void,
         data: T,
     ) void {
         wlr_scene_output_for_each_buffer(
             scene_output,
-            @ptrCast(fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void, iterator),
+            struct {
+                fn wrapper(b: *SceneBuffer, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                    iterator(b, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                }
+            }.wrapper,
             data,
         );
     }

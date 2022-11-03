@@ -13,19 +13,19 @@ pub fn build(b: *Builder) void {
 
     const wayland = Pkg{
         .name = "wayland",
-        .path = .{ .generated = &scanner.result },
+        .source = .{ .generated = &scanner.result },
     };
     const xkbcommon = Pkg{
         .name = "xkbcommon",
-        .path = .{ .path = "deps/zig-xkbcommon/src/xkbcommon.zig" },
+        .source = .{ .path = "deps/zig-xkbcommon/src/xkbcommon.zig" },
     };
     const pixman = Pkg{
         .name = "pixman",
-        .path = .{ .path = "deps/zig-pixman/pixman.zig" },
+        .source = .{ .path = "deps/zig-pixman/pixman.zig" },
     };
     const wlroots = Pkg{
         .name = "wlroots",
-        .path = .{ .path = "../src/wlroots.zig" },
+        .source = .{ .path = "../src/wlroots.zig" },
         .dependencies = &[_]Pkg{ wayland, xkbcommon, pixman },
     };
 
