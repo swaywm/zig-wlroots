@@ -234,15 +234,15 @@ pub const XdgToplevel = extern struct {
     title: ?[*:0]u8,
     app_id: ?[*:0]u8,
     events: extern struct {
-        request_maximize: wl.Signal(*wlr.XdgSurface),
+        request_maximize: wl.Signal(void),
         request_fullscreen: wl.Signal(void),
-        request_minimize: wl.Signal(*wlr.XdgSurface),
+        request_minimize: wl.Signal(void),
         request_move: wl.Signal(*event.Move),
         request_resize: wl.Signal(*event.Resize),
         request_show_window_menu: wl.Signal(*event.ShowWindowMenu),
-        set_parent: wl.Signal(*wlr.XdgSurface),
-        set_title: wl.Signal(*wlr.XdgSurface),
-        set_app_id: wl.Signal(*wlr.XdgSurface),
+        set_parent: wl.Signal(void),
+        set_title: wl.Signal(void),
+        set_app_id: wl.Signal(void),
     },
 
     extern fn wlr_xdg_toplevel_from_resource(resource: *xdg.Toplevel) ?*wlr.XdgToplevel;
