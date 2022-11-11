@@ -264,7 +264,9 @@ pub const XdgToplevel = extern struct {
     pub const setResizing = wlr_xdg_toplevel_set_resizing;
 
     extern fn wlr_xdg_toplevel_set_tiled(toplevel: *wlr.XdgToplevel, tiled_edges: u32) u32;
-    pub const setTiled = wlr_xdg_toplevel_set_tiled;
+    pub fn setTiled(toplevel: *wlr.XdgToplevel, tiled_edges: wlr.Edges) u32 {
+        return wlr_xdg_toplevel_set_tiled(toplevel, @bitCast(u32, tiled_edges));
+    }
 
     extern fn wlr_xdg_toplevel_set_bounds(toplevel: *wlr.XdgToplevel, width: i32, height: i32) u32;
     pub const setBounds = wlr_xdg_toplevel_set_bounds;
