@@ -16,7 +16,6 @@ pub const SwitchState = enum(c_int) {
 pub const Switch = extern struct {
     pub const event = struct {
         pub const Toggle = extern struct {
-            device: *wlr.InputDevice,
             time_msec: u32,
             switch_type: SwitchType,
             switch_state: SwitchState,
