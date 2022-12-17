@@ -14,6 +14,18 @@ pub const TabletTool = extern struct {
         totem,
     };
 
+    pub const Axes = struct {
+        pub const x = 1 << 0;
+        pub const y = 1 << 1;
+        pub const distance = 1 << 2;
+        pub const pressure = 1 << 3;
+        pub const tilt_x = 1 << 4;
+        pub const tilt_y = 1 << 5;
+        pub const rotation = 1 << 6;
+        pub const slider = 1 << 7;
+        pub const wheel = 1 << 8;
+    };
+
     type: Type,
     hardware_serial: u64,
     hardware_wacom: u64,
