@@ -74,8 +74,8 @@ pub const Tablet = extern struct {
 
         pub const Tip = extern struct {
             pub const State = enum(c_int) {
-                up,
-                down,
+                up = 1 << 0,
+                down = 1 << 1,
             };
 
             device: *wlr.InputDevice,
