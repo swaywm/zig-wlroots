@@ -216,8 +216,10 @@ pub const Surface = extern struct {
     extern fn wlr_surface_is_layer_surface(surface: *Surface) bool;
     pub const isLayerSurface = wlr_surface_is_layer_surface;
 
-    extern fn wlr_surface_is_xwayland_surface(surface: *Surface) bool;
-    pub const isXWaylandSurface = wlr_surface_is_xwayland_surface;
+    pub usingnamespace if (wlr.config.has_xwayland) struct {
+        extern fn wlr_surface_is_xwayland_surface(surface: *Surface) bool;
+        pub const isXWaylandSurface = wlr_surface_is_xwayland_surface;
+    } else struct {};
 
     extern fn wlr_surface_is_session_lock_surface_v1(surface: *Surface) bool;
     pub const isSessionLockSurfaceV1 = wlr_surface_is_session_lock_surface_v1;

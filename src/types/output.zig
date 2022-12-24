@@ -342,14 +342,16 @@ pub const Output = extern struct {
     extern fn wlr_output_is_wl(output: *Output) bool;
     pub const isWl = wlr_output_is_wl;
 
-    extern fn wlr_output_is_x11(output: *Output) bool;
-    pub const isX11 = wlr_output_is_x11;
-
     extern fn wlr_wl_output_set_title(output: *Output, title: ?[*:0]const u8) void;
     pub const wlSetTitle = wlr_wl_output_set_title;
 
-    extern fn wlr_x11_output_set_title(output: *Output, title: ?[*:0]const u8) void;
-    pub const x11SetTitle = wlr_x11_output_set_title;
+    pub usingnamespace if (wlr.config.has_x11_backend) struct {
+        extern fn wlr_output_is_x11(output: *Output) bool;
+        pub const isX11 = wlr_output_is_x11;
+
+        extern fn wlr_x11_output_set_title(output: *Output, title: ?[*:0]const u8) void;
+        pub const x11SetTitle = wlr_x11_output_set_title;
+    } else struct {};
 };
 
 pub const OutputCursor = extern struct {

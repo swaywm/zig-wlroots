@@ -144,11 +144,13 @@ pub const XcursorTheme = @import("xcursor.zig").XcursorTheme;
 pub const XcursorManager = @import("types/xcursor_manager.zig").XcursorManager;
 pub const XcursorManagerTheme = @import("types/xcursor_manager.zig").XcursorManagerTheme;
 
-pub const XwaylandServer = @import("xwayland/server.zig").XwaylandServer;
-pub const Xwayland = @import("xwayland/xwayland.zig").Xwayland;
-pub const XwaylandSurface = @import("xwayland/xwayland.zig").XwaylandSurface;
-pub const XwaylandCursor = @import("xwayland/xwayland.zig").XwaylandCursor;
-pub const Xwm = @import("xwayland/xwayland.zig").Xwm;
+pub usingnamespace if (config.has_xwayland) struct {
+    pub const XwaylandServer = @import("xwayland/server.zig").XwaylandServer;
+    pub const Xwayland = @import("xwayland/xwayland.zig").Xwayland;
+    pub const XwaylandSurface = @import("xwayland/xwayland.zig").XwaylandSurface;
+    pub const XwaylandCursor = @import("xwayland/xwayland.zig").XwaylandCursor;
+    pub const Xwm = @import("xwayland/xwayland.zig").Xwm;
+} else struct {};
 
 pub const matrix = @import("types/matrix.zig");
 

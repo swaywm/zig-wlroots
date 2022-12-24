@@ -42,14 +42,16 @@ pub const InputDevice = extern struct {
     extern fn wlr_input_device_get_virtual_keyboard(wlr_dev: *InputDevice) ?*wlr.VirtualKeyboardV1;
     pub const getVirtualKeyboard = wlr_input_device_get_virtual_keyboard;
 
-    extern fn wlr_input_device_is_libinput(wlr_dev: *InputDevice) bool;
-    pub const isLibinput = wlr_input_device_is_libinput;
+    pub usingnamespace if (wlr.config.has_libinput_backend) struct {
+        extern fn wlr_input_device_is_libinput(wlr_dev: *InputDevice) bool;
+        pub const isLibinput = wlr_input_device_is_libinput;
 
-    extern fn wlr_libinput_get_device_handle(wlr_dev: *InputDevice) *LibinputDevice;
-    pub fn getLibinputDevice(wlr_dev: *InputDevice) ?*LibinputDevice {
-        if (!wlr_input_device_is_libinput(wlr_dev)) return null;
-        return wlr_libinput_get_device_handle(wlr_dev);
-    }
+        extern fn wlr_libinput_get_device_handle(wlr_dev: *InputDevice) *LibinputDevice;
+        pub fn getLibinputDevice(wlr_dev: *InputDevice) ?*LibinputDevice {
+            if (!wlr_input_device_is_libinput(wlr_dev)) return null;
+            return wlr_libinput_get_device_handle(wlr_dev);
+        }
+    } else struct {};
 };
 
 const LibinputDevice = opaque {};
