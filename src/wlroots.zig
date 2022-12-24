@@ -16,6 +16,8 @@ pub const BufferCap = @import("types/buffer.zig").BufferCap;
 pub const Buffer = @import("types/buffer.zig").Buffer;
 pub const ClientBuffer = @import("types/buffer.zig").ClientBuffer;
 
+pub const SinglePixelBufferManagerV1 = @import("types/single_pixel_buffer_v1.zig").SinglePixelBufferManagerV1;
+
 pub const DmabufBufferV1 = @import("types/linux_dmabuf_v1.zig").DmabufBufferV1;
 pub const LinuxDmabufV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufV1;
 
