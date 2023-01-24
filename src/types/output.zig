@@ -303,10 +303,10 @@ pub const Output = extern struct {
     extern fn wlr_output_rollback(output: *Output) void;
     pub const rollback = wlr_output_rollback;
 
-    extern fn wlr_output_test_state(output: *Output) void;
+    extern fn wlr_output_test_state(output: *Output, state: *const Output.State) bool;
     pub const testState = wlr_output_test_state;
 
-    extern fn wlr_output_commit_state(output: *Output) void;
+    extern fn wlr_output_commit_state(output: *Output, state: *const Output.State) bool;
     pub const commitState = wlr_output_commit_state;
 
     extern fn wlr_output_schedule_frame(output: *Output) void;
