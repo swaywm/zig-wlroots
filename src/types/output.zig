@@ -1,6 +1,8 @@
 const wlr = @import("../wlroots.zig");
 
-const os = @import("std").os;
+const std = @import("std");
+const mem = std.mem;
+const os = std.os;
 
 const pixman = @import("pixman");
 
@@ -76,6 +78,12 @@ pub const Output = extern struct {
         // if (committed & field.gamma_lut)
         gamma_lut: ?[*]u16,
         gamma_lut_size: usize,
+
+        pub fn init() State {
+            var state: State = undefined;
+            mem.set(u8, mem.asBytes(&state), 0);
+            return state;
+        }
 
         extern fn wlr_output_state_set_enabled(state: *State, enabled: bool) void;
         pub const setEnabled = wlr_output_state_set_enabled;
