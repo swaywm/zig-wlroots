@@ -180,6 +180,7 @@ pub const SceneSurface = @import("types/scene.zig").SceneSurface;
 pub const SceneRect = @import("types/scene.zig").SceneRect;
 pub const SceneBuffer = @import("types/scene.zig").SceneBuffer;
 pub const SceneOutput = @import("types/scene.zig").SceneOutput;
+pub const SceneLayerSurfaceV1 = @import("types/scene.zig").SceneLayerSurfaceV1;
 
 pub const config = @import("config.zig");
 pub const version = @import("version.zig");
