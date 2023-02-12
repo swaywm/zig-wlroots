@@ -130,10 +130,8 @@ pub const XdgPopup = extern struct {
     extern fn wlr_xdg_popup_from_resource(resource: *xdg.Popup) ?*wlr.XdgPopup;
     pub const fromResource = wlr_xdg_popup_from_resource;
 
-    extern fn wlr_xdg_popup_destroy(surface: *wlr.XdgSurface) void;
-    pub inline fn destroy(popup: *wlr.XdgPopup) void {
-        wlr_xdg_popup_destroy(popup.base);
-    }
+    extern fn wlr_xdg_popup_destroy(popup: *wlr.XdgPopup) void;
+    pub const destroy = wlr_xdg_popup_destroy;
 
     extern fn wlr_xdg_popup_get_position(popup: *XdgPopup, popup_sx: *f64, popup_sy: *f64) void;
     pub const getPosition = wlr_xdg_popup_get_position;
