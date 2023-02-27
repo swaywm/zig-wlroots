@@ -185,7 +185,9 @@ pub const XwaylandSurface = extern struct {
     pid: os.pid_t,
     has_utf8_title: bool,
 
-    children: wl.list.Head(XwaylandSurface, .parent_link),
+    // Unfortunately the proper wl.list.Head(XwaylandSurface, .parent_link)
+    // currently causes a dependency loop in the zig compiler.
+    children: wl.list.Link,
     parent: ?*XwaylandSurface,
     /// XwaylandSurface.children
     parent_link: wl.list.Link,
