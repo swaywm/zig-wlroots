@@ -46,13 +46,13 @@ const Server = struct {
 
     xdg_shell: *wlr.XdgShell,
     new_xdg_surface: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(newXdgSurface),
-    views: wl.list.Head(View, "link") = undefined,
+    views: wl.list.Head(View, .link) = undefined,
 
     seat: *wlr.Seat,
     new_input: wl.Listener(*wlr.InputDevice) = wl.Listener(*wlr.InputDevice).init(newInput),
     request_set_cursor: wl.Listener(*wlr.Seat.event.RequestSetCursor) = wl.Listener(*wlr.Seat.event.RequestSetCursor).init(requestSetCursor),
     request_set_selection: wl.Listener(*wlr.Seat.event.RequestSetSelection) = wl.Listener(*wlr.Seat.event.RequestSetSelection).init(requestSetSelection),
-    keyboards: wl.list.Head(Keyboard, "link") = undefined,
+    keyboards: wl.list.Head(Keyboard, .link) = undefined,
 
     cursor: *wlr.Cursor,
     cursor_mgr: *wlr.XcursorManager,

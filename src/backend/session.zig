@@ -55,7 +55,7 @@ pub const Session = extern struct {
     seat_handle: *opaque {},
     libseat_event: *wl.EventSource,
 
-    devices: wl.list.Head(Device, "link"),
+    devices: wl.list.Head(Device, .link),
 
     server: *wl.Server,
     server_destroy: wl.Listener(*wl.Server),

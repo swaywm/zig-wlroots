@@ -13,7 +13,7 @@ pub const OutputPowerManagerV1 = extern struct {
     };
 
     global: *wl.Global,
-    output_powers: wl.list.Head(OutputPowerV1, "link"),
+    output_powers: wl.list.Head(OutputPowerV1, .link),
 
     server_destroy: wl.Listener(*wl.Server),
 

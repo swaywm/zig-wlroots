@@ -129,7 +129,7 @@ pub const XwaylandSurface = extern struct {
 
     /// Bitfield with the size/alignment of a u32
     pub const Decorations = packed struct(u32) {
-        no_border: bool  = false,
+        no_border: bool = false,
         no_title: bool = false,
         _: u30 = 0,
     };
@@ -185,7 +185,7 @@ pub const XwaylandSurface = extern struct {
     pid: os.pid_t,
     has_utf8_title: bool,
 
-    children: wl.list.Head(XwaylandSurface, "parent_link"),
+    children: wl.list.Head(XwaylandSurface, .parent_link),
     parent: ?*XwaylandSurface,
     /// XwaylandSurface.children
     parent_link: wl.list.Link,

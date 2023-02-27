@@ -3,7 +3,7 @@ const wl = wayland.server.wl;
 
 pub const AddonSet = extern struct {
     // private state
-    addons: wl.list.Head(Addon, "link"),
+    addons: wl.list.Head(Addon, .link),
 
     extern fn wlr_addon_set_init(set: *AddonSet) void;
     pub const init = wlr_addon_set_init;

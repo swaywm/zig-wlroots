@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const TextInputManagerV3 = extern struct {
     global: *wl.Global,
-    text_inputs: wl.list.Head(TextInputV3, "link"),
+    text_inputs: wl.list.Head(TextInputV3, .link),
 
     server_destroy: wl.Listener(*wl.Server),
 

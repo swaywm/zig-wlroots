@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const VirtualKeyboardManagerV1 = extern struct {
     global: *wl.Global,
-    virtual_keyboards: wl.list.Head(VirtualKeyboardV1, "link"),
+    virtual_keyboards: wl.list.Head(VirtualKeyboardV1, .link),
 
     server_destroy: wl.Listener(*wl.Server),
 

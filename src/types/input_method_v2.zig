@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const InputMethodManagerV2 = extern struct {
     global: *wl.Global,
-    input_methods: wl.list.Head(InputMethodV2, "link"),
+    input_methods: wl.list.Head(InputMethodV2, .link),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -76,7 +76,7 @@ pub const InputMethodV2 = extern struct {
     client_active: bool,
     current_serial: u32,
 
-    popup_surfaces: wl.list.Head(InputPopupSurfaceV2, "link"),
+    popup_surfaces: wl.list.Head(InputPopupSurfaceV2, .link),
     keyboard_grab: ?*KeyboardGrab,
 
     link: wl.list.Link,

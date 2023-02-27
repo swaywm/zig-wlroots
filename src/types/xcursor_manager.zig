@@ -12,7 +12,7 @@ pub const XcursorManagerTheme = extern struct {
 pub const XcursorManager = extern struct {
     name: ?[*:0]u8,
     size: u32,
-    scaled_themes: wl.list.Head(XcursorManagerTheme, "link"),
+    scaled_themes: wl.list.Head(XcursorManagerTheme, .link),
 
     extern fn wlr_xcursor_manager_create(name: ?[*:0]const u8, size: u32) ?*XcursorManager;
     pub fn create(name: ?[*:0]const u8, size: u32) !*XcursorManager {

@@ -27,7 +27,7 @@ pub const OutputLayout = extern struct {
         right = 8,
     };
 
-    outputs: wl.list.Head(OutputLayout.Output, "link"),
+    outputs: wl.list.Head(OutputLayout.Output, .link),
 
     events: extern struct {
         add: wl.Signal(*OutputLayout),

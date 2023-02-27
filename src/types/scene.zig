@@ -92,7 +92,7 @@ pub const SceneNode = extern struct {
 pub const SceneTree = extern struct {
     node: SceneNode,
 
-    children: wl.list.Head(SceneNode, "link"),
+    children: wl.list.Head(SceneNode, .link),
 
     extern fn wlr_scene_tree_create(parent: *SceneTree) ?*SceneTree;
     pub fn createSceneTree(parent: *SceneTree) !*SceneTree {
@@ -133,7 +133,7 @@ pub const SceneTree = extern struct {
 pub const Scene = extern struct {
     tree: SceneTree,
 
-    outputs: wl.list.Head(SceneOutput, "link"),
+    outputs: wl.list.Head(SceneOutput, .link),
 
     presentation: ?*wlr.Presentation,
 

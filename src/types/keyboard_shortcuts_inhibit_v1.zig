@@ -4,7 +4,7 @@ const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
 pub const KeyboardShortcutsInhibitManagerV1 = extern struct {
-    inhibitors: wl.list.Head(wlr.KeyboardShortcutsInhibitorV1, "link"),
+    inhibitors: wl.list.Head(wlr.KeyboardShortcutsInhibitorV1, .link),
     global: *wl.Global,
 
     server_destroy: wl.Listener(*wl.Server),

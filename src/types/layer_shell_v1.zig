@@ -67,7 +67,7 @@ pub const LayerSurfaceV1 = extern struct {
     resource: *wl.Resource,
     shell: *LayerShellV1,
     /// wlr.XdgPopup.link
-    popups: wl.list.Head(wlr.XdgPopup, "link"),
+    popups: wl.list.Head(wlr.XdgPopup, .link),
 
     namespace: [*:0]u8,
 
@@ -75,7 +75,7 @@ pub const LayerSurfaceV1 = extern struct {
     configured: bool,
     mapped: bool,
 
-    configure_list: wl.list.Head(LayerSurfaceV1.Configure, "link"),
+    configure_list: wl.list.Head(LayerSurfaceV1.Configure, .link),
 
     current: State,
     pending: State,

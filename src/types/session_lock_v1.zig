@@ -27,7 +27,7 @@ pub const SessionLockManagerV1 = extern struct {
 pub const SessionLockV1 = extern struct {
     resource: *ext.SessionLockV1,
 
-    surfaces: wl.list.Head(SessionLockSurfaceV1, "link"),
+    surfaces: wl.list.Head(SessionLockSurfaceV1, .link),
 
     events: extern struct {
         new_surface: wl.Signal(*SessionLockSurfaceV1),
@@ -69,7 +69,7 @@ pub const SessionLockSurfaceV1 = extern struct {
     configured: bool,
     mapped: bool,
 
-    configure_list: wl.list.Head(Configure, "link"),
+    configure_list: wl.list.Head(Configure, .link),
 
     current: State,
     pending: State,

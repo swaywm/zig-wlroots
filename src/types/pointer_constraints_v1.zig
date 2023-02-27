@@ -62,7 +62,7 @@ pub const PointerConstraintV1 = extern struct {
 
 pub const PointerConstraintsV1 = extern struct {
     global: *wl.Global,
-    constraints: wl.list.Head(PointerConstraintV1, "link"),
+    constraints: wl.list.Head(PointerConstraintV1, .link),
 
     events: extern struct {
         new_constraint: wl.Signal(*PointerConstraintV1),

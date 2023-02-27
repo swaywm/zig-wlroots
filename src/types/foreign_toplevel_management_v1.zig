@@ -7,7 +7,7 @@ pub const ForeignToplevelManagerV1 = extern struct {
     event_loop: *wl.EventLoop,
     global: *wl.Global,
     resources: wl.list.Head(wl.Resource, null),
-    toplevels: wl.list.Head(ForeignToplevelHandleV1, "link"),
+    toplevels: wl.list.Head(ForeignToplevelHandleV1, .link),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -83,7 +83,7 @@ pub const ForeignToplevelHandleV1 = extern struct {
     title: ?[*:0]u8,
     app_id: ?[*:0]u8,
     parent: ?*ForeignToplevelHandleV1,
-    outputs: wl.list.Head(ForeignToplevelHandleV1.Output, "link"),
+    outputs: wl.list.Head(ForeignToplevelHandleV1.Output, .link),
     state: State,
 
     events: extern struct {

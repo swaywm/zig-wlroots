@@ -172,7 +172,7 @@ pub const Output = extern struct {
     phys_width: i32,
     phys_height: i32,
 
-    modes: wl.list.Head(Output.Mode, "link"),
+    modes: wl.list.Head(Output.Mode, .link),
     current_mode: ?*Output.Mode,
     width: i32,
     height: i32,
@@ -214,7 +214,7 @@ pub const Output = extern struct {
 
     attach_render_locks: c_int,
 
-    cursors: wl.list.Head(OutputCursor, "link"),
+    cursors: wl.list.Head(OutputCursor, .link),
 
     hardware_cursor: ?*OutputCursor,
     cursor_swapchain: ?*wlr.Swapchain,

@@ -15,7 +15,7 @@ pub const XdgActivationV1 = extern struct {
     /// token timeout in milliseconds (0 to disable)
     token_timeout_msec: u32,
 
-    tokens: wl.list.Head(XdgActivationTokenV1, "link"),
+    tokens: wl.list.Head(XdgActivationTokenV1, .link),
 
     events: extern struct {
         destroy: wl.Signal(*XdgActivationV1),

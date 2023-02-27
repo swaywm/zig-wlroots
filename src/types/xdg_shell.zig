@@ -7,8 +7,8 @@ const xdg = wayland.server.xdg;
 pub const XdgShell = extern struct {
     global: *wl.Global,
     version: u32,
-    clients: wl.list.Head(XdgClient, "link"),
-    popup_grabs: wl.list.Head(XdgPopupGrab, "link"),
+    clients: wl.list.Head(XdgClient, .link),
+    popup_grabs: wl.list.Head(XdgPopupGrab, .link),
     ping_timeout: u32,
 
     server_destroy: wl.Listener(*wl.Server),
@@ -30,7 +30,7 @@ pub const XdgClient = extern struct {
     shell: *wlr.XdgShell,
     resource: *xdg.WmBase,
     client: *wl.Client,
-    surfaces: wl.list.Head(XdgSurface, "link"),
+    surfaces: wl.list.Head(XdgSurface, .link),
     /// XdgShell.clients
     link: wl.list.Link,
 
@@ -86,7 +86,7 @@ pub const XdgPopupGrab = extern struct {
     touch_grab: wlr.Seat.TouchGrab,
     seat: *wlr.Seat,
 
-    popups: wl.list.Head(XdgPopup, "grab_link"),
+    popups: wl.list.Head(XdgPopup, .grab_link),
     /// XdgShell.popup_grabs
     link: wl.list.Link,
 
@@ -317,14 +317,14 @@ pub const XdgSurface = extern struct {
         popup: *wlr.XdgPopup,
     },
 
-    popups: wl.list.Head(XdgPopup, "link"),
+    popups: wl.list.Head(XdgPopup, .link),
 
     added: bool,
     configured: bool,
     mapped: bool,
     configure_idle: ?*wl.EventSource,
     scheduled_serial: u32,
-    configure_list: wl.list.Head(XdgSurface.Configure, "link"),
+    configure_list: wl.list.Head(XdgSurface.Configure, .link),
 
     current: State,
     pending: State,

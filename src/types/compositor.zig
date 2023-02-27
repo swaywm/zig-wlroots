@@ -59,8 +59,8 @@ pub const Surface = extern struct {
         buffer_width: c_int,
         buffer_height: c_int,
 
-        subsurfaces_below: wl.list.Head(wlr.Subsurface.ParentState, "link"),
-        subsurfaces_above: wl.list.Head(wlr.Subsurface.ParentState, "link"),
+        subsurfaces_below: wl.list.Head(wlr.Subsurface.ParentState, .link),
+        subsurfaces_above: wl.list.Head(wlr.Subsurface.ParentState, .link),
 
         viewport: extern struct {
             has_src: bool,
@@ -107,7 +107,7 @@ pub const Surface = extern struct {
     current: State,
     pending: State,
 
-    cached: wl.list.Head(Surface.State, "cached_state_link"),
+    cached: wl.list.Head(Surface.State, .cached_state_link),
 
     role: ?*const Role,
     role_data: ?*anyopaque,
@@ -119,7 +119,7 @@ pub const Surface = extern struct {
         destroy: wl.Signal(*wlr.Surface),
     },
 
-    current_outputs: wl.list.Head(Surface.Output, "link"),
+    current_outputs: wl.list.Head(Surface.Output, .link),
 
     addons: wlr.AddonSet,
     data: usize,

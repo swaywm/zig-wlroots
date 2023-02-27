@@ -6,7 +6,7 @@ const wl = wayland.server.wl;
 pub const PrimarySelectionDeviceManagerV1 = extern struct {
     global: *wl.Global,
     /// PrimarySelectionV1Device.link
-    devices: wl.list.Head(PrimarySelectionDeviceV1, "link"),
+    devices: wl.list.Head(PrimarySelectionDeviceV1, .link),
 
     server_destroy: wl.Listener(*wl.Server),
 

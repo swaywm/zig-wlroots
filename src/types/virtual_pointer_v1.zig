@@ -13,7 +13,7 @@ pub const VirtualPointerManagerV1 = extern struct {
     };
 
     global: *wl.Global,
-    virtual_pointers: wl.list.Head(VirtualPointerV1, "link"),
+    virtual_pointers: wl.list.Head(VirtualPointerV1, .link),
 
     server_destroy: wl.Listener(*wl.Server),
 

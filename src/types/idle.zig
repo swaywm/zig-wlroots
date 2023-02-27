@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const Idle = extern struct {
     global: *wl.Global,
-    idle_timers: wl.list.Head(IdleTimeout, "link"),
+    idle_timers: wl.list.Head(IdleTimeout, .link),
     event_loop: *wl.EventLoop,
     enabled: bool,
 

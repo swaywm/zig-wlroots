@@ -6,7 +6,7 @@ pub const OutputManagerV1 = extern struct {
     global: *wl.Global,
     resources: wl.list.Head(wl.Resource, null),
 
-    heads: wl.list.Head(OutputHeadV1, "link"),
+    heads: wl.list.Head(OutputHeadV1, .link),
     serial: u32,
     current_configuration_dirty: bool,
 
@@ -76,7 +76,7 @@ pub const OutputConfigurationV1 = extern struct {
         }
     };
 
-    heads: wl.list.Head(Head, "link"),
+    heads: wl.list.Head(Head, .link),
 
     manager: *OutputManagerV1,
     serial: u32,

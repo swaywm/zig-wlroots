@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const RelativePointerManagerV1 = extern struct {
     global: *wl.Global,
-    relative_pointers: wl.list.Head(RelativePointerV1, "link"),
+    relative_pointers: wl.list.Head(RelativePointerV1, .link),
 
     events: extern struct {
         destroy: wl.Signal(*RelativePointerManagerV1),

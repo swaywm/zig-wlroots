@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const XdgDecorationManagerV1 = extern struct {
     global: *wl.Global,
-    decorations: wl.list.Head(XdgToplevelDecorationV1, "link"),
+    decorations: wl.list.Head(XdgToplevelDecorationV1, .link),
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -54,7 +54,7 @@ pub const XdgToplevelDecorationV1 = extern struct {
 
     added: bool,
 
-    configure_list: wl.list.Head(XdgToplevelDecorationV1.Configure, "link"),
+    configure_list: wl.list.Head(XdgToplevelDecorationV1.Configure, .link),
 
     events: extern struct {
         destroy: wl.Signal(*XdgToplevelDecorationV1),
