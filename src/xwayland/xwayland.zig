@@ -233,7 +233,7 @@ pub const XwaylandSurface = extern struct {
         set_hints: wl.Signal(*XwaylandSurface),
         set_decorations: wl.Signal(*XwaylandSurface),
         set_override_redirect: wl.Signal(*XwaylandSurface),
-        set_geometry: wl.Signal(*XwaylandSurface),
+        set_geometry: wl.Signal(void),
         ping_timeout: wl.Signal(*XwaylandSurface),
     },
 
