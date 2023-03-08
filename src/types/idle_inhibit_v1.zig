@@ -30,7 +30,7 @@ pub const IdleInhibitorV1 = extern struct {
     link: wl.list.Link,
 
     events: extern struct {
-        destroy: wl.Signal(*IdleInhibitorV1),
+        destroy: wl.Signal(*wlr.Surface),
     },
 
     data: usize,
