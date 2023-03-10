@@ -2,6 +2,7 @@ const wlr = @import("../wlroots.zig");
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
+const zxdg = wayland.server.zxdg;
 
 pub const XdgDecorationManagerV1 = extern struct {
     global: *wl.Global,
@@ -40,7 +41,7 @@ pub const XdgToplevelDecorationV1 = extern struct {
         mode: Mode,
     };
 
-    resource: *wl.Resource,
+    resource: *zxdg.ToplevelDecorationV1,
     surface: *wlr.XdgSurface,
     manager: *XdgDecorationManagerV1,
     /// XdgDecorationManagerV1.decorations

@@ -14,7 +14,7 @@ pub fn build(b: *Builder) void {
     scanner.addProtocolPath("protocol/wlr-output-power-management-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/pointer-constraints/pointer-constraints-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/pointer-gestures/pointer-gestures-unstable-v1.xml");
-    scanner.addSystemProtocol("unstable/xdg-output/xdg-output-unstable-v1.xml");
+    scanner.addSystemProtocol("unstable/xdg-decoration/xdg-decoration-unstable-v1.xml");
     scanner.addSystemProtocol("staging/ext-session-lock/ext-session-lock-v1.xml");
 
     // These must be manually kept in sync with the versions wlroots supports
@@ -32,6 +32,7 @@ pub fn build(b: *Builder) void {
 
     scanner.generate("zwp_pointer_gestures_v1", 3);
     scanner.generate("zwp_pointer_constraints_v1", 1);
+    scanner.generate("zxdg_decoration_manager_v1", 1);
 
     scanner.generate("zwlr_layer_shell_v1", 4);
     scanner.generate("zwlr_output_power_manager_v1", 1);
