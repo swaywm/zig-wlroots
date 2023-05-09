@@ -22,6 +22,23 @@ pub const Renderer = extern struct {
         return wlr_renderer_autocreate(backend) orelse error.RendererCreateFailed;
     }
 
+    /// Since the impl of wlr_egl is not exposed in wlroots headers, we refer to it as opaque for ABI compatibility.
+    /// opaque: struct wlr_egl;
+    extern fn wlr_gles2_renderer_create(egl: *opaque {}) ?*Renderer;
+    pub fn createGles2(egl: *opaque {}) !*Renderer {
+        return wlr_gles2_renderer_create(egl) orelse error.wlr.RendererCreateFailed;
+    }
+
+    extern fn wlr_gles2_renderer_create_with_drm_fd(drmFd: c_int) ?*Renderer;
+    pub fn createGles2WithDrmFd(drmFd: c_int) !*Renderer {
+        return wlr_gles2_renderer_create_with_drm_fd(drmFd) orelse error.wlr.RendererCreateFailed;
+    }
+
+    extern fn wlr_gles2_renderer_get_egl(renderer: *Renderer) ?*opaque {};
+    pub fn getEgl(renderer: *wlr.Renderer) !*opaque {} {
+        return getEgl(renderer) orelse error.wlr.RendererGetEglFailed;
+    }
+
     extern fn wlr_renderer_begin(renderer: *Renderer, width: u32, height: u32) void;
     pub const begin = wlr_renderer_begin;
 
