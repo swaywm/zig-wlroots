@@ -22,7 +22,7 @@ pub const Xcursor = extern struct {
     // a uint32_t which has the ABI of an int
     extern fn wlr_xcursor_get_resize_name(edges: c_int) [*:0]const u8;
     pub fn getResizeName(edges: wlr.Edges) [*:0]const u8 {
-        return wlr_xcursor_get_resize_name(@bitCast(c_int, edges));
+        return wlr_xcursor_get_resize_name(@as(c_int, @bitCast(edges)));
     }
 };
 

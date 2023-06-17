@@ -81,7 +81,7 @@ pub const Output = extern struct {
 
         pub fn init() State {
             var state: State = undefined;
-            mem.set(u8, mem.asBytes(&state), 0);
+            @memset(mem.asBytes(&state), 0);
             return state;
         }
 

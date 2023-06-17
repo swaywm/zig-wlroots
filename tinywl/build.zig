@@ -1,33 +1,29 @@
 const std = @import("std");
-const Builder = std.build.Builder;
-const Pkg = std.build.Pkg;
 
-const ScanProtocolsStep = @import("deps/zig-wayland/build.zig").ScanProtocolsStep;
+const Scanner = @import("deps/zig-wayland/build.zig").Scanner;
 
-pub fn build(b: *Builder) void {
+pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
-    const mode = b.standardReleaseOptions();
+    const optimize = b.standardOptimizeOption(.{});
 
-    const scanner = ScanProtocolsStep.create(b);
+    const scanner = Scanner.create(b, .{});
     scanner.addSystemProtocol("stable/xdg-shell/xdg-shell.xml");
 
-    const wayland = Pkg{
-        .name = "wayland",
-        .source = .{ .generated = &scanner.result },
-    };
-    const xkbcommon = Pkg{
-        .name = "xkbcommon",
-        .source = .{ .path = "deps/zig-xkbcommon/src/xkbcommon.zig" },
-    };
-    const pixman = Pkg{
-        .name = "pixman",
-        .source = .{ .path = "deps/zig-pixman/pixman.zig" },
-    };
-    const wlroots = Pkg{
-        .name = "wlroots",
-        .source = .{ .path = "../src/wlroots.zig" },
-        .dependencies = &[_]Pkg{ wayland, xkbcommon, pixman },
-    };
+    const wayland = b.createModule(.{ .source_file = scanner.result });
+    const xkbcommon = b.createModule(.{
+        .source_file = .{ .path = "deps/zig-xkbcommon/src/xkbcommon.zig" },
+    });
+    const pixman = b.createModule(.{
+        .source_file = .{ .path = "deps/zig-pixman/pixman.zig" },
+    });
+    const wlroots = b.createModule(.{
+        .source_file = .{ .path = "../src/wlroots.zig" },
+        .dependencies = &.{
+            .{ .name = "wayland", .module = wayland },
+            .{ .name = "xkbcommon", .module = xkbcommon },
+            .{ .name = "pixman", .module = pixman },
+        },
+    });
 
     // These must be manually kept in sync with the versions wlroots supports
     // until wlroots gives the option to request a specific version.
@@ -39,33 +35,27 @@ pub fn build(b: *Builder) void {
     scanner.generate("wl_data_device_manager", 3);
     scanner.generate("xdg_wm_base", 2);
 
-    const exe = b.addExecutable("tinywl", "tinywl.zig");
-    exe.setTarget(target);
-    exe.setBuildMode(mode);
+    const tinywl = b.addExecutable(.{
+        .name = "tinywl",
+        .root_source_file = .{ .path = "tinywl.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
 
-    exe.linkLibC();
+    tinywl.linkLibC();
 
-    exe.addPackage(wayland);
-    exe.linkSystemLibrary("wayland-server");
-    exe.step.dependOn(&scanner.step);
+    tinywl.addModule("wayland", wayland);
+    tinywl.linkSystemLibrary("wayland-server");
+
     // TODO: remove when https://github.com/ziglang/zig/issues/131 is implemented
-    scanner.addCSource(exe);
+    scanner.addCSource(tinywl);
 
-    exe.addPackage(xkbcommon);
-    exe.linkSystemLibrary("xkbcommon");
+    tinywl.addModule("xkbcommon", xkbcommon);
+    tinywl.linkSystemLibrary("xkbcommon");
 
-    exe.addPackage(wlroots);
-    exe.linkSystemLibrary("wlroots");
-    exe.linkSystemLibrary("pixman-1");
+    tinywl.addModule("wlroots", wlroots);
+    tinywl.linkSystemLibrary("wlroots");
+    tinywl.linkSystemLibrary("pixman-1");
 
-    exe.install();
-
-    const run_cmd = exe.run();
-    run_cmd.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
-
-    const run_step = b.step("run", "Run the compositor");
-    run_step.dependOn(&run_cmd.step);
+    b.installArtifact(tinywl);
 }

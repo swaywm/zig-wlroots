@@ -196,7 +196,7 @@ pub const Surface = extern struct {
             surface,
             struct {
                 fn wrapper(s: *Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
-                    iterator(s, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                    iterator(s, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,
             data,

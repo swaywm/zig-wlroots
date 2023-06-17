@@ -60,7 +60,7 @@ pub const SceneNode = extern struct {
             node,
             struct {
                 fn wrapper(b: *SceneBuffer, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
-                    iterator(b, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                    iterator(b, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,
             data,
@@ -306,7 +306,7 @@ pub const SceneOutput = extern struct {
             scene_output,
             struct {
                 fn wrapper(b: *SceneBuffer, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
-                    iterator(b, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                    iterator(b, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,
             data,

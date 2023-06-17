@@ -316,7 +316,7 @@ pub const Seat = extern struct {
 
     extern fn wlr_seat_set_capabilities(seat: *Seat, capabilities: u32) void;
     pub inline fn setCapabilities(seat: *Seat, capabilities: wl.Seat.Capability) void {
-        wlr_seat_set_capabilities(seat, @bitCast(u32, capabilities));
+        wlr_seat_set_capabilities(seat, @as(u32, @bitCast(capabilities)));
     }
 
     extern fn wlr_seat_set_name(seat: *Seat, name: [*:0]const u8) void;
@@ -393,7 +393,7 @@ pub const Seat = extern struct {
 
     extern fn wlr_seat_keyboard_notify_key(seat: *Seat, time_msec: u32, key: u32, state: u32) void;
     pub fn keyboardNotifyKey(seat: *Seat, time_msec: u32, key: u32, state: wl.Keyboard.KeyState) void {
-        wlr_seat_keyboard_notify_key(seat, time_msec, key, @intCast(u32, @enumToInt(state)));
+        wlr_seat_keyboard_notify_key(seat, time_msec, key, @as(u32, @intCast(@intFromEnum(state))));
     }
 
     extern fn wlr_seat_keyboard_notify_modifiers(seat: *Seat, modifiers: ?*wlr.Keyboard.Modifiers) void;

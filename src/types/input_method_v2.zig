@@ -53,7 +53,7 @@ pub const InputMethodV2 = extern struct {
 
         extern fn wlr_input_method_keyboard_grab_v2_send_key(keyboard_grab: *wlr.InputMethodV2.KeyboardGrab, time: u32, key: u32, state: u32) void;
         pub fn sendKey(keyboard_grab: *wlr.InputMethodV2.KeyboardGrab, time: u32, key: u32, state: wl.Keyboard.KeyState) void {
-            wlr_input_method_keyboard_grab_v2_send_key(keyboard_grab, time, key, @intCast(u32, @enumToInt(state)));
+            wlr_input_method_keyboard_grab_v2_send_key(keyboard_grab, time, key, @as(u32, @intCast(@intFromEnum(state))));
         }
 
         extern fn wlr_input_method_keyboard_grab_v2_send_modifiers(keyboard_grab: *wlr.InputMethodV2.KeyboardGrab, modifiers: *wlr.Keyboard.Modifiers) void;

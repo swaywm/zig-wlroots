@@ -9,7 +9,7 @@ const xkb = @import("xkbcommon");
 const gpa = std.heap.c_allocator;
 
 pub fn main() anyerror!void {
-    wlr.log.init(.debug);
+    wlr.log.init(.debug, null);
 
     var server: Server = undefined;
     try server.init();
@@ -164,8 +164,8 @@ const Server = struct {
                         return;
                     },
                 };
-                view.scene_tree.node.data = @ptrToInt(view);
-                xdg_surface.data = @ptrToInt(view.scene_tree);
+                view.scene_tree.node.data = @intFromPtr(view);
+                xdg_surface.data = @intFromPtr(view.scene_tree);
 
                 xdg_surface.events.map.add(&view.map);
                 xdg_surface.events.unmap.add(&view.unmap);
@@ -177,7 +177,7 @@ const Server = struct {
                 // These asserts are fine since tinywl.zig doesn't support anything else that can
                 // make xdg popups (e.g. layer shell).
                 const parent = wlr.XdgSurface.fromWlrSurface(xdg_surface.role_data.popup.parent.?) orelse return;
-                const parent_tree = @intToPtr(?*wlr.SceneTree, parent.data) orelse {
+                const parent_tree = @as(?*wlr.SceneTree, @ptrFromInt(parent.data)) orelse {
                     // The xdg surface user data could be left null due to allocation failure.
                     return;
                 };
@@ -185,7 +185,7 @@ const Server = struct {
                     std.log.err("failed to allocate xdg popup node", .{});
                     return;
                 };
-                xdg_surface.data = @ptrToInt(scene_tree);
+                xdg_surface.data = @intFromPtr(scene_tree);
             },
             .none => unreachable,
         }
@@ -208,7 +208,7 @@ const Server = struct {
 
             var it: ?*wlr.SceneNode = node;
             while (it) |n| : (it = n.parent) {
-                if (@intToPtr(?*View, n.data)) |view| {
+                if (@as(?*View, @ptrFromInt(n.data))) |view| {
                     return ViewAtResult{
                         .view = view,
                         .surface = scene_surface.surface,
@@ -308,14 +308,14 @@ const Server = struct {
             },
             .move => {
                 const view = server.grabbed_view.?;
-                view.x = @floatToInt(i32, server.cursor.x - server.grab_x);
-                view.y = @floatToInt(i32, server.cursor.y - server.grab_y);
+                view.x = @as(i32, @intFromFloat(server.cursor.x - server.grab_x));
+                view.y = @as(i32, @intFromFloat(server.cursor.y - server.grab_y));
                 view.scene_tree.node.setPosition(view.x, view.y);
             },
             .resize => {
                 const view = server.grabbed_view.?;
-                const border_x = @floatToInt(i32, server.cursor.x - server.grab_x);
-                const border_y = @floatToInt(i32, server.cursor.y - server.grab_y);
+                const border_x = @as(i32, @intFromFloat(server.cursor.x - server.grab_x));
+                const border_y = @as(i32, @intFromFloat(server.cursor.y - server.grab_y));
 
                 var new_left = server.grab_box.x;
                 var new_right = server.grab_box.x + server.grab_box.width;
@@ -390,7 +390,7 @@ const Server = struct {
     /// Assumes the modifier used for compositor keybinds is pressed
     /// Returns true if the key was handled
     fn handleKeybind(server: *Server, key: xkb.Keysym) bool {
-        switch (@enumToInt(key)) {
+        switch (@intFromEnum(key)) {
             // Exit the compositor
             xkb.Keysym.Escape => server.wl_server.terminate(),
             // Focus the next view in the stack, pushing the current top to the back
@@ -469,8 +469,8 @@ const View = struct {
         const server = view.server;
         server.grabbed_view = view;
         server.cursor_mode = .move;
-        server.grab_x = server.cursor.x - @intToFloat(f64, view.x);
-        server.grab_y = server.cursor.y - @intToFloat(f64, view.y);
+        server.grab_x = server.cursor.x - @as(f64, @floatFromInt(view.x));
+        server.grab_y = server.cursor.y - @as(f64, @floatFromInt(view.y));
     }
 
     fn requestResize(
@@ -489,8 +489,8 @@ const View = struct {
 
         const border_x = view.x + box.x + if (event.edges.right) box.width else 0;
         const border_y = view.y + box.y + if (event.edges.bottom) box.height else 0;
-        server.grab_x = server.cursor.x - @intToFloat(f64, border_x);
-        server.grab_y = server.cursor.y - @intToFloat(f64, border_y);
+        server.grab_x = server.cursor.x - @as(f64, @floatFromInt(border_x));
+        server.grab_y = server.cursor.y - @as(f64, @floatFromInt(border_y));
 
         server.grab_box = box;
         server.grab_box.x += view.x;

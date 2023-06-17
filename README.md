@@ -8,7 +8,7 @@ as stable as wlroots*
 
 ## Dependencies
 
-- [zig](https://ziglang.org/) 0.10
+- [zig](https://ziglang.org/) 0.11
 - [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots) 0.16
 - [zig-wayland](https://github.com/ifreund/zig-wayland)
 - [zig-xkbcommon](https://github.com/ifreund/zig-xkbcommon)

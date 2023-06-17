@@ -265,7 +265,7 @@ pub const XdgToplevel = extern struct {
 
     extern fn wlr_xdg_toplevel_set_tiled(toplevel: *wlr.XdgToplevel, tiled_edges: u32) u32;
     pub fn setTiled(toplevel: *wlr.XdgToplevel, tiled_edges: wlr.Edges) u32 {
-        return wlr_xdg_toplevel_set_tiled(toplevel, @bitCast(u32, tiled_edges));
+        return wlr_xdg_toplevel_set_tiled(toplevel, @as(u32, @bitCast(tiled_edges)));
     }
 
     extern fn wlr_xdg_toplevel_set_bounds(toplevel: *wlr.XdgToplevel, width: i32, height: i32) u32;
@@ -376,7 +376,7 @@ pub const XdgSurface = extern struct {
             surface,
             struct {
                 fn wrapper(s: *wlr.Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
-                    iterator(s, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                    iterator(s, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,
             data,
@@ -398,7 +398,7 @@ pub const XdgSurface = extern struct {
             surface,
             struct {
                 fn wrapper(s: *wlr.Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
-                    iterator(s, sx, sy, @ptrCast(T, @alignCast(@alignOf(T), d)));
+                    iterator(s, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,
             data,
