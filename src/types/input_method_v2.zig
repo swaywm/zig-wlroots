@@ -22,7 +22,7 @@ pub const InputMethodManagerV2 = extern struct {
 
 pub const InputMethodV2 = extern struct {
     pub const PreeditString = extern struct {
-        text: [*:0]u8,
+        text: ?[*:0]u8,
         cursor_begin: i32,
         cursor_end: i32,
     };
@@ -34,7 +34,7 @@ pub const InputMethodV2 = extern struct {
 
     pub const State = extern struct {
         preedit: wlr.InputMethodV2.PreeditString,
-        commit_text: [*:0]u8,
+        commit_text: ?[*:0]u8,
         delete: wlr.InputMethodV2.DeleteSurroundingText,
     };
 
