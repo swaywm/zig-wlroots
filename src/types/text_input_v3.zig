@@ -55,7 +55,7 @@ pub const TextInputV3 = extern struct {
     current_serial: u32,
     pending_enabled: bool,
     current_enabled: bool,
-    active_features: u32,
+    active_features: Features,
 
     link: wl.list.Link,
 
