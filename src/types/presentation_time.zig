@@ -22,8 +22,11 @@ pub const Presentation = extern struct {
     extern fn wlr_presentation_surface_sampled(presentation: *wlr.Presentation, surface: *wlr.Surface) ?*wlr.PresentationFeedback;
     pub const surfaceSampled = wlr_presentation_surface_sampled;
 
-    extern fn wlr_presentation_surface_sampled_on_output(presentation: *wlr.Presentation, surface: *wlr.Surface, output: *wlr.Output) void;
-    pub const surfaceSampledOnOutput = wlr_presentation_surface_sampled_on_output;
+    extern fn wlr_presentation_surface_textured_on_output(presentation: *wlr.Presentation, surface: *wlr.Surface, output: *wlr.Output) void;
+    pub const surfaceTexturedOnOutput = wlr_presentation_surface_textured_on_output;
+
+    extern fn wlr_presentation_surface_scanned_out_on_output(presentation: *wlr.Presentation, surface: *wlr.Surface, output: *wlr.Output) void;
+    pub const surfaceScannedOutdOnOutput = wlr_presentation_surface_scanned_out_on_output;
 };
 
 pub const PresentationFeedback = extern struct {
@@ -32,12 +35,13 @@ pub const PresentationFeedback = extern struct {
     output: ?*wlr.Output,
     output_committed: bool,
     output_commit_seq: u32,
+    zero_copy: bool,
 
     output_commit: wl.Listener(*wlr.Output.event.Commit),
     output_present: wl.Listener(*wlr.Output.event.Present),
     output_destroy: wl.Listener(*wlr.Output),
 
-    extern fn wlr_presentation_feedback_send_presented(feedback: *wlr.PresentationFeedback, event: *wlr.PresentationEvent) void;
+    extern fn wlr_presentation_feedback_send_presented(feedback: *wlr.PresentationFeedback, event: *const wlr.PresentationEvent) void;
     pub const sendPresented = wlr_presentation_feedback_send_presented;
 
     extern fn wlr_presentation_feedback_destroy(feedback: *wlr.PresentationFeedback) void;

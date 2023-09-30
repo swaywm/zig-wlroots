@@ -30,4 +30,5 @@ pub const ExportDmabufFrameV1 = extern struct {
     cursor_locked: bool,
 
     output_commit: wl.Listener(*wlr.Output.event.Commit),
+    output_destroy: wl.Listener(*wlr.Output),
 };

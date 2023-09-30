@@ -42,7 +42,7 @@ pub const XdgToplevelDecorationV1 = extern struct {
     };
 
     resource: *zxdg.ToplevelDecorationV1,
-    surface: *wlr.XdgSurface,
+    toplevel: *wlr.XdgToplevel,
     manager: *XdgDecorationManagerV1,
     /// XdgDecorationManagerV1.decorations
     link: wl.list.Link,

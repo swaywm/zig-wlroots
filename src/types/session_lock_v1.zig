@@ -37,6 +37,10 @@ pub const SessionLockV1 = extern struct {
 
     data: usize,
 
+    // private state
+
+    locked_sent: bool,
+
     extern fn wlr_session_lock_v1_send_locked(lock: *SessionLockV1) void;
     pub const sendLocked = wlr_session_lock_v1_send_locked;
 
@@ -67,7 +71,6 @@ pub const SessionLockSurfaceV1 = extern struct {
     surface: *wlr.Surface,
 
     configured: bool,
-    mapped: bool,
 
     configure_list: wl.list.Head(Configure, .link),
 
@@ -75,7 +78,6 @@ pub const SessionLockSurfaceV1 = extern struct {
     pending: State,
 
     events: extern struct {
-        map: wl.Signal(void),
         destroy: wl.Signal(void),
     },
 
@@ -88,6 +90,6 @@ pub const SessionLockSurfaceV1 = extern struct {
     extern fn wlr_session_lock_surface_v1_configure(lock_surface: *SessionLockSurfaceV1, width: u32, height: u32) u32;
     pub const configure = wlr_session_lock_surface_v1_configure;
 
-    extern fn wlr_session_lock_surface_v1_from_wlr_surface(surface: *wlr.Surface) ?*SessionLockSurfaceV1;
-    pub const fromWlrSurface = wlr_session_lock_surface_v1_from_wlr_surface;
+    extern fn wlr_session_lock_surface_v1_try_from_wlr_surface(surface: *wlr.Surface) ?*SessionLockSurfaceV1;
+    pub const tryFromWlrSurface = wlr_session_lock_surface_v1_try_from_wlr_surface;
 };

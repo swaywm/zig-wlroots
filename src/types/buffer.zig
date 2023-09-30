@@ -99,12 +99,6 @@ pub const ClientBuffer = extern struct {
 
     n_ignore_locks: usize,
 
-    extern fn wlr_client_buffer_create(buffer: *wlr.Buffer, renderer: *wlr.Renderer) ?*ClientBuffer;
-    pub const create = wlr_client_buffer_create;
-
     extern fn wlr_client_buffer_get(buffer: *wlr.Buffer) ?*ClientBuffer;
     pub const get = wlr_client_buffer_get;
-
-    extern fn wlr_client_buffer_apply_damage(buffer: *ClientBuffer, next: *wlr.Buffer, damage: *pixman.Region32) bool;
-    pub const applyDamage = wlr_client_buffer_apply_damage;
 };

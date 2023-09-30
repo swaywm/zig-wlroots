@@ -21,7 +21,7 @@ pub const DamageRing = extern struct {
     extern fn wlr_damage_ring_set_bounds(ring: *DamageRing, width: i32, height: i32) void;
     pub const setBounds = wlr_damage_ring_set_bounds;
 
-    extern fn wlr_damage_ring_add(ring: *DamageRing, damage: *pixman.Region32) bool;
+    extern fn wlr_damage_ring_add(ring: *DamageRing, damage: *const pixman.Region32) bool;
     pub const add = wlr_damage_ring_add;
 
     extern fn wlr_damage_ring_add_box(ring: *DamageRing, box: ?*const wlr.Box) bool;

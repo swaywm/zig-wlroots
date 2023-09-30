@@ -3,6 +3,8 @@ const wlr = @import("../wlroots.zig");
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
+const pixman = @import("pixman");
+
 pub const Renderer = extern struct {
     const Impl = opaque {};
 
@@ -140,4 +142,69 @@ pub const Renderer = extern struct {
         matrix: *const [9]f32,
     ) void;
     pub const renderQuadWithMatrix = wlr_render_quad_with_matrix;
+
+    pub const BufferPassOptions = extern struct {
+        timer: ?*RenderTimer,
+    };
+    extern fn wlr_renderer_begin_buffer_pass(renderer: *Renderer, buffer: *wlr.Buffer, options: ?*const BufferPassOptions) ?*RenderPass;
+    pub fn beginBufferPass(renderer: *Renderer, buffer: *wlr.Buffer, options: ?*const BufferPassOptions) !*RenderPass {
+        return wlr_renderer_begin_buffer_pass(renderer, buffer, options) orelse error.OutOfMemory;
+    }
+
+    extern fn wlr_render_timer_create(renderer: *Renderer) ?*RenderTimer;
+    pub fn createRenderTimer(renderer: *Renderer) !*RenderTimer {
+        return wlr_render_timer_create(renderer) orelse error.OutOfMemory;
+    }
+};
+
+pub const RenderTimer = opaque {
+    extern fn wlr_render_timer_get_duration_ns(timer: *RenderTimer) c_int;
+    pub const getDurationNs = wlr_render_timer_get_duration_ns;
+
+    extern fn wlr_render_timer_destroy(timer: *RenderTimer) void;
+    pub const destroy = wlr_render_timer_destroy;
+};
+
+pub const RenderPass = opaque {
+    pub const BlendMode = enum(c_int) {
+        premultiplied,
+        none,
+    };
+
+    pub const ScaleFilterMode = enum(c_int) {
+        bilinear,
+        nearest,
+    };
+
+    pub const RenderColor = extern struct {
+        r: f32,
+        g: f32,
+        b: f32,
+        a: f32,
+    };
+
+    extern fn wlr_render_pass_submit(render_pass: *RenderPass) bool;
+    pub const submit = wlr_render_pass_submit;
+
+    pub const RenderTextureOptions = extern struct {
+        texture: *wlr.Texture,
+        src_box: wlr.FBox,
+        dst_box: wlr.Box,
+        alpha: ?*f32,
+        clip: ?*pixman.Region32,
+        transform: wl.Output.Transform,
+        filter_mode: ScaleFilterMode,
+        blend_mode: BlendMode,
+    };
+    extern fn wlr_render_pass_add_texture(render_pass: *RenderPass, options: *const RenderTextureOptions) void;
+    pub const addTexture = wlr_render_pass_add_texture;
+
+    pub const RenderRectOptions = extern struct {
+        box: wlr.Box,
+        color: RenderColor,
+        clip: ?*pixman.Region32,
+        blend_mode: BlendMode,
+    };
+    extern fn wlr_render_pass_add_rect(render_pass: *RenderPass, options: *const RenderRectOptions) void;
+    pub const addRect = wlr_render_pass_add_rect;
 };

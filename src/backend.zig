@@ -15,9 +15,9 @@ pub const Backend = extern struct {
 
     // backend.h
 
-    extern fn wlr_backend_autocreate(server: *wl.Server) ?*Backend;
-    pub fn autocreate(server: *wl.Server) !*Backend {
-        return wlr_backend_autocreate(server) orelse error.BackendCreateFailed;
+    extern fn wlr_backend_autocreate(server: *wl.Server, session_ptr: ?*?*wlr.Session) ?*Backend;
+    pub fn autocreate(server: *wl.Server, session_ptr: ?*?*wlr.Session) !*Backend {
+        return wlr_backend_autocreate(server, session_ptr) orelse error.BackendCreateFailed;
     }
 
     extern fn wlr_backend_start(backend: *Backend) bool;
@@ -29,9 +29,6 @@ pub const Backend = extern struct {
 
     extern fn wlr_backend_destroy(backend: *Backend) void;
     pub const destroy = wlr_backend_destroy;
-
-    extern fn wlr_backend_get_session(backend: *Backend) ?*wlr.Session;
-    pub const getSession = wlr_backend_get_session;
 
     extern fn wlr_backend_get_drm_fd(backend: *Backend) c_int;
     pub const getDrmFd = wlr_backend_get_drm_fd;

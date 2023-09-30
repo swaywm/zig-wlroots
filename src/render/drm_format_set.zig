@@ -1,21 +1,17 @@
-const std = @import("std");
-const c = @cImport(@cInclude("wlr/render/drm_format_set.h"));
-
 pub const DrmFormat = extern struct {
-    // Use comptime introspection to get the alignment of arch dependent field
-    format: u32 align(std.meta.fieldInfo(c.wlr_drm_format, .format).alignment),
+    format: u32,
     len: usize,
     capacity: usize,
+    modifiers: [*]u64,
 
-    // The output of translate_c is arch dependent for flexible arrays so import
-    // the generated version directly rather than copying it verbatim here
-    pub const modifiers = c.wlr_drm_format.modifiers;
+    extern fn wlr_drm_format_finish(format: *DrmFormat) void;
+    pub const finish = wlr_drm_format_finish;
 };
 
 pub const DrmFormatSet = extern struct {
     len: usize,
     capacity: usize,
-    formats: [*]*DrmFormat,
+    formats: [*]DrmFormat,
 
     extern fn wlr_drm_format_set_finish(set: *DrmFormatSet) void;
     pub const finish = wlr_drm_format_set_finish;
@@ -31,4 +27,7 @@ pub const DrmFormatSet = extern struct {
 
     extern fn wlr_drm_format_set_intersect(dst: *DrmFormatSet, a: *const DrmFormatSet, b: *const DrmFormatSet) bool;
     pub const intersect = wlr_drm_format_set_intersect;
+
+    extern fn wlr_drm_format_set_union(dst: *DrmFormatSet, a: *const DrmFormatSet, b: *const DrmFormatSet) bool;
+    pub const @"union" = wlr_drm_format_set_union;
 };

@@ -62,8 +62,14 @@ pub const Cursor = extern struct {
     extern fn wlr_cursor_move(cur: *Cursor, dev: ?*wlr.InputDevice, delta_x: f64, delta_y: f64) void;
     pub const move = wlr_cursor_move;
 
-    extern fn wlr_cursor_set_image(cur: *Cursor, pixels: [*c]const u8, stride: i32, width: u32, height: u32, hotspot_x: i32, hotspot_y: i32, scale: f32) void;
-    pub const setImage = wlr_cursor_set_image;
+    extern fn wlr_cursor_set_buffer(cur: *Cursor, buffer: *wlr.Buffer, hotspot_x: i32, hotspot_y: i32, scale: f32) void;
+    pub const setBuffer = wlr_cursor_set_buffer;
+
+    extern fn wlr_cursor_unset_umage(cur: *Cursor) void;
+    pub const unsetImage = wlr_cursor_unset_umage;
+
+    extern fn wlr_cursor_set_xcursor(cur: *Cursor, manager: *wlr.XcursorManager, name: [*:0]const u8) void;
+    pub const setXcursor = wlr_cursor_set_xcursor;
 
     extern fn wlr_cursor_set_surface(cur: *Cursor, surface: ?*wlr.Surface, hotspot_x: i32, hotspot_y: i32) void;
     pub const setSurface = wlr_cursor_set_surface;

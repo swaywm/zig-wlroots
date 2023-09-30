@@ -128,6 +128,14 @@ pub const SceneTree = extern struct {
     pub fn createSceneLayerSurfaceV1(parent: *SceneTree, layer_surface: *wlr.LayerSurfaceV1) !*SceneLayerSurfaceV1 {
         return wlr_scene_layer_surface_v1_create(parent, layer_surface) orelse error.OutOfMemory;
     }
+
+    extern fn wlr_scene_drag_icon_create(parent: *SceneTree, drag_icon: *wlr.Drag.Icon) ?*SceneTree;
+    pub fn createDragIcon(parent: *SceneTree, drag_icon: *wlr.Drag.Icon) !*SceneTree {
+        return wlr_scene_drag_icon_create(parent, drag_icon) orelse error.OutOfMemory;
+    }
+
+    extern fn wlr_scene_tree_from_node(node: *SceneNode) *SceneTree;
+    pub const fromNode = wlr_scene_tree_from_node;
 };
 
 pub const Scene = extern struct {
@@ -136,10 +144,12 @@ pub const Scene = extern struct {
     outputs: wl.list.Head(SceneOutput, .link),
 
     presentation: ?*wlr.Presentation,
+    linux_dmabuf_v1: ?*wlr.LinuxDmabufV1,
 
     // private state
 
     presentation_destroy: wl.Listener(void),
+    linux_dmabuf_v1_destroy: wl.Listener(*wlr.LinuxDmabufV1),
 
     debug_damage_option: enum(c_int) {
         none,
@@ -155,9 +165,9 @@ pub const Scene = extern struct {
         return wlr_scene_create() orelse error.OutOfMemory;
     }
 
-    extern fn wlr_scene_attach_output_layout(scene: *Scene, output_layout: *wlr.OutputLayout) bool;
-    pub fn attachOutputLayout(scene: *Scene, output_layout: *wlr.OutputLayout) !void {
-        if (!wlr_scene_attach_output_layout(scene, output_layout)) return error.OutOfMemory;
+    extern fn wlr_scene_attach_output_layout(scene: *Scene, output_layout: *wlr.OutputLayout) ?*SceneOutputLayout;
+    pub fn attachOutputLayout(scene: *Scene, output_layout: *wlr.OutputLayout) !*SceneOutputLayout {
+        return wlr_scene_attach_output_layout(scene, output_layout) orelse error.OutOfMemory;
     }
 
     extern fn wlr_scene_get_scene_output(scene: *Scene, output: *wlr.Output) ?*SceneOutput;
@@ -166,13 +176,28 @@ pub const Scene = extern struct {
     extern fn wlr_scene_set_presentation(scene: *Scene, presentation: *wlr.Presentation) void;
     pub const setPresentation = wlr_scene_set_presentation;
 
+    extern fn wlr_scene_set_linux_dmabuf_v1(scene: *Scene, linux_dmabuf_v1: *wlr.LinuxDmabufV1) void;
+    pub const setLinuxDmabufV1 = wlr_scene_set_linux_dmabuf_v1;
+
     extern fn wlr_scene_output_create(scene: *Scene, output: *wlr.Output) ?*SceneOutput;
     pub fn createSceneOutput(scene: *Scene, output: *wlr.Output) !*SceneOutput {
         return wlr_scene_output_create(scene, output) orelse error.OutOfMemory;
     }
 };
 
+pub const SceneOutputLayout = opaque {
+    extern fn wlr_scene_output_layout_add_output(sol: *SceneOutputLayout, lo: *wlr.OutputLayout.Output, so: *SceneOutput) void;
+    pub const addOutput = wlr_scene_output_layout_add_output;
+};
+
 pub const SceneSurface = extern struct {
+    pub const event = struct {
+        pub const Sample = extern struct {
+            output: *SceneOutput,
+            direct_scanout: bool,
+        };
+    };
+
     buffer: *SceneBuffer,
     surface: *wlr.Surface,
 
@@ -180,15 +205,16 @@ pub const SceneSurface = extern struct {
 
     addon: wlr.Addon,
 
+    outputs_update: wl.Listener(*SceneBuffer.event.OutputsUpdate),
     output_enter: wl.Listener(*SceneOutput),
     output_leave: wl.Listener(*SceneOutput),
-    output_present: wl.Listener(*SceneOutput),
+    output_sample: wl.Listener(*event.Sample),
     frame_done: wl.Listener(*os.timespec),
     surface_destroy: wl.Listener(void),
     surface_commit: wl.Listener(void),
 
-    extern fn wlr_scene_surface_from_buffer(buffer: *SceneBuffer) ?*SceneSurface;
-    pub const fromBuffer = wlr_scene_surface_from_buffer;
+    extern fn wlr_scene_surface_try_from_buffer(buffer: *SceneBuffer) ?*SceneSurface;
+    pub const tryFromBuffer = wlr_scene_surface_try_from_buffer;
 };
 
 pub const SceneRect = extern struct {
@@ -202,13 +228,24 @@ pub const SceneRect = extern struct {
 
     extern fn wlr_scene_rect_set_size(rect: *SceneRect, width: c_int, height: c_int) void;
     pub const setSize = wlr_scene_rect_set_size;
+
+    extern fn wlr_scene_rect_from_node(node: *SceneNode) *SceneRect;
+    pub const fromNode = wlr_scene_rect_from_node;
 };
 
 pub const SceneBuffer = extern struct {
+    pub const event = struct {
+        pub const OutputsUpdate = extern struct {
+            active: [*]*SceneOutput,
+            size: usize,
+        };
+    };
+
     node: SceneNode,
     buffer: ?*wlr.Buffer,
 
     events: extern struct {
+        outputs_update: wl.Signal(*event.OutputsUpdate),
         output_enter: wl.Signal(*SceneOutput),
         output_leave: wl.Signal(*SceneOutput),
         output_present: wl.Signal(*SceneOutput),
@@ -219,15 +256,19 @@ pub const SceneBuffer = extern struct {
 
     primary_output: ?*wlr.Output,
 
-    // private state
-
-    active_outputs: u64,
-    texture: ?*wlr.Texture,
+    opacity: f32,
+    filter_mode: wlr.RenderPass.ScaleFilterMode,
     src_box: wlr.FBox,
     dst_width: c_int,
     dst_height: c_int,
     transform: wl.Output.Transform,
     opaque_region: pixman.Region32,
+
+    // private state
+
+    active_outputs: u64,
+    texture: ?*wlr.Texture,
+    prev_feedback_options: wlr.LinuxDmabufFeedbackV1.InitOptions,
 
     extern fn wlr_scene_buffer_from_node(node: *SceneNode) *SceneBuffer;
     pub const fromNode = wlr_scene_buffer_from_node;
@@ -235,10 +276,10 @@ pub const SceneBuffer = extern struct {
     extern fn wlr_scene_buffer_set_buffer(scene_buffer: *SceneBuffer, buffer: ?*wlr.Buffer) void;
     pub const setBuffer = wlr_scene_buffer_set_buffer;
 
-    extern fn wlr_scene_buffer_set_buffer_with_damage(scene_buffer: *SceneBuffer, buffer: *wlr.Buffer, region: *pixman.Region32) void;
+    extern fn wlr_scene_buffer_set_buffer_with_damage(scene_buffer: *SceneBuffer, buffer: *wlr.Buffer, region: *const pixman.Region32) void;
     pub const setBufferWithDamage = wlr_scene_buffer_set_buffer_with_damage;
 
-    extern fn wlr_scene_buffer_set_opaque_region(scene_buffer: *SceneBuffer, region: *pixman.Region32) void;
+    extern fn wlr_scene_buffer_set_opaque_region(scene_buffer: *SceneBuffer, region: *const pixman.Region32) void;
     pub const setOpaqueRegion = wlr_scene_buffer_set_opaque_region;
 
     extern fn wlr_scene_buffer_set_dest_size(scene_buffer: *SceneBuffer, width: c_int, height: c_int) void;
@@ -249,6 +290,12 @@ pub const SceneBuffer = extern struct {
 
     extern fn wlr_scene_buffer_set_transform(scene_buffer: *SceneBuffer, transform: wl.Output.Transform) void;
     pub const setTransform = wlr_scene_buffer_set_transform;
+
+    extern fn wlr_scene_buffer_set_opacity(scene_buffer: *SceneBuffer, opacity: f32) void;
+    pub const setOpacity = wlr_scene_buffer_set_opacity;
+
+    extern fn wlr_scene_buffer_set_filter_mode(scene_buffer: *SceneBuffer, filter_mode: wlr.RenderPass.ScaleFilterMode) void;
+    pub const setFilterMode = wlr_scene_buffer_set_filter_mode;
 
     extern fn wlr_scene_buffer_send_frame_done(scene_buffer: *SceneBuffer, now: *os.timespec) void;
     pub const sendFrameDone = wlr_scene_buffer_send_frame_done;
@@ -276,7 +323,6 @@ pub const SceneOutput = extern struct {
     prev_scanout: bool,
 
     output_commit: wl.Listener(*wlr.Output.event.Commit),
-    output_mode: wl.Listener(*wlr.Output),
     output_damage: wl.Listener(void),
     output_needs_frame: wl.Listener(void),
 
@@ -285,8 +331,15 @@ pub const SceneOutput = extern struct {
 
     render_list: wl.Array,
 
-    extern fn wlr_scene_output_commit(scene_output: *SceneOutput) bool;
+    pub const StateOptions = extern struct {
+        timer: ?*wlr.SceneTimer,
+    };
+
+    extern fn wlr_scene_output_commit(scene_output: *SceneOutput, options: ?*const StateOptions) bool;
     pub const commit = wlr_scene_output_commit;
+
+    extern fn wlr_scene_output_build_state(scene_output: *SceneOutput, state: *wlr.Output.State, options: ?*const StateOptions) bool;
+    pub const buildState = wlr_scene_output_build_state;
 
     extern fn wlr_scene_output_destroy(scene_output: *SceneOutput) void;
     pub const destroy = wlr_scene_output_destroy;
@@ -318,6 +371,17 @@ pub const SceneOutput = extern struct {
 
     extern fn wlr_scene_output_set_position(scene_output: *SceneOutput, lx: c_int, ly: c_int) void;
     pub const setPosition = wlr_scene_output_set_position;
+};
+
+pub const SceneTimer = extern struct {
+    pre_render_duration: i64,
+    render_timer: ?*wlr.RenderTimer,
+
+    extern fn wlr_scene_timer_get_duration_ns(timer: *SceneTimer) i64;
+    pub const getDurationNs = wlr_scene_timer_get_duration_ns;
+
+    extern fn wlr_scene_timer_finish(timer: *SceneTimer) void;
+    pub const finish = wlr_scene_timer_finish;
 };
 
 pub const SceneLayerSurfaceV1 = extern struct {

@@ -5,6 +5,8 @@ pub const Session = @import("backend/session.zig").Session;
 
 pub const DmabufAttributes = @import("render/dmabuf.zig").DmabufAttributes;
 pub const Renderer = @import("render/renderer.zig").Renderer;
+pub const RenderTimer = @import("render/renderer.zig").RenderTimer;
+pub const RenderPass = @import("render/renderer.zig").RenderPass;
 pub const Texture = @import("render/texture.zig").Texture;
 pub const Allocator = @import("render/allocator.zig").Allocator;
 pub const Swapchain = opaque {};
@@ -20,6 +22,7 @@ pub const SinglePixelBufferManagerV1 = @import("types/single_pixel_buffer_v1.zig
 
 pub const DmabufBufferV1 = @import("types/linux_dmabuf_v1.zig").DmabufBufferV1;
 pub const LinuxDmabufV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufV1;
+pub const LinuxDmabufFeedbackV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufFeedbackV1;
 
 pub const Compositor = @import("types/compositor.zig").Compositor;
 pub const Surface = @import("types/compositor.zig").Surface;
@@ -120,7 +123,6 @@ pub const PrimarySelectionDeviceV1 = @import("types/primary_selection_v1.zig").P
 
 pub const Output = @import("types/output.zig").Output;
 pub const OutputCursor = @import("types/output.zig").OutputCursor;
-pub const OutputDamage = @import("types/output_damage.zig").OutputDamage;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
 
 pub const DamageRing = @import("types/damage_ring.zig").DamageRing;
@@ -180,14 +182,16 @@ pub const SceneSurface = @import("types/scene.zig").SceneSurface;
 pub const SceneRect = @import("types/scene.zig").SceneRect;
 pub const SceneBuffer = @import("types/scene.zig").SceneBuffer;
 pub const SceneOutput = @import("types/scene.zig").SceneOutput;
+pub const SceneOutputLayout = @import("types/scene.zig").SceneOutputLayout;
+pub const SceneTimer = @import("types/scene.zig").SceneTimer;
 pub const SceneLayerSurfaceV1 = @import("types/scene.zig").SceneLayerSurfaceV1;
 
 pub const config = @import("config.zig");
 pub const version = @import("version.zig");
 
 comptime {
-    if (version.major != 0 or version.minor != 16) {
-        @compileError("zig-wlroots requires wlroots version 0.16");
+    if (version.major != 0 or version.minor != 17) {
+        @compileError("zig-wlroots requires wlroots version 0.17");
     }
 }
 test {

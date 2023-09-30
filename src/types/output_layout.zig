@@ -5,19 +5,25 @@ const wl = wayland.server.wl;
 
 pub const OutputLayout = extern struct {
     pub const Output = extern struct {
-        pub const State = opaque {};
+        layout: *OutputLayout,
 
         output: *wlr.Output,
+
         x: c_int,
         y: c_int,
         /// OutputLayout.outputs
         link: wl.list.Link,
-        state: *State,
 
-        addon: wlr.Addon,
+        auto_configured: bool,
         events: extern struct {
             destroy: wl.Signal(*OutputLayout.Output),
         },
+
+        // private state
+
+        addon: *wlr.Addon,
+
+        commit: wl.Listener(*wlr.Output.event.Commit),
     };
 
     pub const Direction = enum(c_int) {
@@ -30,7 +36,7 @@ pub const OutputLayout = extern struct {
     outputs: wl.list.Head(OutputLayout.Output, .link),
 
     events: extern struct {
-        add: wl.Signal(*OutputLayout),
+        add: wl.Signal(*OutputLayout.Output),
         change: wl.Signal(*OutputLayout),
         destroy: wl.Signal(*OutputLayout),
     },
@@ -51,11 +57,15 @@ pub const OutputLayout = extern struct {
     extern fn wlr_output_layout_output_at(layout: *OutputLayout, lx: f64, ly: f64) ?*wlr.Output;
     pub const outputAt = wlr_output_layout_output_at;
 
-    extern fn wlr_output_layout_add(layout: *OutputLayout, output: *wlr.Output, lx: c_int, ly: c_int) void;
-    pub const add = wlr_output_layout_add;
+    extern fn wlr_output_layout_add(layout: *OutputLayout, output: *wlr.Output, lx: c_int, ly: c_int) ?*OutputLayout.Output;
+    pub fn add(layout: *OutputLayout, output: *wlr.Output, lx: c_int, ly: c_int) !*OutputLayout.Output {
+        return wlr_output_layout_add(layout, output, lx, ly) orelse error.OutOfMemory;
+    }
 
-    extern fn wlr_output_layout_move(layout: *OutputLayout, output: *wlr.Output, lx: c_int, ly: c_int) void;
-    pub const move = wlr_output_layout_move;
+    extern fn wlr_output_layout_add_auto(layout: *OutputLayout, output: *wlr.Output) ?*OutputLayout.Output;
+    pub fn addAuto(layout: *OutputLayout, output: *wlr.Output) !*OutputLayout.Output {
+        return wlr_output_layout_add_auto(layout, output) orelse error.OutOfMemory;
+    }
 
     extern fn wlr_output_layout_remove(layout: *OutputLayout, output: *wlr.Output) void;
     pub const remove = wlr_output_layout_remove;
@@ -74,9 +84,6 @@ pub const OutputLayout = extern struct {
 
     extern fn wlr_output_layout_get_box(layout: *OutputLayout, reference: ?*wlr.Output, dest_box: ?*wlr.Box) void;
     pub const getBox = wlr_output_layout_get_box;
-
-    extern fn wlr_output_layout_add_auto(layout: *OutputLayout, output: *wlr.Output) void;
-    pub const addAuto = wlr_output_layout_add_auto;
 
     extern fn wlr_output_layout_get_center_output(layout: *OutputLayout) ?*wlr.Output;
     pub const getCenterOutput = wlr_output_layout_get_center_output;

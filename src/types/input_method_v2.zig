@@ -116,13 +116,10 @@ pub const InputPopupSurfaceV2 = extern struct {
     resource: *wl.Resource,
     input_method: *InputMethodV2,
     link: wl.list.Link,
-    mapped: bool,
 
     surface: *wlr.Surface,
 
     events: extern struct {
-        map: wl.Signal(void),
-        unmap: wl.Signal(void),
         destroy: wl.Signal(void),
     },
 

@@ -18,7 +18,7 @@ pub const Texture = extern struct {
     extern fn wlr_texture_from_dmabuf(renderer: *wlr.Renderer, attribs: *wlr.DmabufAttributes) ?*Texture;
     pub const fromDmabuf = wlr_texture_from_dmabuf;
 
-    extern fn wlr_texture_update_from_buffer(texture: *Texture, buffer: *wlr.Buffer, damage: *pixman.Region32) bool;
+    extern fn wlr_texture_update_from_buffer(texture: *Texture, buffer: *wlr.Buffer, damage: *const pixman.Region32) bool;
     pub const updateFromBuffer = wlr_texture_update_from_buffer;
 
     extern fn wlr_texture_destroy(texture: *Texture) void;

@@ -45,7 +45,8 @@ pub const Output = extern struct {
             gamma_lut: bool = false,
             render_format: bool = false,
             subpixel: bool = false,
-            _: u22 = 0,
+            layers: bool = false,
+            _: u21 = 0,
         };
 
         pub const ModeType = enum(c_int) {
@@ -63,10 +64,9 @@ pub const Output = extern struct {
         render_format: u32,
         subpixel: wl.Output.Subpixel,
 
-        // if (committed & field.buffer)
         buffer: ?*wlr.Buffer,
+        tearing_page_flip: bool,
 
-        // if (committed & field.mode)
         mode_type: ModeType,
         mode: ?*Mode,
         custom_mode: extern struct {
@@ -75,15 +75,22 @@ pub const Output = extern struct {
             refresh: i32,
         },
 
-        // if (committed & field.gamma_lut)
         gamma_lut: ?[*]u16,
         gamma_lut_size: usize,
 
+        // TODO: Bind output layers
+        layers: ?*anyopaque,
+        layers_len: usize,
+
+        extern fn wlr_output_state_init(state: *State) void;
         pub fn init() State {
             var state: State = undefined;
-            @memset(mem.asBytes(&state), 0);
+            wlr_output_state_init(&state);
             return state;
         }
+
+        extern fn wlr_output_state_finish(state: *State) void;
+        pub const finish = wlr_output_state_finish;
 
         extern fn wlr_output_state_set_enabled(state: *State, enabled: bool) void;
         pub const setEnabled = wlr_output_state_set_enabled;
@@ -108,13 +115,25 @@ pub const Output = extern struct {
 
         extern fn wlr_output_state_set_subpixel(state: *State, subpixel: wl.Output.Subpixel) void;
         pub const setSubpixel = wlr_output_state_set_subpixel;
+
+        extern fn wlr_output_state_set_buffer(state: *State, buffer: *wlr.Buffer) void;
+        pub const setBuffer = wlr_output_state_set_buffer;
+
+        extern fn wlr_output_state_set_gamma_lut(state: *State, ramp_size: usize, r: *const u16, g: *const u16, b: *const u16) bool;
+        pub const setGammaLut = wlr_output_state_set_gamma_lut;
+
+        extern fn wlr_output_state_set_damage(state: *State, damage: *const pixman.Region32) void;
+        pub const setDamage = wlr_output_state_set_damage;
+
+        extern fn wlr_output_state_copy(dst: *State, src: *const State) bool;
+        pub const copy = wlr_output_state_copy;
     };
 
     pub const event = struct {
         pub const Damage = extern struct {
             output: *wlr.Output,
             /// In output buffer local coordinates
-            damage: *pixman.Region32,
+            damage: *const pixman.Region32,
         };
 
         pub const Precommit = extern struct {
@@ -151,6 +170,11 @@ pub const Output = extern struct {
         pub const Bind = extern struct {
             output: *wlr.Output,
             resource: *wl.Output,
+        };
+
+        pub const RequestState = extern struct {
+            output: *wlr.Output,
+            state: *wlr.Output.State,
         };
     };
 
@@ -202,9 +226,8 @@ pub const Output = extern struct {
         commit: wl.Signal(*event.Commit),
         present: wl.Signal(*event.Present),
         bind: wl.Signal(*event.Bind),
-        enable: wl.Signal(*Output),
-        mode: wl.Signal(*Output),
         description: wl.Signal(*Output),
+        request_state: wl.Signal(*event.RequestState),
         destroy: wl.Signal(*Output),
     },
 
@@ -219,6 +242,9 @@ pub const Output = extern struct {
     cursor_swapchain: ?*wlr.Swapchain,
     cursor_front_buffer: ?*wlr.Buffer,
     software_cursor_locks: c_int,
+
+    // TODO: Bind output layers
+    layers: wl.list.Link,
 
     allocator: ?*wlr.Allocator,
     renderer: ?*wlr.Renderer,
@@ -296,7 +322,7 @@ pub const Output = extern struct {
     extern fn wlr_output_preferred_read_format(output: *Output) u32;
     pub const preferredReadFormat = wlr_output_preferred_read_format;
 
-    extern fn wlr_output_set_damage(output: *Output, damage: *pixman.Region32) void;
+    extern fn wlr_output_set_damage(output: *Output, damage: *const pixman.Region32) void;
     pub const setDamage = wlr_output_set_damage;
 
     extern fn wlr_output_test(output: *Output) bool;
@@ -334,8 +360,11 @@ pub const Output = extern struct {
     extern fn wlr_output_lock_software_cursors(output: *Output, lock: bool) void;
     pub const lockSoftwareCursors = wlr_output_lock_software_cursors;
 
-    extern fn wlr_output_render_software_cursors(output: *Output, damage: ?*pixman.Region32) void;
+    extern fn wlr_output_render_software_cursors(output: *Output, damage: ?*const pixman.Region32) void;
     pub const renderSoftwareCursors = wlr_output_render_software_cursors;
+
+    extern fn wlr_output_is_direct_scanout_allowed(output: *Output) bool;
+    pub const isDirectScanoutAllowed = wlr_output_is_direct_scanout_allowed;
 
     extern fn wlr_output_transform_invert(tr: wl.Output.Transform) wl.Output.Transform;
     pub const transformInvert = wlr_output_transform_invert;
@@ -369,29 +398,19 @@ pub const OutputCursor = extern struct {
     visible: bool,
     width: u32,
     height: u32,
+    src_box: wlr.FBox,
+    transform: wl.Output.Transform,
     hotspot_x: i32,
     hotspot_y: i32,
+    texture: ?*wlr.Texture,
+    own_texture: bool,
     /// Output.cursors
     link: wl.list.Link,
-
-    /// only when using a software cursor without a surface
-    texture: ?*wlr.Texture,
-
-    /// only when using a cursor surface
-    surface: ?*wlr.Surface,
-    surface_commit: wl.Listener(*wlr.Surface),
-    surface_destroy: wl.Listener(*wlr.Surface),
 
     extern fn wlr_output_cursor_create(output: *Output) ?*OutputCursor;
     pub fn create(output: *Output) !*OutputCursor {
         return wlr_output_cursor_create(output) orelse error.OutOfMemory;
     }
-
-    extern fn wlr_output_cursor_set_image(cursor: *OutputCursor, pixels: ?[*]const u8, stride: i32, width: u32, height: u32, hotspot_x: i32, hotspot_y: i32) bool;
-    pub const setImage = wlr_output_cursor_set_image;
-
-    extern fn wlr_output_cursor_set_surface(cursor: *OutputCursor, surface: ?*wlr.Surface, hotspot_x: i32, hotspot_y: i32) void;
-    pub const setSurface = wlr_output_cursor_set_surface;
 
     extern fn wlr_output_cursor_set_buffer(cursor: *OutputCursor, buffer: *wlr.Buffer, hotspot_x: i32, hotspot_y: i32) bool;
     pub const setBuffer = wlr_output_cursor_set_buffer;

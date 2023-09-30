@@ -38,7 +38,6 @@ pub const Subsurface = extern struct {
 
     synchronized: bool,
     reordered: bool,
-    mapped: bool,
     added: bool,
 
     surface_client_commit: wl.Listener(void),
@@ -46,12 +45,10 @@ pub const Subsurface = extern struct {
 
     events: extern struct {
         destroy: wl.Signal(*Subsurface),
-        map: wl.Signal(*Subsurface),
-        unmap: wl.Signal(*Subsurface),
     },
 
     data: usize,
 
-    extern fn wlr_subsurface_from_wlr_surface(surface: *wlr.Surface) ?*wlr.Subsurface;
-    pub const fromWlrSurface = wlr_subsurface_from_wlr_surface;
+    extern fn wlr_subsurface_try_from_wlr_surface(surface: *wlr.Surface) ?*wlr.Subsurface;
+    pub const tryFromWlrSurface = wlr_subsurface_try_from_wlr_surface;
 };

@@ -16,9 +16,9 @@ pub const LayerShellV1 = extern struct {
 
     data: usize,
 
-    extern fn wlr_layer_shell_v1_create(server: *wl.Server) ?*LayerShellV1;
-    pub fn create(server: *wl.Server) !*LayerShellV1 {
-        return wlr_layer_shell_v1_create(server) orelse error.OutOfMemory;
+    extern fn wlr_layer_shell_v1_create(server: *wl.Server, version: u32) ?*LayerShellV1;
+    pub fn create(server: *wl.Server, version: u32) !*LayerShellV1 {
+        return wlr_layer_shell_v1_create(server, version) orelse error.OutOfMemory;
     }
 };
 
@@ -73,7 +73,6 @@ pub const LayerSurfaceV1 = extern struct {
 
     added: bool,
     configured: bool,
-    mapped: bool,
 
     configure_list: wl.list.Head(LayerSurfaceV1.Configure, .link),
 
@@ -82,8 +81,6 @@ pub const LayerSurfaceV1 = extern struct {
 
     events: extern struct {
         destroy: wl.Signal(*LayerSurfaceV1),
-        map: wl.Signal(*LayerSurfaceV1),
-        unmap: wl.Signal(*LayerSurfaceV1),
         new_popup: wl.Signal(*wlr.XdgPopup),
     },
 
@@ -95,8 +92,8 @@ pub const LayerSurfaceV1 = extern struct {
     extern fn wlr_layer_surface_v1_destroy(surface: *LayerSurfaceV1) void;
     pub const destroy = wlr_layer_surface_v1_destroy;
 
-    extern fn wlr_layer_surface_v1_from_wlr_surface(surface: *wlr.Surface) ?*LayerSurfaceV1;
-    pub const fromWlrSurface = wlr_layer_surface_v1_from_wlr_surface;
+    extern fn wlr_layer_surface_v1_try_from_wlr_surface(surface: *wlr.Surface) ?*LayerSurfaceV1;
+    pub const tryFromWlrSurface = wlr_layer_surface_v1_try_from_wlr_surface;
 
     extern fn wlr_layer_surface_v1_for_each_surface(
         surface: *LayerSurfaceV1,

@@ -68,6 +68,21 @@ const xcb = struct {
 
         win_gravity: u32,
     };
+
+    pub const StrutPartial = extern struct {
+        left: u32,
+        right: u32,
+        top: u32,
+        bottom: u32,
+        left_start_y: u32,
+        left_end_y: u32,
+        right_start_y: u32,
+        right_end_y: u32,
+        top_start_x: u32,
+        top_end_x: u32,
+        bottom_start_x: u32,
+        bottom_end_x: u32,
+    };
 };
 
 pub const Xwm = opaque {};
@@ -82,6 +97,8 @@ pub const Xwayland = extern struct {
     };
     server: *wlr.XwaylandServer,
     xwm: ?*Xwm,
+    // TODO: Bind xwayland-shell
+    shell_v1: *anyopaque,
     cursor: ?*XwaylandCursor,
 
     display_name: [*:0]const u8,
@@ -98,6 +115,7 @@ pub const Xwayland = extern struct {
 
     user_event_handler: ?*const fn (*Xwm, *xcb.GenericEvent) callconv(.C) c_int,
 
+    server_start: wl.Listener(void),
     server_ready: wl.Listener(*wlr.XwaylandServer.event.Ready),
     server_destroy: wl.Listener(void),
     seat_destroy: wl.Listener(*wlr.Seat),
@@ -144,10 +162,6 @@ pub const XwaylandSurface = extern struct {
             mask: u16,
         };
 
-        pub const Move = extern struct {
-            surface: *XwaylandSurface,
-        };
-
         pub const Resize = extern struct {
             surface: *XwaylandSurface,
             edges: u32,
@@ -162,12 +176,17 @@ pub const XwaylandSurface = extern struct {
     window_id: xcb.Window,
     xwm: *Xwm,
     surface_id: u32,
+    serial: u64,
 
     link: wl.list.Link,
     stack_link: wl.list.Link,
     unpaired_link: wl.list.Link,
 
     surface: ?*wlr.Surface,
+    surface_addon: wlr.Addon,
+    surface_commit: wl.Listener(*wlr.Surface),
+    surface_precommit: wl.Listener(*wlr.Surface.State),
+
     x: i16,
     y: i16,
     width: u16,
@@ -175,7 +194,6 @@ pub const XwaylandSurface = extern struct {
     saved_width: u16,
     saved_height: u16,
     override_redirect: bool,
-    mapped: bool,
 
     title: ?[*:0]u8,
     class: ?[*:0]u8,
@@ -199,6 +217,7 @@ pub const XwaylandSurface = extern struct {
     decorations: Decorations,
     hints: ?*xcb.IcccmWmHints,
     size_hints: ?*xcb.SizeHints,
+    strut_partial: ?*xcb.StrutPartial,
 
     pinging: bool,
     ping_timer: *wl.EventSource,
@@ -208,30 +227,32 @@ pub const XwaylandSurface = extern struct {
     maximized_vert: bool,
     maximized_horz: bool,
     minimized: bool,
+    withdrawn: bool,
 
     has_alpha: bool,
 
     events: extern struct {
         destroy: wl.Signal(*XwaylandSurface),
         request_configure: wl.Signal(*event.Configure),
-        request_move: wl.Signal(*event.Move),
+        request_move: wl.Signal(void),
         request_resize: wl.Signal(*event.Resize),
         request_minimize: wl.Signal(*event.Minimize),
         request_maximize: wl.Signal(*XwaylandSurface),
         request_fullscreen: wl.Signal(*XwaylandSurface),
         request_activate: wl.Signal(*XwaylandSurface),
 
-        map: wl.Signal(*XwaylandSurface),
-        unmap: wl.Signal(*XwaylandSurface),
+        associate: wl.Signal(void),
+        dissociate: wl.Signal(void),
+
         set_title: wl.Signal(*XwaylandSurface),
         set_class: wl.Signal(*XwaylandSurface),
         set_role: wl.Signal(*XwaylandSurface),
         set_parent: wl.Signal(*XwaylandSurface),
-        set_pid: wl.Signal(*XwaylandSurface),
         set_startup_id: wl.Signal(*XwaylandSurface),
         set_window_type: wl.Signal(*XwaylandSurface),
         set_hints: wl.Signal(*XwaylandSurface),
         set_decorations: wl.Signal(*XwaylandSurface),
+        set_strut_partial: wl.Signal(*XwaylandSurface),
         set_override_redirect: wl.Signal(*XwaylandSurface),
         set_geometry: wl.Signal(void),
         ping_timeout: wl.Signal(*XwaylandSurface),
@@ -251,6 +272,9 @@ pub const XwaylandSurface = extern struct {
     extern fn wlr_xwayland_surface_close(surface: *XwaylandSurface) void;
     pub const close = wlr_xwayland_surface_close;
 
+    extern fn wlr_xwayland_surface_set_withdrawn(surface: *XwaylandSurface, withdrawn: bool) void;
+    pub const setWithdrawn = wlr_xwayland_surface_set_withdrawn;
+
     extern fn wlr_xwayland_surface_set_minimized(surface: *XwaylandSurface, minimized: bool) void;
     pub const setMinimized = wlr_xwayland_surface_set_minimized;
 
@@ -260,8 +284,8 @@ pub const XwaylandSurface = extern struct {
     extern fn wlr_xwayland_surface_set_fullscreen(surface: *XwaylandSurface, fullscreen: bool) void;
     pub const setFullscreen = wlr_xwayland_surface_set_fullscreen;
 
-    extern fn wlr_xwayland_surface_from_wlr_surface(surface: *wlr.Surface) ?*XwaylandSurface;
-    pub const fromWlrSurface = wlr_xwayland_surface_from_wlr_surface;
+    extern fn wlr_xwayland_surface_try_from_wlr_surface(surface: *wlr.Surface) ?*XwaylandSurface;
+    pub const tryFromWlrSurface = wlr_xwayland_surface_try_from_wlr_surface;
 
     extern fn wlr_xwayland_surface_ping(surface: *XwaylandSurface) void;
     pub const ping = wlr_xwayland_surface_ping;

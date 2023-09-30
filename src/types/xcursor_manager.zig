@@ -31,7 +31,4 @@ pub const XcursorManager = extern struct {
 
     extern fn wlr_xcursor_manager_get_xcursor(manager: *XcursorManager, name: [*:0]const u8, scale: f32) ?*wlr.Xcursor;
     pub const getXcursor = wlr_xcursor_manager_get_xcursor;
-
-    extern fn wlr_xcursor_manager_set_cursor_image(manager: *XcursorManager, name: [*:0]const u8, cursor: *wlr.Cursor) void;
-    pub const setCursorImage = wlr_xcursor_manager_set_cursor_image;
 };

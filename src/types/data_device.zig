@@ -90,13 +90,12 @@ pub const Drag = extern struct {
     pub const Icon = extern struct {
         drag: *Drag,
         surface: *wlr.Surface,
-        mapped: bool,
 
         events: extern struct {
-            map: wl.Signal(*Drag.Icon),
-            unmap: wl.Signal(*Drag.Icon),
             destroy: wl.Signal(*Drag.Icon),
         },
+
+        surface_destroy: wl.Listener(*wlr.Surface),
 
         data: usize,
     };

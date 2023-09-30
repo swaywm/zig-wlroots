@@ -57,6 +57,7 @@ pub const Keyboard = extern struct {
     led_indexes: [3]xkb.LED_Index,
     mod_indexes: [8]xkb.ModIndex,
 
+    leds: u32,
     keycodes: [32]u32,
     num_keycodes: usize,
     modifiers: Modifiers,
@@ -75,7 +76,7 @@ pub const Keyboard = extern struct {
 
     data: usize,
 
-    extern fn wlr_keyboard_set_keymap(kb: *Keyboard, keymap: *xkb.Keymap) bool;
+    extern fn wlr_keyboard_set_keymap(kb: *Keyboard, keymap: ?*xkb.Keymap) bool;
     pub const setKeymap = wlr_keyboard_set_keymap;
 
     extern fn wlr_keyboard_keymaps_match(km1: ?*xkb.Keymap, km2: ?*xkb.Keymap) bool;

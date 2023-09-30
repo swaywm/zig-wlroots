@@ -9,7 +9,7 @@ const wl = wayland.server.wl;
 
 pub const Compositor = extern struct {
     global: *wl.Global,
-    renderer: *wlr.Renderer,
+    renderer: ?*wlr.Renderer,
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -18,9 +18,9 @@ pub const Compositor = extern struct {
         destroy: wl.Signal(*wlr.Compositor),
     },
 
-    extern fn wlr_compositor_create(server: *wl.Server, renderer: *wlr.Renderer) ?*Compositor;
-    pub fn create(server: *wl.Server, renderer: *wlr.Renderer) !*Compositor {
-        return wlr_compositor_create(server, renderer) orelse error.OutOfMemory;
+    extern fn wlr_compositor_create(server: *wl.Server, version: u32, renderer: *wlr.Renderer) ?*Compositor;
+    pub fn create(server: *wl.Server, version: u32, renderer: *wlr.Renderer) !*Compositor {
+        return wlr_compositor_create(server, version, renderer) orelse error.OutOfMemory;
     }
 };
 
@@ -76,8 +76,9 @@ pub const Surface = extern struct {
 
     pub const Role = extern struct {
         name: [*:0]const u8,
+        no_object: bool,
         commit: ?*const fn (surface: *Surface) callconv(.C) void,
-        precommit: ?*const fn (surface: *Surface, state: *const State) callconv(.C) void,
+        unmap: ?*const fn (surface: *Surface) callconv(.C) void,
         destroy: ?*const fn (surface: *Surface) callconv(.C) void,
     };
 
@@ -92,12 +93,9 @@ pub const Surface = extern struct {
     };
 
     resource: *wl.Surface,
-    renderer: *wlr.Renderer,
+    renderer: ?*wlr.Renderer,
 
     buffer: ?*wlr.ClientBuffer,
-
-    sx: c_int,
-    sy: c_int,
 
     buffer_damage: pixman.Region32,
     external_damage: pixman.Region32,
@@ -109,12 +107,17 @@ pub const Surface = extern struct {
 
     cached: wl.list.Head(Surface.State, .cached_state_link),
 
+    mapped: bool,
+
     role: ?*const Role,
-    role_data: ?*anyopaque,
+    role_resource: ?*wl.Resource,
 
     events: extern struct {
         client_commit: wl.Signal(void),
+        precommit: wl.Signal(*const wlr.Surface.State),
         commit: wl.Signal(*wlr.Surface),
+        map: wl.Signal(void),
+        unmap: wl.Signal(void),
         new_subsurface: wl.Signal(*wlr.Subsurface),
         destroy: wl.Signal(*wlr.Surface),
     },
@@ -127,6 +130,7 @@ pub const Surface = extern struct {
     // private state
 
     renderer_destroy: wl.Listener(*wlr.Renderer),
+    role_resource_destroy: wl.Listener(*wl.Resource),
 
     previous: extern struct {
         scale: i32,
@@ -138,18 +142,28 @@ pub const Surface = extern struct {
     },
 
     @"opaque": bool,
+    has_buffer: bool,
+
+    preferred_buffer_scale: i32,
+    preferred_buffer_transform_sent: bool,
+    preferred_buffer_transform: wl.Output.Transform,
 
     extern fn wlr_surface_set_role(
         surface: *Surface,
         role: *const Role,
-        role_data: ?*anyopaque,
         error_resource: ?*wl.Resource,
         error_code: u32,
     ) bool;
     pub const setRole = wlr_surface_set_role;
 
-    extern fn wlr_surface_destroy_role_object(surface: *Surface) void;
-    pub const destroyRoleObject = wlr_surface_destroy_role_object;
+    extern fn wlr_surface_set_role_object(surface: *Surface, role_resource: *wl.Resource) void;
+    pub const setRoleObject = wlr_surface_set_role_object;
+
+    extern fn wlr_surface_map(surface: *Surface) void;
+    pub const map = wlr_surface_map;
+
+    extern fn wlr_surface_unmap(surface: *Surface) void;
+    pub const unmap = wlr_surface_unmap;
 
     // Just check if Surface.buffer is null, that's all this function does
     extern fn wlr_surface_has_buffer(surface: *Surface) bool;
@@ -214,26 +228,15 @@ pub const Surface = extern struct {
         return wlr_surface_accepts_touch(seat, surface);
     }
 
-    extern fn wlr_surface_is_xdg_surface(surface: *Surface) bool;
-    pub const isXdgSurface = wlr_surface_is_xdg_surface;
-
-    extern fn wlr_surface_is_layer_surface(surface: *Surface) bool;
-    pub const isLayerSurface = wlr_surface_is_layer_surface;
-
-    pub usingnamespace if (wlr.config.has_xwayland) struct {
-        extern fn wlr_surface_is_xwayland_surface(surface: *Surface) bool;
-        pub const isXwaylandSurface = wlr_surface_is_xwayland_surface;
-    } else struct {};
-
-    extern fn wlr_surface_is_session_lock_surface_v1(surface: *Surface) bool;
-    pub const isSessionLockSurfaceV1 = wlr_surface_is_session_lock_surface_v1;
-
     extern fn wlr_surface_lock_pending(surface: *Surface) u32;
     pub const lockPending = wlr_surface_lock_pending;
 
     extern fn wlr_surface_unlock_cached(surface: *Surface, seq: u32) void;
     pub const unlockCached = wlr_surface_unlock_cached;
 
-    extern fn wlr_surface_is_subsurface(surface: *Surface) bool;
-    pub const isSubsurface = wlr_surface_is_subsurface;
+    extern fn wlr_surface_set_preferred_buffer_scale(surface: *Surface, scale: i32) void;
+    pub const setPreferredBufferScale = wlr_surface_set_preferred_buffer_scale;
+
+    extern fn wlr_surface_set_preferred_buffer_transform(surface: *Surface, transform: wl.Output.Transform) void;
+    pub const setPreferredBufferTransform = wlr_surface_set_preferred_buffer_transform;
 };
