@@ -125,8 +125,7 @@ pub const Output = extern struct {
 
         pub const Commit = extern struct {
             output: *wlr.Output,
-            /// This is a bitfield of State.field members
-            comitted: u32,
+            committed: State.Fields,
             when: *os.timespec,
             buffer: ?*wlr.Buffer,
         };
