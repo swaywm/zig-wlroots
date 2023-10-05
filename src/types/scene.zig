@@ -308,7 +308,7 @@ pub const SceneOutput = extern struct {
     scene: *Scene,
     addon: wlr.Addon,
 
-    damage_ring: *wlr.DamageRing,
+    damage_ring: wlr.DamageRing,
 
     x: c_int,
     y: c_int,
