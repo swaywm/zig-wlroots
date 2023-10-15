@@ -8,6 +8,10 @@ const xkb = @import("xkbcommon");
 
 const gpa = std.heap.c_allocator;
 
+const toplevel_corner_radius: c_int = 20;
+const toplevel_opacity: f32 = 1; // Ranges from 0-1
+const toplevel_box_shadow_color: [4]f32 = .{ 0.0, 0.0, 1.0, 1.0 }; // RGBA
+
 pub fn main() anyerror!void {
     wlr.log.init(.debug, null);
 
@@ -415,11 +419,50 @@ const Output = struct {
         const output = @fieldParentPtr(Output, "frame", listener);
 
         const scene_output = output.server.scene.getSceneOutput(output.wlr_output).?;
+        configure_node_decoration(output, &scene_output.scene.tree.node);
+
         _ = scene_output.commit();
 
         var now: os.timespec = undefined;
         os.clock_gettime(os.CLOCK.MONOTONIC, &now) catch @panic("CLOCK_MONOTONIC not supported");
         scene_output.sendFrameDone(&now);
+    }
+
+    fn configure_node_decoration(output: *Output, node: *wlr.SceneNode) void {
+        if (!node.enabled) {
+            return;
+        }
+
+        if (node.type == .buffer) {
+            const scene_buffer = wlr.SceneBuffer.fromNode(node);
+            const scene_surface = wlr.SceneSurface.fromBuffer(scene_buffer) orelse return;
+
+            var xdg_surface: *wlr.XdgSurface = undefined;
+            if (wlr.Surface.isXdgSurface(scene_surface.surface)) {
+                xdg_surface = wlr.XdgSurface.fromWlrSurface(scene_surface.surface) orelse return;
+            }
+
+            if (xdg_surface.role == .toplevel) {
+                scene_buffer.setOpacity(toplevel_opacity);
+
+                if (!wlr.Surface.isSubsurface(xdg_surface.surface)) {
+                    var shadow_data = wlr.ShadowData.getDefault();
+
+                    shadow_data.enabled = true;
+                    shadow_data.color.* = toplevel_box_shadow_color;
+
+                    scene_buffer.setShadowData(shadow_data);
+                    scene_buffer.setCornerRadius(toplevel_corner_radius);
+                }
+            }
+        } else if (node.type == .tree) {
+            const tree = @fieldParentPtr(wlr.SceneTree, "node", node);
+            var it = tree.children.safeIterator(.forward);
+
+            while (it.next()) |scene_node| {
+                configure_node_decoration(output, scene_node);
+            }
+        }
     }
 };
 

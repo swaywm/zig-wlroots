@@ -1,10 +1,6 @@
 # zig-wlroots
 
-Idiomatic [Zig](https://ziglang.org/) bindings for
-[wlroots](https://gitlab.freedesktop.org/wlroots/wlroots).
-
-*Note: these bindings are early in development and should not be considered
-as stable as wlroots*
+This fork adds support for scenefx to zig-wlroots and provides a sample implementation (tinywl).
 
 ## Dependencies
 
@@ -28,6 +24,6 @@ are not part of zig-wlroots and are released under the Zero Clause BSD license.
 
 ## TODO
 
-- [x] Bind enough to port [tinywl](https://gitlab.freedesktop.org/wlroots/wlroots/-/tree/master/tinywl)
-- [x] Bind enough to port [river](https://github.com/riverwm/river)
-- [ ] Complete bindings
+- [x] Rounded corners
+- [x] Drop shadow
+- [ ] Blur support

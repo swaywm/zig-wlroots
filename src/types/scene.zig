@@ -34,6 +34,9 @@ pub const SceneNode = extern struct {
 
     // private state
 
+    opacity: f32,
+    corner_radius: c_int,
+
     visible: pixman.Region32,
 
     extern fn wlr_scene_node_at(node: *SceneNode, lx: f64, ly: f64, nx: *f64, ny: *f64) ?*SceneNode;
@@ -252,6 +255,19 @@ pub const SceneBuffer = extern struct {
 
     extern fn wlr_scene_buffer_send_frame_done(scene_buffer: *SceneBuffer, now: *os.timespec) void;
     pub const sendFrameDone = wlr_scene_buffer_send_frame_done;
+
+    // fx decoration
+    extern fn scene_buffer_has_shadow(shadow_data: *wlr.ShadowData) bool;
+    pub const hasShadow = scene_buffer_has_shadow;
+
+    extern fn wlr_scene_buffer_set_opacity(scene_buffer: *SceneBuffer, opacity: f32) void;
+    pub const setOpacity = wlr_scene_buffer_set_opacity;
+
+    extern fn wlr_scene_buffer_set_corner_radius(scene_buffer: *SceneBuffer, radii: c_int) void;
+    pub const setCornerRadius = wlr_scene_buffer_set_corner_radius;
+
+    extern fn wlr_scene_buffer_set_shadow_data(scene_buffer: *SceneBuffer, shadow_data: wlr.ShadowData) void;
+    pub const setShadowData = wlr_scene_buffer_set_shadow_data;
 };
 
 pub const SceneOutput = extern struct {

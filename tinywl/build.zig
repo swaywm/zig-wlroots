@@ -54,6 +54,7 @@ pub fn build(b: *std.Build) void {
     tinywl.linkSystemLibrary("xkbcommon");
 
     tinywl.addModule("wlroots", wlroots);
+    tinywl.linkSystemLibrary("scenefx");
     tinywl.linkSystemLibrary("wlroots");
     tinywl.linkSystemLibrary("pixman-1");
 
