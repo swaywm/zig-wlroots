@@ -147,6 +147,7 @@ pub const Output = extern struct {
             committed: State.Fields,
             when: *os.timespec,
             buffer: ?*wlr.Buffer,
+            state: *const Output.State,
         };
 
         pub const Present = extern struct {
