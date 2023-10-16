@@ -96,6 +96,7 @@ pub const Xwayland = extern struct {
         };
     };
     server: *wlr.XwaylandServer,
+    own_server: bool,
     xwm: ?*Xwm,
     // TODO: Bind xwayland-shell
     shell_v1: *anyopaque,
@@ -126,6 +127,11 @@ pub const Xwayland = extern struct {
     extern fn wlr_xwayland_create(server: *wl.Server, compositor: *wlr.Compositor, lazy: bool) ?*Xwayland;
     pub fn create(server: *wl.Server, compositor: *wlr.Compositor, lazy: bool) !*Xwayland {
         return wlr_xwayland_create(server, compositor, lazy) orelse error.XwaylandCreateFailed;
+    }
+
+    extern fn wlr_xwayland_create_with_server(server: *wl.Server, compositor: *wlr.Compositor, xwayland_server: *wlr.XwaylandServer) ?*Xwayland;
+    pub fn createWithServer(server: *wl.Server, compositor: *wlr.Compositor, xwayland_server: *wlr.XwaylandServer) !*Xwayland {
+        return wlr_xwayland_create_with_server(server, compositor, xwayland_server) orelse error.XwaylandCreateWithServerFailed;
     }
 
     extern fn wlr_xwayland_destroy(wlr_xwayland: *Xwayland) void;
