@@ -224,7 +224,6 @@ pub const XdgToplevel = extern struct {
 
     resource: *xdg.Toplevel,
     base: *wlr.XdgSurface,
-    sent_initial_configure: bool,
     parent: ?*wlr.XdgToplevel,
     parent_unmap: wl.Listener(*XdgSurface),
 
@@ -333,6 +332,9 @@ pub const XdgSurface = extern struct {
 
     current: State,
     pending: State,
+
+    initialized: bool,
+    initial_commit: bool,
 
     events: extern struct {
         destroy: wl.Signal(void),
