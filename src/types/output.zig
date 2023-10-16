@@ -144,9 +144,7 @@ pub const Output = extern struct {
 
         pub const Commit = extern struct {
             output: *wlr.Output,
-            committed: State.Fields,
             when: *os.timespec,
-            buffer: ?*wlr.Buffer,
             state: *const Output.State,
         };
 
