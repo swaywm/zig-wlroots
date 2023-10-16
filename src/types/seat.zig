@@ -465,9 +465,6 @@ pub const Seat = extern struct {
     extern fn wlr_seat_touch_has_grab(seat: *Seat) bool;
     pub const touchHasGrab = wlr_seat_touch_has_grab;
 
-    extern fn wlr_seat_validate_grab_serial(seat: *Seat, serial: u32) bool;
-    pub const validateGrabSerial = wlr_seat_validate_grab_serial;
-
     extern fn wlr_seat_validate_pointer_grab_serial(seat: *Seat, origin: ?*wlr.Surface, serial: u32) bool;
     pub const validatePointerGrabSerial = wlr_seat_validate_pointer_grab_serial;
 
