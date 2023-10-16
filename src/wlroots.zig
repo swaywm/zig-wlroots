@@ -98,9 +98,6 @@ pub const VirtualPointerV1 = @import("types/virtual_pointer_v1.zig").VirtualPoin
 pub const VirtualKeyboardManagerV1 = @import("types/virtual_keyboard_v1.zig").VirtualKeyboardManagerV1;
 pub const VirtualKeyboardV1 = @import("types/virtual_keyboard_v1.zig").VirtualKeyboardV1;
 
-pub const Idle = @import("types/idle.zig").Idle;
-pub const IdleTimeout = @import("types/idle.zig").IdleTimeout;
-
 pub const IdleInhibitManagerV1 = @import("types/idle_inhibit_v1.zig").IdleInhibitManagerV1;
 pub const IdleInhibitorV1 = @import("types/idle_inhibit_v1.zig").IdleInhibitorV1;
 
