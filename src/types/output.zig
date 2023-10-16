@@ -55,7 +55,7 @@ pub const Output = extern struct {
         };
 
         committed: Fields,
-        allow_artifacts: bool,
+        allow_reconfiguration: bool,
         damage: pixman.Region32,
         enabled: bool,
         scale: f32,
