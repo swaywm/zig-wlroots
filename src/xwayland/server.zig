@@ -27,6 +27,7 @@ pub const XwaylandServer = extern struct {
     pipe_source: ?*wl.EventSource,
     wm_fd: [2]c_int,
     wl_fd: [2]c_int,
+    ready: bool,
 
     server_start: os.time_t,
     display: c_int,
