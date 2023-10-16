@@ -119,6 +119,7 @@ pub const Xwayland = extern struct {
     server_ready: wl.Listener(*wlr.XwaylandServer.event.Ready),
     server_destroy: wl.Listener(void),
     seat_destroy: wl.Listener(*wlr.Seat),
+    shell_destroy: wl.Listener(void),
 
     data: usize,
 
