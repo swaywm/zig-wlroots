@@ -166,9 +166,9 @@ pub const Output = extern struct {
 
     name: [*:0]u8,
     description: ?[*:0]u8,
-    make: ?*[*:0]u8,
-    model: ?*[*:0]u8,
-    serial: ?*[*:0]u8,
+    make: ?[*:0]u8,
+    model: ?[*:0]u8,
+    serial: ?[*:0]u8,
     phys_width: i32,
     phys_height: i32,
 
