@@ -206,9 +206,9 @@ const Server = struct {
             const scene_buffer = wlr.SceneBuffer.fromNode(node);
             const scene_surface = wlr.SceneSurface.fromBuffer(scene_buffer) orelse return null;
 
-            var it: ?*wlr.SceneNode = node;
-            while (it) |n| : (it = n.parent) {
-                if (@as(?*View, @ptrFromInt(n.data))) |view| {
+            var it: ?*wlr.SceneTree = node.parent;
+            while (it) |n| : (it = n.node.parent) {
+                if (@as(?*View, @ptrFromInt(n.node.data))) |view| {
                     return ViewAtResult{
                         .view = view,
                         .surface = scene_surface.surface,
