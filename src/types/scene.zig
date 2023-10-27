@@ -16,7 +16,7 @@ pub const SceneNode = extern struct {
     };
 
     type: Type,
-    parent: ?*SceneNode,
+    parent: ?*SceneTree,
 
     link: wl.list.Link,
 
