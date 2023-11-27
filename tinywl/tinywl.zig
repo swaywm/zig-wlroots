@@ -42,6 +42,7 @@ const Server = struct {
     scene: *wlr.Scene,
 
     output_layout: *wlr.OutputLayout,
+    scene_output_layout: *wlr.SceneOutputLayout,
     new_output: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(newOutput),
 
     xdg_shell: *wlr.XdgShell,
@@ -71,16 +72,18 @@ const Server = struct {
 
     fn init(server: *Server) !void {
         const wl_server = try wl.Server.create();
-        const backend = try wlr.Backend.autocreate(wl_server);
+        const backend = try wlr.Backend.autocreate(wl_server, null);
         const renderer = try wlr.Renderer.autocreate(backend);
+        const output_layout = try wlr.OutputLayout.create();
+        const scene = try wlr.Scene.create();
         server.* = .{
             .wl_server = wl_server,
             .backend = backend,
             .renderer = renderer,
             .allocator = try wlr.Allocator.autocreate(backend, renderer),
-            .scene = try wlr.Scene.create(),
-
-            .output_layout = try wlr.OutputLayout.create(),
+            .scene = scene,
+            .output_layout = output_layout,
+            .scene_output_layout = try scene.attachOutputLayout(output_layout),
             .xdg_shell = try wlr.XdgShell.create(wl_server, 2),
             .seat = try wlr.Seat.create(wl_server, "default"),
             .cursor = try wlr.Cursor.create(),
@@ -88,9 +91,8 @@ const Server = struct {
         };
 
         try server.renderer.initServer(wl_server);
-        try server.scene.attachOutputLayout(server.output_layout);
 
-        _ = try wlr.Compositor.create(server.wl_server, server.renderer);
+        _ = try wlr.Compositor.create(server.wl_server, 6, server.renderer);
         _ = try wlr.Subcompositor.create(server.wl_server);
         _ = try wlr.DataDeviceManager.create(server.wl_server);
 
@@ -123,25 +125,20 @@ const Server = struct {
 
         if (!wlr_output.initRender(server.allocator, server.renderer)) return;
 
-        if (wlr_output.preferredMode()) |mode| {
-            wlr_output.setMode(mode);
-            wlr_output.enable(true);
-            wlr_output.commit() catch return;
-        }
+        var state = wlr.Output.State.init();
+        defer state.finish();
 
-        const output = gpa.create(Output) catch {
+        state.setEnabled(true);
+        if (wlr_output.preferredMode()) |mode| {
+            state.setMode(mode);
+        }
+        if (!wlr_output.commitState(&state)) return;
+
+        Output.create(server, wlr_output) catch {
             std.log.err("failed to allocate new output", .{});
+            wlr_output.destroy();
             return;
         };
-
-        output.* = .{
-            .server = server,
-            .wlr_output = wlr_output,
-        };
-
-        wlr_output.events.frame.add(&output.frame);
-
-        server.output_layout.addAuto(wlr_output);
     }
 
     fn newXdgSurface(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
@@ -167,16 +164,16 @@ const Server = struct {
                 view.scene_tree.node.data = @intFromPtr(view);
                 xdg_surface.data = @intFromPtr(view.scene_tree);
 
-                xdg_surface.events.map.add(&view.map);
-                xdg_surface.events.unmap.add(&view.unmap);
+                xdg_surface.surface.events.map.add(&view.map);
+                xdg_surface.surface.events.unmap.add(&view.unmap);
                 xdg_surface.events.destroy.add(&view.destroy);
-                xdg_surface.role_data.toplevel.events.request_move.add(&view.request_move);
-                xdg_surface.role_data.toplevel.events.request_resize.add(&view.request_resize);
+                xdg_surface.role_data.toplevel.?.events.request_move.add(&view.request_move);
+                xdg_surface.role_data.toplevel.?.events.request_resize.add(&view.request_resize);
             },
             .popup => {
                 // These asserts are fine since tinywl.zig doesn't support anything else that can
                 // make xdg popups (e.g. layer shell).
-                const parent = wlr.XdgSurface.fromWlrSurface(xdg_surface.role_data.popup.parent.?) orelse return;
+                const parent = wlr.XdgSurface.tryFromWlrSurface(xdg_surface.role_data.popup.?.parent.?) orelse return;
                 const parent_tree = @as(?*wlr.SceneTree, @ptrFromInt(parent.data)) orelse {
                     // The xdg surface user data could be left null due to allocation failure.
                     return;
@@ -204,7 +201,7 @@ const Server = struct {
         if (server.scene.tree.node.at(lx, ly, &sx, &sy)) |node| {
             if (node.type != .buffer) return null;
             const scene_buffer = wlr.SceneBuffer.fromNode(node);
-            const scene_surface = wlr.SceneSurface.fromBuffer(scene_buffer) orelse return null;
+            const scene_surface = wlr.SceneSurface.tryFromBuffer(scene_buffer) orelse return null;
 
             var it: ?*wlr.SceneTree = node.parent;
             while (it) |n| : (it = n.node.parent) {
@@ -224,9 +221,8 @@ const Server = struct {
     fn focusView(server: *Server, view: *View, surface: *wlr.Surface) void {
         if (server.seat.keyboard_state.focused_surface) |previous_surface| {
             if (previous_surface == surface) return;
-            if (previous_surface.isXdgSurface()) {
-                const xdg_surface = wlr.XdgSurface.fromWlrSurface(previous_surface) orelse return;
-                _ = xdg_surface.role_data.toplevel.setActivated(false);
+            if (wlr.XdgSurface.tryFromWlrSurface(previous_surface)) |xdg_surface| {
+                _ = xdg_surface.role_data.toplevel.?.setActivated(false);
             }
         }
 
@@ -234,7 +230,7 @@ const Server = struct {
         view.link.remove();
         server.views.prepend(view);
 
-        _ = view.xdg_surface.role_data.toplevel.setActivated(true);
+        _ = view.xdg_surface.role_data.toplevel.?.setActivated(true);
 
         const wlr_keyboard = server.seat.getKeyboard() orelse return;
         server.seat.keyboardNotifyEnter(
@@ -303,7 +299,7 @@ const Server = struct {
                 server.seat.pointerNotifyEnter(res.surface, res.sx, res.sy);
                 server.seat.pointerNotifyMotion(time_msec, res.sx, res.sy);
             } else {
-                server.cursor_mgr.setCursorImage("left_ptr", server.cursor);
+                server.cursor.setXcursor(server.cursor_mgr, "default");
                 server.seat.pointerClearFocus();
             },
             .move => {
@@ -350,7 +346,7 @@ const Server = struct {
 
                 const new_width = new_right - new_left;
                 const new_height = new_bottom - new_top;
-                _ = view.xdg_surface.role_data.toplevel.setSize(new_width, new_height);
+                _ = view.xdg_surface.role_data.toplevel.?.setSize(new_width, new_height);
             },
         }
     }
@@ -410,16 +406,55 @@ const Output = struct {
     wlr_output: *wlr.Output,
 
     frame: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(frame),
+    request_state: wl.Listener(*wlr.Output.event.RequestState) =
+        wl.Listener(*wlr.Output.event.RequestState).init(request_state),
+    destroy: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(destroy),
+
+    // The wlr.Output should be destroyed by the caller on failure to trigger cleanup.
+    fn create(server: *Server, wlr_output: *wlr.Output) !void {
+        const output = try gpa.create(Output);
+
+        output.* = .{
+            .server = server,
+            .wlr_output = wlr_output,
+        };
+        wlr_output.events.frame.add(&output.frame);
+        wlr_output.events.request_state.add(&output.request_state);
+        wlr_output.events.destroy.add(&output.destroy);
+
+        const layout_output = try server.output_layout.addAuto(wlr_output);
+
+        const scene_output = try server.scene.createSceneOutput(wlr_output);
+        server.scene_output_layout.addOutput(layout_output, scene_output);
+    }
 
     fn frame(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
         const output = @fieldParentPtr(Output, "frame", listener);
 
         const scene_output = output.server.scene.getSceneOutput(output.wlr_output).?;
-        _ = scene_output.commit();
+        _ = scene_output.commit(null);
 
         var now: os.timespec = undefined;
         os.clock_gettime(os.CLOCK.MONOTONIC, &now) catch @panic("CLOCK_MONOTONIC not supported");
         scene_output.sendFrameDone(&now);
+    }
+
+    fn request_state(
+        listener: *wl.Listener(*wlr.Output.event.RequestState),
+        event: *wlr.Output.event.RequestState,
+    ) void {
+        const output = @fieldParentPtr(Output, "request_state", listener);
+
+        _ = output.wlr_output.commitState(event.state);
+    }
+
+    fn destroy(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
+        const output = @fieldParentPtr(Output, "destroy", listener);
+
+        output.frame.link.remove();
+        output.destroy.link.remove();
+
+        gpa.destroy(output);
     }
 };
 
