@@ -69,7 +69,7 @@ const xcb = struct {
         win_gravity: u32,
     };
 
-    pub const StrutPartial = extern struct {
+    pub const EwmhWmStrutPartial = extern struct {
         left: u32,
         right: u32,
         top: u32,
@@ -98,7 +98,7 @@ pub const Xwayland = extern struct {
     server: *wlr.XwaylandServer,
     own_server: bool,
     xwm: ?*Xwm,
-    // TODO: Bind xwayland-shell
+    // TODO: Bind wlr_xwayland_shell_v1
     shell_v1: *anyopaque,
     cursor: ?*XwaylandCursor,
 
@@ -224,7 +224,7 @@ pub const XwaylandSurface = extern struct {
     decorations: Decorations,
     hints: ?*xcb.IcccmWmHints,
     size_hints: ?*xcb.SizeHints,
-    strut_partial: ?*xcb.StrutPartial,
+    strut_partial: ?*xcb.EwmhWmStrutPartial,
 
     pinging: bool,
     ping_timer: *wl.EventSource,

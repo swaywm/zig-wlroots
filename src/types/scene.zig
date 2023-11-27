@@ -194,13 +194,6 @@ pub const SceneOutputLayout = opaque {
 };
 
 pub const SceneSurface = extern struct {
-    pub const event = struct {
-        pub const Sample = extern struct {
-            output: *SceneOutput,
-            direct_scanout: bool,
-        };
-    };
-
     buffer: *SceneBuffer,
     surface: *wlr.Surface,
 
@@ -213,7 +206,7 @@ pub const SceneSurface = extern struct {
     outputs_update: wl.Listener(*SceneBuffer.event.OutputsUpdate),
     output_enter: wl.Listener(*SceneOutput),
     output_leave: wl.Listener(*SceneOutput),
-    output_sample: wl.Listener(*event.Sample),
+    output_sample: wl.Listener(*SceneBuffer.event.OutputSample),
     frame_done: wl.Listener(*os.timespec),
     surface_destroy: wl.Listener(void),
     surface_commit: wl.Listener(void),
@@ -244,6 +237,10 @@ pub const SceneBuffer = extern struct {
             active: [*]*SceneOutput,
             size: usize,
         };
+        pub const OutputSample = extern struct {
+            output: *SceneOutput,
+            direct_scanout: bool,
+        };
     };
 
     node: SceneNode,
@@ -253,7 +250,7 @@ pub const SceneBuffer = extern struct {
         outputs_update: wl.Signal(*event.OutputsUpdate),
         output_enter: wl.Signal(*SceneOutput),
         output_leave: wl.Signal(*SceneOutput),
-        output_present: wl.Signal(*SceneOutput),
+        output_sample: wl.Signal(*event.OutputSample),
         frame_done: wl.Signal(*os.timespec),
     },
 

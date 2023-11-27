@@ -78,7 +78,7 @@ pub const Output = extern struct {
         gamma_lut: ?[*]u16,
         gamma_lut_size: usize,
 
-        // TODO: Bind output layers
+        // TODO: Bind wlr_output_layer and related structs
         layers: ?*anyopaque,
         layers_len: usize,
 
@@ -242,7 +242,7 @@ pub const Output = extern struct {
     cursor_front_buffer: ?*wlr.Buffer,
     software_cursor_locks: c_int,
 
-    // TODO: Bind output layers
+    // TODO: Bind wlr_output_layer and related structs
     layers: wl.list.Link,
 
     allocator: ?*wlr.Allocator,

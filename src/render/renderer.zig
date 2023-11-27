@@ -176,35 +176,37 @@ pub const RenderPass = opaque {
         nearest,
     };
 
-    pub const RenderColor = extern struct {
+    pub const Color = extern struct {
         r: f32,
         g: f32,
         b: f32,
         a: f32,
     };
 
-    extern fn wlr_render_pass_submit(render_pass: *RenderPass) bool;
-    pub const submit = wlr_render_pass_submit;
-
-    pub const RenderTextureOptions = extern struct {
+    pub const TextureOptions = extern struct {
         texture: *wlr.Texture,
         src_box: wlr.FBox,
         dst_box: wlr.Box,
-        alpha: ?*f32,
-        clip: ?*pixman.Region32,
+        alpha: ?*const f32,
+        clip: ?*const pixman.Region32,
         transform: wl.Output.Transform,
         filter_mode: ScaleFilterMode,
         blend_mode: BlendMode,
     };
-    extern fn wlr_render_pass_add_texture(render_pass: *RenderPass, options: *const RenderTextureOptions) void;
-    pub const addTexture = wlr_render_pass_add_texture;
 
-    pub const RenderRectOptions = extern struct {
+    pub const RectOptions = extern struct {
         box: wlr.Box,
-        color: RenderColor,
+        color: Color,
         clip: ?*pixman.Region32,
         blend_mode: BlendMode,
     };
-    extern fn wlr_render_pass_add_rect(render_pass: *RenderPass, options: *const RenderRectOptions) void;
+
+    extern fn wlr_render_pass_submit(render_pass: *RenderPass) bool;
+    pub const submit = wlr_render_pass_submit;
+
+    extern fn wlr_render_pass_add_texture(render_pass: *RenderPass, options: *const TextureOptions) void;
+    pub const addTexture = wlr_render_pass_add_texture;
+
+    extern fn wlr_render_pass_add_rect(render_pass: *RenderPass, options: *const RectOptions) void;
     pub const addRect = wlr_render_pass_add_rect;
 };

@@ -65,8 +65,8 @@ pub const Cursor = extern struct {
     extern fn wlr_cursor_set_buffer(cur: *Cursor, buffer: *wlr.Buffer, hotspot_x: i32, hotspot_y: i32, scale: f32) void;
     pub const setBuffer = wlr_cursor_set_buffer;
 
-    extern fn wlr_cursor_unset_umage(cur: *Cursor) void;
-    pub const unsetImage = wlr_cursor_unset_umage;
+    extern fn wlr_cursor_unset_image(cur: *Cursor) void;
+    pub const unsetImage = wlr_cursor_unset_image;
 
     extern fn wlr_cursor_set_xcursor(cur: *Cursor, manager: *wlr.XcursorManager, name: [*:0]const u8) void;
     pub const setXcursor = wlr_cursor_set_xcursor;

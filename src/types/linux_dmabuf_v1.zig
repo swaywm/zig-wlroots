@@ -42,7 +42,7 @@ pub const LinuxDmabufFeedbackV1 = extern struct {
     pub const InitOptions = extern struct {
         main_renderer: *wlr.Renderer,
         scanout_primary_output: ?*wlr.Output,
-        // TODO: Bind output-layer
+        // TODO: Bind wlr_output_layer and related structs
         output_layer_feedback_event: ?*const anyopaque,
     };
     extern fn wlr_linux_dmabuf_feedback_v1_init_with_options(feedback: LinuxDmabufFeedbackV1, options: InitOptions) bool;
@@ -60,7 +60,7 @@ pub const LinuxDmabufV1 = extern struct {
 
     // private state
 
-    default_fedback: *LinuxDmabufFeedbackV1Compiled,
+    default_feedback: *LinuxDmabufFeedbackV1Compiled,
     default_formats: wlr.DrmFormatSet,
     surfaces: wl.list.Link,
 
