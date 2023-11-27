@@ -87,6 +87,9 @@ pub const SceneNode = extern struct {
 
     extern fn wlr_scene_node_set_position(node: *SceneNode, x: c_int, y: c_int) void;
     pub const setPosition = wlr_scene_node_set_position;
+
+    extern fn wlr_scene_subsurface_tree_set_clip(node: *SceneNode, clip: *wlr.Box) void;
+    pub const subsurfaceTreeSetClip = wlr_scene_subsurface_tree_set_clip;
 };
 
 pub const SceneTree = extern struct {
@@ -203,6 +206,8 @@ pub const SceneSurface = extern struct {
 
     // private state
 
+    clip: wlr.Box,
+
     addon: wlr.Addon,
 
     outputs_update: wl.Listener(*SceneBuffer.event.OutputsUpdate),
@@ -252,7 +257,7 @@ pub const SceneBuffer = extern struct {
         frame_done: wl.Signal(*os.timespec),
     },
 
-    point_accepts_input: ?*const fn (buffer: *SceneBuffer, sx: c_int, sy: c_int) callconv(.C) bool,
+    point_accepts_input: ?*const fn (buffer: *SceneBuffer, sx: *f64, sy: *f64) callconv(.C) bool,
 
     primary_output: ?*wlr.Output,
 

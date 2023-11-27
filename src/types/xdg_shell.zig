@@ -348,7 +348,6 @@ pub const XdgSurface = extern struct {
 
     // private state
 
-    client_mapped: bool,
     role_resource_destroy: wl.Listener(*wl.Resource),
 
     extern fn wlr_xdg_surface_from_resource(resource: *xdg.Surface) ?*wlr.XdgSurface;

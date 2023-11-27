@@ -77,8 +77,8 @@ pub const Buffer = extern struct {
     extern fn wlr_buffer_register_resource_interface(iface: *const ResourceInterface) void;
     pub const registerResourceInterface = wlr_buffer_register_resource_interface;
 
-    extern fn wlr_buffer_from_resource(resource: *wl.Buffer) ?*Buffer;
-    pub const fromWlBuffer = wlr_buffer_from_resource;
+    extern fn wlr_buffer_try_from_resource(resource: *wl.Buffer) ?*Buffer;
+    pub const tryFromWlBuffer = wlr_buffer_try_from_resource;
 
     extern fn wlr_buffer_begin_data_ptr_access(buffer: *Buffer, flags: u32, data: **anyopaque, format: *u32, stride: *usize) bool;
     pub const beginDataPtrAccess = wlr_buffer_begin_data_ptr_access;

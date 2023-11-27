@@ -79,6 +79,9 @@ pub const LayerSurfaceV1 = extern struct {
     current: State,
     pending: State,
 
+    initialized: bool,
+    initial_commit: bool,
+
     events: extern struct {
         destroy: wl.Signal(*LayerSurfaceV1),
         new_popup: wl.Signal(*wlr.XdgPopup),

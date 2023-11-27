@@ -17,11 +17,8 @@ pub const DmabufBufferV1 = extern struct {
 
     release: wl.Listener(void),
 
-    extern fn wlr_dmabuf_v1_resource_is_buffer(buffer_resource: *wl.Resource) bool;
-    pub const resourceIsBuffer = wlr_dmabuf_v1_resource_is_buffer;
-
-    extern fn wlr_dmabuf_v1_buffer_from_buffer_resource(buffer_resource: *wl.Resource) *DmabufBufferV1;
-    pub const fromBufferResource = wlr_dmabuf_v1_buffer_from_buffer_resource;
+    extern fn wlr_dmabuf_v1_buffer_try_from_buffer_resource(buffer_resource: *wl.Resource) ?*DmabufBufferV1;
+    pub const tryFromBufferResource = wlr_dmabuf_v1_buffer_try_from_buffer_resource;
 };
 
 pub const LinuxDmabufFeedbackV1 = extern struct {

@@ -141,6 +141,7 @@ pub const Surface = extern struct {
         buffer_height: c_int,
     },
 
+    unmap_commit: bool,
     @"opaque": bool,
     has_buffer: bool,
 
