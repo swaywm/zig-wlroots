@@ -133,7 +133,7 @@ pub const SceneTree = extern struct {
     }
 
     extern fn wlr_scene_drag_icon_create(parent: *SceneTree, drag_icon: *wlr.Drag.Icon) ?*SceneTree;
-    pub fn createDragIcon(parent: *SceneTree, drag_icon: *wlr.Drag.Icon) !*SceneTree {
+    pub fn createSceneDragIcon(parent: *SceneTree, drag_icon: *wlr.Drag.Icon) !*SceneTree {
         return wlr_scene_drag_icon_create(parent, drag_icon) orelse error.OutOfMemory;
     }
 
