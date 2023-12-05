@@ -192,7 +192,8 @@ pub const XwaylandSurface = extern struct {
     surface: ?*wlr.Surface,
     surface_addon: wlr.Addon,
     surface_commit: wl.Listener(*wlr.Surface),
-    surface_precommit: wl.Listener(*wlr.Surface.State),
+    surface_map: wl.Listener(void),
+    surface_unmap: wl.Listener(void),
 
     x: i16,
     y: i16,
