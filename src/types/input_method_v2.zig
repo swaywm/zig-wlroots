@@ -124,4 +124,10 @@ pub const InputPopupSurfaceV2 = extern struct {
     },
 
     data: usize,
+
+    extern fn wlr_input_popup_surface_v2_try_from_wlr_surface(surface: *wlr.Surface) ?*wlr.InputPopupSurfaceV2;
+    pub const tryFromWlrSurface = wlr_input_popup_surface_v2_try_from_wlr_surface;
+
+    extern fn wlr_input_popup_surface_v2_send_text_input_rectangle(popup_surface: *wlr.InputPopupSurfaceV2, box: *wlr.Box) void;
+    pub const sendTextInputRectangle = wlr_input_popup_surface_v2_send_text_input_rectangle;
 };
