@@ -240,7 +240,7 @@ pub const XwaylandSurface = extern struct {
     has_alpha: bool,
 
     events: extern struct {
-        destroy: wl.Signal(*XwaylandSurface),
+        destroy: wl.Signal(void),
         request_configure: wl.Signal(*event.Configure),
         request_move: wl.Signal(void),
         request_resize: wl.Signal(*event.Resize),
