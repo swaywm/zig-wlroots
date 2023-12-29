@@ -122,6 +122,16 @@ pub const Output = extern struct {
         extern fn wlr_output_state_set_gamma_lut(state: *State, ramp_size: usize, r: *const u16, g: *const u16, b: *const u16) bool;
         pub const setGammaLut = wlr_output_state_set_gamma_lut;
 
+        /// Clearing the gamma lut can't fail. Furthermore, a separate function for this
+        /// allows using non-optional pointers for the r/b/g parameters of setGammaLut.
+        pub fn clearGammaLut(state: *State) void {
+            state.committed.gamma_lut = true;
+
+            std.c.free(state.gamma_lut);
+            state.gamma_lut = null;
+            state.gamma_lut_size = 0;
+        }
+
         extern fn wlr_output_state_set_damage(state: *State, damage: *const pixman.Region32) void;
         pub const setDamage = wlr_output_state_set_damage;
 
