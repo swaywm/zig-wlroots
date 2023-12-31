@@ -381,6 +381,9 @@ pub const Output = extern struct {
     extern fn wlr_output_transform_compose(tr_a: wl.Output.Transform, tr_b: wl.Output.Transform) wl.Output.Transform;
     pub const transformCompose = wlr_output_transform_compose;
 
+    extern fn wlr_output_is_drm(output: *Output) bool;
+    pub const isDrm = wlr_output_is_drm;
+
     extern fn wlr_output_is_headless(outupt: *Output) bool;
     pub const isHeadless = wlr_output_is_headless;
 
