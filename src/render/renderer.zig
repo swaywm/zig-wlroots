@@ -36,6 +36,13 @@ pub const Renderer = extern struct {
     extern fn wlr_renderer_clear(renderer: *Renderer, color: *const [4]f32) void;
     pub const clear = wlr_renderer_clear;
 
+    extern fn wlr_renderer_init_wl_shm(renderer: *Renderer, server: *wl.Server) bool;
+    pub inline fn initWlShm(renderer: *Renderer, server: *wl.Server) !void {
+        if (!wlr_renderer_init_wl_shm(renderer, server)) {
+            return error.RenderInitFailed;
+        }
+    }
+
     extern fn wlr_renderer_init_wl_display(renderer: *Renderer, server: *wl.Server) bool;
     pub fn initServer(renderer: *Renderer, server: *wl.Server) !void {
         if (!wlr_renderer_init_wl_display(renderer, server)) {
