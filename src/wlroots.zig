@@ -13,6 +13,8 @@ pub const Swapchain = opaque {};
 pub const DrmFormat = @import("render/drm_format_set.zig").DrmFormat;
 pub const DrmFormatSet = @import("render/drm_format_set.zig").DrmFormatSet;
 
+pub const FractionalScaleManagerV1 = @import("types/fractional_scale_v1.zig").FractionalScaleManagerV1;
+
 pub const ShmAttributes = @import("types/buffer.zig").ShmAttributes;
 pub const BufferCap = @import("types/buffer.zig").BufferCap;
 pub const Buffer = @import("types/buffer.zig").Buffer;
