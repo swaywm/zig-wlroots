@@ -1,5 +1,7 @@
 pub const Backend = @import("backend.zig").Backend;
 
+pub const CursorShapeManagerV1 = @import("types/cursor_shape_v1.zig").CursorShapeManagerV1;
+
 pub const Device = @import("backend/session.zig").Device;
 pub const Session = @import("backend/session.zig").Session;
 
