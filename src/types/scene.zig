@@ -88,7 +88,7 @@ pub const SceneNode = extern struct {
     extern fn wlr_scene_node_set_position(node: *SceneNode, x: c_int, y: c_int) void;
     pub const setPosition = wlr_scene_node_set_position;
 
-    extern fn wlr_scene_subsurface_tree_set_clip(node: *SceneNode, clip: *wlr.Box) void;
+    extern fn wlr_scene_subsurface_tree_set_clip(node: *SceneNode, clip: ?*wlr.Box) void;
     pub const subsurfaceTreeSetClip = wlr_scene_subsurface_tree_set_clip;
 };
 
