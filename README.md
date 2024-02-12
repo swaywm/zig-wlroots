@@ -3,8 +3,15 @@
 Idiomatic [Zig](https://ziglang.org/) bindings for
 [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots).
 
-*Note: these bindings are early in development and should not be considered
-as stable as wlroots*
+## Completion status
+
+Large parts of the wlroots API are fully bound, more than enough for the
+[river](https://github.com/riverwm/river) Wayland compositor to use these bindings.
+
+At this stage, I only personally add bindings for new parts of the
+wlroots API as required by river. If your project requires some
+part of the wlroots API not yet bound please open an issue or pull
+request on [codeberg](https://codeberg.org/ifreund/zig-wlroots).
 
 ## Dependencies
 
@@ -25,9 +32,3 @@ See the C headers of wlroots for documentation.
 
 zig-wlroots is released under the MIT (expat) license. The contents of the tinywl directory
 are not part of zig-wlroots and are released under the Zero Clause BSD license.
-
-## TODO
-
-- [x] Bind enough to port [tinywl](https://gitlab.freedesktop.org/wlroots/wlroots/-/tree/master/tinywl)
-- [x] Bind enough to port [river](https://github.com/riverwm/river)
-- [ ] Complete bindings
