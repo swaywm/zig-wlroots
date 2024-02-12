@@ -3,6 +3,12 @@
 Idiomatic [Zig](https://ziglang.org/) bindings for
 [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots).
 
+The main repository is on [codeberg](https://codeberg.org/ifreund/zig-wlroots),
+this is where the issue tracker may be found and where contributions are accepted.
+
+Read-only mirrors exist on [sourcehut](https://git.sr.ht/~ifreund/zig-wlroots)
+and [github](https://github.com/ifreund/zig-wlroots).
+
 ## Completion status
 
 Large parts of the wlroots API are fully bound, more than enough for the
