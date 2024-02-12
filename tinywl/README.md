@@ -1,8 +1,8 @@
 # tinywl.zig
 
 This is an implmentation of
-[tinywl](https://github.com/swaywm/wlroots/tree/master/tinywl) in zig using
-zig-wlroots.
+[tinywl](https://gitlab.freedesktop.org/wlroots/wlroots/-/tree/master/tinywl)
+in zig using zig-wlroots.
 
 ## Building
 
