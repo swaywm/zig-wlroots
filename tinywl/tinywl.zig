@@ -235,8 +235,7 @@ const Server = struct {
         const wlr_keyboard = server.seat.getKeyboard() orelse return;
         server.seat.keyboardNotifyEnter(
             surface,
-            &wlr_keyboard.keycodes,
-            wlr_keyboard.num_keycodes,
+            wlr_keyboard.keycodes[0..wlr_keyboard.num_keycodes],
             &wlr_keyboard.modifiers,
         );
     }

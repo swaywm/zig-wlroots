@@ -386,7 +386,9 @@ pub const Seat = extern struct {
     pub const keyboardSendModifiers = wlr_seat_keyboard_send_modifiers;
 
     extern fn wlr_seat_keyboard_enter(seat: *Seat, surface: ?*wlr.Surface, keycodes: ?[*]const u32, num_keycodes: usize, modifiers: ?*const wlr.Keyboard.Modifiers) void;
-    pub const keyboardEnter = wlr_seat_keyboard_enter;
+    pub fn keyboardEnter(seat: *Seat, surface: ?*wlr.Surface, keycodes: []const u32, modifiers: ?*const wlr.Keyboard.Modifiers) void {
+        wlr_seat_keyboard_enter(seat, surface, keycodes.ptr, keycodes.len, modifiers);
+    }
 
     extern fn wlr_seat_keyboard_clear_focus(seat: *Seat) void;
     pub const keyboardClearFocus = wlr_seat_keyboard_clear_focus;
@@ -400,7 +402,9 @@ pub const Seat = extern struct {
     pub const keyboardNotifyModifiers = wlr_seat_keyboard_notify_modifiers;
 
     extern fn wlr_seat_keyboard_notify_enter(seat: *Seat, surface: *wlr.Surface, keycodes: ?[*]const u32, num_keycodes: usize, modifiers: ?*const wlr.Keyboard.Modifiers) void;
-    pub const keyboardNotifyEnter = wlr_seat_keyboard_notify_enter;
+    pub fn keyboardNotifyEnter(seat: *Seat, surface: *wlr.Surface, keycodes: []const u32, modifiers: ?*const wlr.Keyboard.Modifiers) void {
+        wlr_seat_keyboard_notify_enter(seat, surface, keycodes.ptr, keycodes.len, modifiers);
+    }
 
     extern fn wlr_seat_keyboard_notify_clear_focus(seat: *Seat) void;
     pub const keyboardNotifyClearFocus = wlr_seat_keyboard_notify_clear_focus;
