@@ -7,7 +7,7 @@ The main repository is on [codeberg](https://codeberg.org/ifreund/zig-wlroots),
 which is where the issue tracker may be found and where contributions are accepted.
 
 Read-only mirrors exist on [sourcehut](https://git.sr.ht/~ifreund/zig-wlroots)
-and [github](https://github.com/ifreund/zig-wlroots).
+and [github](https://github.com/swaywm/zig-wlroots).
 
 ## Completion status
 
