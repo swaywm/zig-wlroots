@@ -86,7 +86,7 @@ pub const Cursor = extern struct {
     extern fn wlr_cursor_map_to_output(cur: *Cursor, output: *wlr.Output) void;
     pub const mapToOutput = wlr_cursor_map_to_output;
 
-    extern fn wlr_cursor_map_input_to_output(cur: *Cursor, dev: *wlr.InputDevice, output: *wlr.Output) void;
+    extern fn wlr_cursor_map_input_to_output(cur: *Cursor, dev: *wlr.InputDevice, output: ?*wlr.Output) void;
     pub const mapInputToOutput = wlr_cursor_map_input_to_output;
 
     extern fn wlr_cursor_map_to_region(cur: *Cursor, box: *const wlr.Box) void;
