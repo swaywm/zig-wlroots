@@ -1,6 +1,8 @@
 const wlr = @import("../wlroots.zig");
 
-const wl = @import("wayland").server.wl;
+const wayland = @import("wayland");
+const wl = wayland.server.wl;
+const zwp = wayland.server.zwp;
 
 pub const TabletTool = extern struct {
     pub const Type = enum(c_int) {
@@ -107,7 +109,7 @@ pub const Tablet = extern struct {
             time_msec: u32,
             x: f64,
             y: f64,
-            state: wl.Pointer.ButtonState,
+            state: zwp.TabletToolV2.ButtonState,
         };
     };
 

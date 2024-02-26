@@ -12,6 +12,7 @@ pub fn build(b: *std.Build) void {
     scanner.addSystemProtocol("unstable/pointer-constraints/pointer-constraints-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/pointer-gestures/pointer-gestures-unstable-v1.xml");
     scanner.addSystemProtocol("unstable/xdg-decoration/xdg-decoration-unstable-v1.xml");
+    scanner.addSystemProtocol("unstable/tablet/tablet-unstable-v2.xml");
     scanner.addSystemProtocol("staging/ext-session-lock/ext-session-lock-v1.xml");
     scanner.addSystemProtocol("unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml");
     scanner.addSystemProtocol("staging/cursor-shape/cursor-shape-v1.xml");
@@ -35,6 +36,7 @@ pub fn build(b: *std.Build) void {
     scanner.generate("zwp_pointer_gestures_v1", 3);
     scanner.generate("zwp_pointer_constraints_v1", 1);
     scanner.generate("zxdg_decoration_manager_v1", 1);
+    scanner.generate("zwp_tablet_manager_v2", 1);
     scanner.generate("zwp_linux_dmabuf_v1", 4);
     scanner.generate("wp_cursor_shape_manager_v1", 1);
 

@@ -95,6 +95,12 @@ pub const Touch = @import("types/touch.zig").Touch;
 
 pub const Tablet = @import("types/tablet_tool.zig").Tablet;
 pub const TabletTool = @import("types/tablet_tool.zig").TabletTool;
+pub const TabletPad = @import("types/tablet_pad.zig").TabletPad;
+
+pub const TabletManagerV2 = @import("types/tablet_v2.zig").TabletManagerV2;
+pub const TabletV2Tablet = @import("types/tablet_v2.zig").TabletV2Tablet;
+pub const TabletV2TabletTool = @import("types/tablet_v2.zig").TabletV2TabletTool;
+pub const TabletV2TabletPad = @import("types/tablet_v2.zig").TabletV2TabletPad;
 
 pub const Switch = @import("types/switch.zig").Switch;
 
