@@ -47,9 +47,6 @@ pub const TabletV2Tablet = extern struct {
     tool_destroy: wl.Listener(void),
 
     current_client: ?*opaque {},
-
-    extern fn wlr_surface_accepts_tablet_v2(tablet: *TabletV2Tablet, surface: *wlr.Surface) bool;
-    pub const surfaceAcceptsTabletV2 = wlr_surface_accepts_tablet_v2;
 };
 
 pub const TabletV2TabletTool = extern struct {

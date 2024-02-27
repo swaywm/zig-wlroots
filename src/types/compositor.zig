@@ -229,6 +229,11 @@ pub const Surface = extern struct {
         return wlr_surface_accepts_touch(seat, surface);
     }
 
+    extern fn wlr_surface_accepts_tablet_v2(tablet: *wlr.TabletV2Tablet, surface: *Surface) bool;
+    pub fn acceptsTabletV2(surface: *Surface, tablet: *wlr.TabletV2Tablet) bool {
+        return wlr_surface_accepts_tablet_v2(tablet, surface);
+    }
+
     extern fn wlr_surface_lock_pending(surface: *Surface) u32;
     pub const lockPending = wlr_surface_lock_pending;
 
