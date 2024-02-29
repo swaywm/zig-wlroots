@@ -16,7 +16,7 @@ pub const InputDevice = extern struct {
     type: Type,
     vendor: c_uint,
     product: c_uint,
-    name: [*:0]u8,
+    name: ?[*:0]u8,
 
     events: extern struct {
         destroy: wl.Signal(*InputDevice),
