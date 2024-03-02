@@ -98,8 +98,7 @@ pub const Xwayland = extern struct {
     server: *wlr.XwaylandServer,
     own_server: bool,
     xwm: ?*Xwm,
-    // TODO: Bind wlr_xwayland_shell_v1
-    shell_v1: *anyopaque,
+    shell_v1: *wlr.XwaylandShellV1,
     cursor: ?*XwaylandCursor,
 
     display_name: [*:0]const u8,

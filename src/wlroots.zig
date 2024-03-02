@@ -165,6 +165,8 @@ pub usingnamespace if (config.has_xwayland) struct {
     pub const XwaylandSurface = @import("xwayland/xwayland.zig").XwaylandSurface;
     pub const XwaylandCursor = @import("xwayland/xwayland.zig").XwaylandCursor;
     pub const Xwm = @import("xwayland/xwayland.zig").Xwm;
+    pub const XwaylandShellV1 = @import("xwayland/shell.zig").XwaylandShellV1;
+    pub const XwaylandSurfaceV1 = @import("xwayland/shell.zig").XwaylandSurfaceV1;
 } else struct {};
 
 pub const matrix = @import("types/matrix.zig");
