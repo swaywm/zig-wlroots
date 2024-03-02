@@ -95,7 +95,9 @@ pub const Xwayland = extern struct {
             window: xcb.Window,
         };
     };
-    server: *wlr.XwaylandServer,
+
+    /// This can be null during destruction
+    server: ?*wlr.XwaylandServer,
     own_server: bool,
     xwm: ?*Xwm,
     shell_v1: *wlr.XwaylandShellV1,
