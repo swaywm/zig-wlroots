@@ -1,6 +1,6 @@
 const wlr = @import("../wlroots.zig");
 
-const os = @import("std").os;
+const posix = @import("std").posix;
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
@@ -252,7 +252,7 @@ pub const Seat = extern struct {
 
     capabilities: u32,
     accumulated_capabilities: u32,
-    last_event: os.timespec,
+    last_event: posix.timespec,
 
     selection_source: ?*wlr.DataSource,
     selection_serial: u32,

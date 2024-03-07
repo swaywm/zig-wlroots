@@ -1,6 +1,6 @@
 const wlr = @import("../wlroots.zig");
 
-const os = @import("std").os;
+const posix = @import("std").posix;
 const wl = @import("wayland").server.wl;
 const pixman = @import("pixman");
 
@@ -10,7 +10,7 @@ pub const ShmAttributes = extern struct {
     width: c_int,
     height: c_int,
     stride: c_int,
-    offset: os.off_t,
+    offset: posix.off_t,
 };
 
 pub const BufferCap = enum(c_int) {

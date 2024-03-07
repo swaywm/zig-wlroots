@@ -1,4 +1,4 @@
-const os = @import("std").os;
+const posix = @import("std").posix;
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
@@ -25,7 +25,7 @@ pub const Device = extern struct {
 
     fd: c_int,
     device_id: c_int,
-    dev: os.dev_t,
+    dev: posix.dev_t,
     /// Session.devices
     link: wl.list.Link,
 

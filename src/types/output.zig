@@ -2,7 +2,7 @@ const wlr = @import("../wlroots.zig");
 
 const std = @import("std");
 const mem = std.mem;
-const os = std.os;
+const posix = std.posix;
 
 const pixman = @import("pixman");
 
@@ -148,13 +148,13 @@ pub const Output = extern struct {
 
         pub const Precommit = extern struct {
             output: *wlr.Output,
-            when: *os.timespec,
+            when: *posix.timespec,
             state: *const State,
         };
 
         pub const Commit = extern struct {
             output: *wlr.Output,
-            when: *os.timespec,
+            when: *posix.timespec,
             state: *const Output.State,
         };
 
@@ -170,7 +170,7 @@ pub const Output = extern struct {
             output: *wlr.Output,
             commit_seq: u32,
             presented: bool,
-            when: *os.timespec,
+            when: *posix.timespec,
             seq: c_uint,
             refresh: c_int,
             flags: Flags,

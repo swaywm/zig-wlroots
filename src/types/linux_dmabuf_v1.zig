@@ -1,7 +1,7 @@
 const wlr = @import("../wlroots.zig");
 
 const std = @import("std");
-const os = std.os;
+const posix = std.posix;
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
@@ -23,12 +23,12 @@ pub const DmabufBufferV1 = extern struct {
 
 pub const LinuxDmabufFeedbackV1 = extern struct {
     pub const Tranche = extern struct {
-        target_device: os.dev_t,
+        target_device: posix.dev_t,
         flags: zwp.LinuxDmabufFeedbackV1.TrancheFlags,
         formats: wlr.DrmFormatSet,
     };
 
-    main_device: os.dev_t,
+    main_device: posix.dev_t,
     tranches: wl.Array,
 
     extern fn wlr_linux_dmabuf_feedback_add_tranche(feedback: *LinuxDmabufFeedbackV1) ?*Tranche;

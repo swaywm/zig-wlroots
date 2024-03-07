@@ -1,7 +1,7 @@
 const wlr = @import("../wlroots.zig");
 
 const std = @import("std");
-const os = std.os;
+const posix = std.posix;
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
@@ -209,7 +209,7 @@ pub const XwaylandSurface = extern struct {
     instance: ?[*:0]u8,
     role: ?[*:0]u8,
     startup_id: ?[*:0]u8,
-    pid: os.pid_t,
+    pid: posix.pid_t,
     has_utf8_title: bool,
 
     children: wl.list.Head(XwaylandSurface, .parent_link),

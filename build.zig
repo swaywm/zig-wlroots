@@ -43,12 +43,12 @@ pub fn build(b: *std.Build) void {
     scanner.generate("zwlr_layer_shell_v1", 4);
     scanner.generate("zwlr_output_power_manager_v1", 1);
 
-    const wayland = b.createModule(.{ .source_file = scanner.result });
+    const wayland = b.createModule(.{ .root_source_file = scanner.result });
     const xkbcommon = b.createModule(.{
-        .source_file = .{ .path = "tinywl/deps/zig-xkbcommon/src/xkbcommon.zig" },
+        .root_source_file = .{ .path = "tinywl/deps/zig-xkbcommon/src/xkbcommon.zig" },
     });
     const pixman = b.createModule(.{
-        .source_file = .{ .path = "tinywl/deps/zig-pixman/pixman.zig" },
+        .root_source_file = .{ .path = "tinywl/deps/zig-pixman/pixman.zig" },
     });
 
     const wlr_test = b.addTest(.{
@@ -59,16 +59,16 @@ pub fn build(b: *std.Build) void {
 
     wlr_test.linkLibC();
 
-    wlr_test.addModule("wayland", wayland);
+    wlr_test.root_module.addImport("wayland", wayland);
     wlr_test.linkSystemLibrary("wayland-server");
 
     // TODO: remove when https://github.com/ziglang/zig/issues/131 is implemented
     scanner.addCSource(wlr_test);
 
-    wlr_test.addModule("xkbcommon", xkbcommon);
+    wlr_test.root_module.addImport("xkbcommon", xkbcommon);
     wlr_test.linkSystemLibrary("xkbcommon");
 
-    wlr_test.addModule("pixman", pixman);
+    wlr_test.root_module.addImport("pixman", pixman);
     wlr_test.linkSystemLibrary("pixman-1");
 
     wlr_test.linkSystemLibrary("wlroots");

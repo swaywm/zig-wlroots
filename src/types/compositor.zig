@@ -1,6 +1,6 @@
 const wlr = @import("../wlroots.zig");
 
-const os = @import("std").os;
+const posix = @import("std").posix;
 
 const pixman = @import("pixman");
 
@@ -187,7 +187,7 @@ pub const Surface = extern struct {
     extern fn wlr_surface_send_leave(surface: *Surface, output: *wlr.Output) void;
     pub const sendLeave = wlr_surface_send_leave;
 
-    extern fn wlr_surface_send_frame_done(surface: *Surface, when: *const os.timespec) void;
+    extern fn wlr_surface_send_frame_done(surface: *Surface, when: *const posix.timespec) void;
     pub const sendFrameDone = wlr_surface_send_frame_done;
 
     extern fn wlr_surface_get_extends(surface: *Surface, box: *wlr.Box) void;

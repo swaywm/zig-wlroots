@@ -1,5 +1,5 @@
 const std = @import("std");
-const os = std.os;
+const posix = std.posix;
 
 const wl = @import("wayland").server.wl;
 
@@ -18,8 +18,8 @@ pub fn main() anyerror!void {
     var buf: [11]u8 = undefined;
     const socket = try server.wl_server.addSocketAuto(&buf);
 
-    if (os.argv.len >= 2) {
-        const cmd = std.mem.span(os.argv[1]);
+    if (std.os.argv.len >= 2) {
+        const cmd = std.mem.span(std.os.argv[1]);
         var child = std.ChildProcess.init(&[_][]const u8{ "/bin/sh", "-c", cmd }, gpa);
         var env_map = try std.process.getEnvMap(gpa);
         defer env_map.deinit();
@@ -121,7 +121,7 @@ const Server = struct {
     }
 
     fn newOutput(listener: *wl.Listener(*wlr.Output), wlr_output: *wlr.Output) void {
-        const server = @fieldParentPtr(Server, "new_output", listener);
+        const server: *Server = @fieldParentPtr("new_output", listener);
 
         if (!wlr_output.initRender(server.allocator, server.renderer)) return;
 
@@ -142,7 +142,7 @@ const Server = struct {
     }
 
     fn newXdgSurface(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
-        const server = @fieldParentPtr(Server, "new_xdg_surface", listener);
+        const server: *Server = @fieldParentPtr("new_xdg_surface", listener);
 
         switch (xdg_surface.role) {
             .toplevel => {
@@ -241,7 +241,7 @@ const Server = struct {
     }
 
     fn newInput(listener: *wl.Listener(*wlr.InputDevice), device: *wlr.InputDevice) void {
-        const server = @fieldParentPtr(Server, "new_input", listener);
+        const server: *Server = @fieldParentPtr("new_input", listener);
         switch (device.type) {
             .keyboard => Keyboard.create(server, device) catch |err| {
                 std.log.err("failed to create keyboard: {}", .{err});
@@ -261,7 +261,7 @@ const Server = struct {
         listener: *wl.Listener(*wlr.Seat.event.RequestSetCursor),
         event: *wlr.Seat.event.RequestSetCursor,
     ) void {
-        const server = @fieldParentPtr(Server, "request_set_cursor", listener);
+        const server: *Server = @fieldParentPtr("request_set_cursor", listener);
         if (event.seat_client == server.seat.pointer_state.focused_client)
             server.cursor.setSurface(event.surface, event.hotspot_x, event.hotspot_y);
     }
@@ -270,7 +270,7 @@ const Server = struct {
         listener: *wl.Listener(*wlr.Seat.event.RequestSetSelection),
         event: *wlr.Seat.event.RequestSetSelection,
     ) void {
-        const server = @fieldParentPtr(Server, "request_set_selection", listener);
+        const server: *Server = @fieldParentPtr("request_set_selection", listener);
         server.seat.setSelection(event.source, event.serial);
     }
 
@@ -278,7 +278,7 @@ const Server = struct {
         listener: *wl.Listener(*wlr.Pointer.event.Motion),
         event: *wlr.Pointer.event.Motion,
     ) void {
-        const server = @fieldParentPtr(Server, "cursor_motion", listener);
+        const server: *Server = @fieldParentPtr("cursor_motion", listener);
         server.cursor.move(event.device, event.delta_x, event.delta_y);
         server.processCursorMotion(event.time_msec);
     }
@@ -287,7 +287,7 @@ const Server = struct {
         listener: *wl.Listener(*wlr.Pointer.event.MotionAbsolute),
         event: *wlr.Pointer.event.MotionAbsolute,
     ) void {
-        const server = @fieldParentPtr(Server, "cursor_motion_absolute", listener);
+        const server: *Server = @fieldParentPtr("cursor_motion_absolute", listener);
         server.cursor.warpAbsolute(event.device, event.x, event.y);
         server.processCursorMotion(event.time_msec);
     }
@@ -354,7 +354,7 @@ const Server = struct {
         listener: *wl.Listener(*wlr.Pointer.event.Button),
         event: *wlr.Pointer.event.Button,
     ) void {
-        const server = @fieldParentPtr(Server, "cursor_button", listener);
+        const server: *Server = @fieldParentPtr("cursor_button", listener);
         _ = server.seat.pointerNotifyButton(event.time_msec, event.button, event.state);
         if (event.state == .released) {
             server.cursor_mode = .passthrough;
@@ -367,7 +367,7 @@ const Server = struct {
         listener: *wl.Listener(*wlr.Pointer.event.Axis),
         event: *wlr.Pointer.event.Axis,
     ) void {
-        const server = @fieldParentPtr(Server, "cursor_axis", listener);
+        const server: *Server = @fieldParentPtr("cursor_axis", listener);
         server.seat.pointerNotifyAxis(
             event.time_msec,
             event.orientation,
@@ -378,7 +378,7 @@ const Server = struct {
     }
 
     fn cursorFrame(listener: *wl.Listener(*wlr.Cursor), _: *wlr.Cursor) void {
-        const server = @fieldParentPtr(Server, "cursor_frame", listener);
+        const server: *Server = @fieldParentPtr("cursor_frame", listener);
         server.seat.pointerNotifyFrame();
     }
 
@@ -391,7 +391,7 @@ const Server = struct {
             // Focus the next view in the stack, pushing the current top to the back
             xkb.Keysym.F1 => {
                 if (server.views.length() < 2) return true;
-                const view = @fieldParentPtr(View, "link", server.views.link.prev.?);
+                const view: *View = @fieldParentPtr("link", server.views.link.prev.?);
                 server.focusView(view, view.xdg_surface.surface);
             },
             else => return false,
@@ -428,13 +428,13 @@ const Output = struct {
     }
 
     fn frame(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
-        const output = @fieldParentPtr(Output, "frame", listener);
+        const output: *Output = @fieldParentPtr("frame", listener);
 
         const scene_output = output.server.scene.getSceneOutput(output.wlr_output).?;
         _ = scene_output.commit(null);
 
-        var now: os.timespec = undefined;
-        os.clock_gettime(os.CLOCK.MONOTONIC, &now) catch @panic("CLOCK_MONOTONIC not supported");
+        var now: posix.timespec = undefined;
+        posix.clock_gettime(posix.CLOCK.MONOTONIC, &now) catch @panic("CLOCK_MONOTONIC not supported");
         scene_output.sendFrameDone(&now);
     }
 
@@ -442,13 +442,13 @@ const Output = struct {
         listener: *wl.Listener(*wlr.Output.event.RequestState),
         event: *wlr.Output.event.RequestState,
     ) void {
-        const output = @fieldParentPtr(Output, "request_state", listener);
+        const output: *Output = @fieldParentPtr("request_state", listener);
 
         _ = output.wlr_output.commitState(event.state);
     }
 
     fn destroy(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
-        const output = @fieldParentPtr(Output, "destroy", listener);
+        const output: *Output = @fieldParentPtr("destroy", listener);
 
         output.frame.link.remove();
         output.destroy.link.remove();
@@ -473,18 +473,18 @@ const View = struct {
     request_resize: wl.Listener(*wlr.XdgToplevel.event.Resize) = wl.Listener(*wlr.XdgToplevel.event.Resize).init(requestResize),
 
     fn map(listener: *wl.Listener(void)) void {
-        const view = @fieldParentPtr(View, "map", listener);
+        const view: *View = @fieldParentPtr("map", listener);
         view.server.views.prepend(view);
         view.server.focusView(view, view.xdg_surface.surface);
     }
 
     fn unmap(listener: *wl.Listener(void)) void {
-        const view = @fieldParentPtr(View, "unmap", listener);
+        const view: *View = @fieldParentPtr("unmap", listener);
         view.link.remove();
     }
 
     fn destroy(listener: *wl.Listener(void)) void {
-        const view = @fieldParentPtr(View, "destroy", listener);
+        const view: *View = @fieldParentPtr("destroy", listener);
 
         view.map.link.remove();
         view.unmap.link.remove();
@@ -499,7 +499,7 @@ const View = struct {
         listener: *wl.Listener(*wlr.XdgToplevel.event.Move),
         _: *wlr.XdgToplevel.event.Move,
     ) void {
-        const view = @fieldParentPtr(View, "request_move", listener);
+        const view: *View = @fieldParentPtr("request_move", listener);
         const server = view.server;
         server.grabbed_view = view;
         server.cursor_mode = .move;
@@ -511,7 +511,7 @@ const View = struct {
         listener: *wl.Listener(*wlr.XdgToplevel.event.Resize),
         event: *wlr.XdgToplevel.event.Resize,
     ) void {
-        const view = @fieldParentPtr(View, "request_resize", listener);
+        const view: *View = @fieldParentPtr("request_resize", listener);
         const server = view.server;
 
         server.grabbed_view = view;
@@ -566,13 +566,13 @@ const Keyboard = struct {
     }
 
     fn modifiers(listener: *wl.Listener(*wlr.Keyboard), wlr_keyboard: *wlr.Keyboard) void {
-        const keyboard = @fieldParentPtr(Keyboard, "modifiers", listener);
+        const keyboard: *Keyboard = @fieldParentPtr("modifiers", listener);
         keyboard.server.seat.setKeyboard(wlr_keyboard);
         keyboard.server.seat.keyboardNotifyModifiers(&wlr_keyboard.modifiers);
     }
 
     fn key(listener: *wl.Listener(*wlr.Keyboard.event.Key), event: *wlr.Keyboard.event.Key) void {
-        const keyboard = @fieldParentPtr(Keyboard, "key", listener);
+        const keyboard: *Keyboard = @fieldParentPtr("key", listener);
         const wlr_keyboard = keyboard.device.toKeyboard();
 
         // Translate libinput keycode -> xkbcommon

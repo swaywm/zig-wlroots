@@ -1,7 +1,7 @@
 const wlr = @import("../wlroots.zig");
 
 const std = @import("std");
-const os = std.os;
+const posix = std.posix;
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
@@ -22,14 +22,14 @@ pub const XwaylandServer = extern struct {
         };
     };
 
-    pid: os.pid_t,
+    pid: posix.pid_t,
     client: ?*wl.Client,
     pipe_source: ?*wl.EventSource,
     wm_fd: [2]c_int,
     wl_fd: [2]c_int,
     ready: bool,
 
-    server_start: os.time_t,
+    server_start: posix.time_t,
     display: c_int,
     display_name: [16]u8,
     x_fd: [2]c_int,

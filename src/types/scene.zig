@@ -1,7 +1,7 @@
 const wlr = @import("../wlroots.zig");
 
 const std = @import("std");
-const os = std.os;
+const posix = std.posix;
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
@@ -207,7 +207,7 @@ pub const SceneSurface = extern struct {
     output_enter: wl.Listener(*SceneOutput),
     output_leave: wl.Listener(*SceneOutput),
     output_sample: wl.Listener(*SceneBuffer.event.OutputSample),
-    frame_done: wl.Listener(*os.timespec),
+    frame_done: wl.Listener(*posix.timespec),
     surface_destroy: wl.Listener(void),
     surface_commit: wl.Listener(void),
 
@@ -251,7 +251,7 @@ pub const SceneBuffer = extern struct {
         output_enter: wl.Signal(*SceneOutput),
         output_leave: wl.Signal(*SceneOutput),
         output_sample: wl.Signal(*event.OutputSample),
-        frame_done: wl.Signal(*os.timespec),
+        frame_done: wl.Signal(*posix.timespec),
     },
 
     point_accepts_input: ?*const fn (buffer: *SceneBuffer, sx: *f64, sy: *f64) callconv(.C) bool,
@@ -299,7 +299,7 @@ pub const SceneBuffer = extern struct {
     extern fn wlr_scene_buffer_set_filter_mode(scene_buffer: *SceneBuffer, filter_mode: wlr.RenderPass.ScaleFilterMode) void;
     pub const setFilterMode = wlr_scene_buffer_set_filter_mode;
 
-    extern fn wlr_scene_buffer_send_frame_done(scene_buffer: *SceneBuffer, now: *os.timespec) void;
+    extern fn wlr_scene_buffer_send_frame_done(scene_buffer: *SceneBuffer, now: *posix.timespec) void;
     pub const sendFrameDone = wlr_scene_buffer_send_frame_done;
 };
 
@@ -368,7 +368,7 @@ pub const SceneOutput = extern struct {
         );
     }
 
-    extern fn wlr_scene_output_send_frame_done(scene_output: *SceneOutput, now: *os.timespec) void;
+    extern fn wlr_scene_output_send_frame_done(scene_output: *SceneOutput, now: *posix.timespec) void;
     pub const sendFrameDone = wlr_scene_output_send_frame_done;
 
     extern fn wlr_scene_output_set_position(scene_output: *SceneOutput, lx: c_int, ly: c_int) void;

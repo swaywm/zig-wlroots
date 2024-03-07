@@ -207,7 +207,7 @@ pub const version = @import("version.zig");
 
 comptime {
     if (version.major != 0 or version.minor != 17) {
-        @compileError("zig-wlroots requires wlroots version 0.17");
+        @compileError("zig-wlroots requires wlroots version 0.17, found version " ++ version.str);
     }
 }
 test {
