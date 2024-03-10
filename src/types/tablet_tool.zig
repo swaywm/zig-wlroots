@@ -107,8 +107,7 @@ pub const Tablet = extern struct {
             tool: *TabletTool,
 
             time_msec: u32,
-            x: f64,
-            y: f64,
+            button: u32,
             state: zwp.TabletToolV2.ButtonState,
         };
     };
