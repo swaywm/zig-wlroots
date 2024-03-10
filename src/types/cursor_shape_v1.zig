@@ -17,8 +17,8 @@ pub const CursorShapeManagerV1 = extern struct {
     server_destroy: wl.Listener(*wl.Server),
 
     pub const DeviceType = enum(c_int) {
-        Pointer = 0,
-        TabletTool = 1,
+        pointer,
+        tablet_tool,
     };
 
     pub const event = struct {
