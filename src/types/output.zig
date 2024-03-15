@@ -193,7 +193,7 @@ pub const Output = extern struct {
     backend: *wlr.Backend,
     server: *wl.Server,
 
-    global: *wl.Global,
+    global: ?*wl.Global,
     resources: wl.list.Head(wl.Output, null),
 
     name: [*:0]u8,
