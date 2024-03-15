@@ -26,6 +26,8 @@ pub const ClientBuffer = @import("types/buffer.zig").ClientBuffer;
 
 pub const SinglePixelBufferManagerV1 = @import("types/single_pixel_buffer_v1.zig").SinglePixelBufferManagerV1;
 
+pub const Shm = @import("types/shm.zig").Shm;
+
 pub const DmabufBufferV1 = @import("types/linux_dmabuf_v1.zig").DmabufBufferV1;
 pub const LinuxDmabufV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufV1;
 pub const LinuxDmabufFeedbackV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufFeedbackV1;
