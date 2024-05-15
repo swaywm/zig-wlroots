@@ -28,7 +28,7 @@ pub const Subsurface = extern struct {
 
     resource: *wl.Subsurface,
     surface: *wlr.Surface,
-    parent: ?*wlr.Surface,
+    parent: *wlr.Surface,
 
     current: ParentState,
     pending: ParentState,

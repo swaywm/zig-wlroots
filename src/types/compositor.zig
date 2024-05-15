@@ -172,7 +172,7 @@ pub const Surface = extern struct {
     extern fn wlr_surface_get_texture(surface: *Surface) ?*wlr.Texture;
     pub const getTexture = wlr_surface_get_texture;
 
-    extern fn wlr_surface_get_root_surface(surface: *Surface) ?*Surface;
+    extern fn wlr_surface_get_root_surface(surface: *Surface) *Surface;
     pub const getRootSurface = wlr_surface_get_root_surface;
 
     extern fn wlr_surface_point_accepts_input(surface: *Surface, sx: f64, sy: f64) bool;
