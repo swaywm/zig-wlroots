@@ -34,6 +34,21 @@ of how to integrate zig-wlroots and its dependencies into your build.zig.
 
 See the C headers of wlroots for documentation.
 
+## Versioning
+
+zig-wlroots versions have the form `major.minor.revision` where major and minor
+are the major and minor version numbers of the compatible wlroots release. The
+revision number is incremented for every zig-wlroots release compatible with a
+given wlroots release. Breaking bugfixes and breaking changes may occur in
+with only a revision version bump. The required Zig version may be updated with
+a revision version bump.
+
+For example, zig-wlroots `0.16.42` would be compatible with wlroots 0.16, the 42
+indicating that there were 42 zig-wlroots releases since the initial wlroots 0.16
+compatible zig-wlroots release.
+
+For unreleased versions, the `-dev` suffix is used (e.g. `0.1.0-dev`).
+
 ## License
 
 zig-wlroots is released under the MIT (expat) license. The contents of the tinywl directory
