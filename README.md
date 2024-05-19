@@ -12,7 +12,7 @@ and [github](https://github.com/swaywm/zig-wlroots).
 ## Completion status
 
 Large parts of the wlroots API are fully bound, more than enough for the
-[river](https://github.com/riverwm/river) Wayland compositor to use these bindings.
+[river](https://codeberg.org/river/river) Wayland compositor to use these bindings.
 
 At this stage, I only personally add bindings for new parts of the
 wlroots API as required by river. If your project requires some
