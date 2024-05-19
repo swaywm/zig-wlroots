@@ -1,9 +1,0 @@
-[submodule "tinywl/deps/zig-wayland"]
-	path = tinywl/deps/zig-wayland
-	url = https://codeberg.org/ifreund/zig-wayland
-[submodule "tinywl/deps/zig-xkbcommon"]
-	path = tinywl/deps/zig-xkbcommon
-	url = https://codeberg.org/ifreund/zig-xkbcommon
-[submodule "tinywl/deps/zig-pixman"]
-	path = tinywl/deps/zig-pixman
-	url = https://codeberg.org/ifreund/zig-pixman

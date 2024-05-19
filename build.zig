@@ -1,10 +1,19 @@
 const std = @import("std");
 
-const Scanner = @import("tinywl/deps/zig-wayland/build.zig").Scanner;
-
 pub fn build(b: *std.Build) void {
+    _ = b.addModule("wlroots", .{
+        .root_source_file = .{ .path = "src/wlroots.zig" },
+    });
+
+    const enable_tests = b.option(bool, "enable-tests", "allow running tests") orelse false;
+
+    // Hack to allow making all dependencies required for tests lazy.
+    if (!enable_tests) return;
+
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+
+    const Scanner = (b.lazyImport(@This(), "zig-wayland") orelse return).Scanner;
 
     const scanner = Scanner.create(b, .{});
 
@@ -44,12 +53,8 @@ pub fn build(b: *std.Build) void {
     scanner.generate("zwlr_output_power_manager_v1", 1);
 
     const wayland = b.createModule(.{ .root_source_file = scanner.result });
-    const xkbcommon = b.createModule(.{
-        .root_source_file = .{ .path = "tinywl/deps/zig-xkbcommon/src/xkbcommon.zig" },
-    });
-    const pixman = b.createModule(.{
-        .root_source_file = .{ .path = "tinywl/deps/zig-pixman/pixman.zig" },
-    });
+    const xkbcommon = (b.lazyDependency("zig-xkbcommon", .{}) orelse return).module("xkbcommon");
+    const pixman = (b.lazyDependency("zig-pixman", .{}) orelse return).module("pixman");
 
     const wlr_test = b.addTest(.{
         .root_source_file = .{ .path = "src/wlroots.zig" },

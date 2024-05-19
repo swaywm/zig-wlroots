@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const Scanner = @import("deps/zig-wayland/build.zig").Scanner;
+const Scanner = @import("zig-wayland").Scanner;
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
@@ -22,33 +22,19 @@ pub fn build(b: *std.Build) void {
     scanner.generate("wl_data_device_manager", 3);
     scanner.generate("xdg_wm_base", 2);
 
-    const wayland = b.createModule(.{
-        .root_source_file = scanner.result,
-        .target = target,
-    });
-    wayland.linkSystemLibrary("wayland-server", .{});
+    const wayland = b.createModule(.{ .root_source_file = scanner.result });
+    const xkbcommon = b.dependency("zig-xkbcommon", .{}).module("xkbcommon");
+    const pixman = b.dependency("zig-pixman", .{}).module("pixman");
+    const wlroots = b.dependency("zig-wlroots", .{}).module("wlroots");
 
-    const xkbcommon = b.createModule(.{
-        .root_source_file = .{ .path = "deps/zig-xkbcommon/src/xkbcommon.zig" },
-        .target = target,
-    });
-    xkbcommon.linkSystemLibrary("xkbcommon", .{});
+    wlroots.addImport("wayland", wayland);
+    wlroots.addImport("xkbcommon", xkbcommon);
+    wlroots.addImport("pixman", pixman);
 
-    const pixman = b.createModule(.{
-        .root_source_file = .{ .path = "deps/zig-pixman/pixman.zig" },
-        .target = target,
-    });
-    pixman.linkSystemLibrary("pixman-1", .{});
-
-    const wlroots = b.createModule(.{
-        .root_source_file = .{ .path = "../src/wlroots.zig" },
-        .imports = &.{
-            .{ .name = "wayland", .module = wayland },
-            .{ .name = "xkbcommon", .module = xkbcommon },
-            .{ .name = "pixman", .module = pixman },
-        },
-        .target = target,
-    });
+    // We need to ensure the wlroots include path obtained from pkg-config is
+    // exposed to the wlroots module for @cImport() to work. This seems to be
+    // the best way to do so with the current std.Build API.
+    wlroots.resolved_target = target;
     wlroots.linkSystemLibrary("wlroots", .{});
 
     const tinywl = b.addExecutable(.{
@@ -63,6 +49,10 @@ pub fn build(b: *std.Build) void {
     tinywl.root_module.addImport("wayland", wayland);
     tinywl.root_module.addImport("xkbcommon", xkbcommon);
     tinywl.root_module.addImport("wlroots", wlroots);
+
+    tinywl.linkSystemLibrary("wayland-server");
+    tinywl.linkSystemLibrary("xkbcommon");
+    tinywl.linkSystemLibrary("pixman-1");
 
     // TODO: remove when https://github.com/ziglang/zig/issues/131 is implemented
     scanner.addCSource(tinywl);
