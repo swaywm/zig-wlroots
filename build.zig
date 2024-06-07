@@ -2,7 +2,7 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     _ = b.addModule("wlroots", .{
-        .root_source_file = .{ .path = "src/wlroots.zig" },
+        .root_source_file = b.path("src/wlroots.zig"),
     });
 
     const enable_tests = b.option(bool, "enable-tests", "allow running tests") orelse false;
@@ -57,7 +57,7 @@ pub fn build(b: *std.Build) void {
     const pixman = (b.lazyDependency("zig-pixman", .{}) orelse return).module("pixman");
 
     const wlr_test = b.addTest(.{
-        .root_source_file = .{ .path = "src/wlroots.zig" },
+        .root_source_file = b.path("src/wlroots.zig"),
         .target = target,
         .optimize = optimize,
     });

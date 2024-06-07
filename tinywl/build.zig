@@ -39,7 +39,7 @@ pub fn build(b: *std.Build) void {
 
     const tinywl = b.addExecutable(.{
         .name = "tinywl",
-        .root_source_file = .{ .path = "tinywl.zig" },
+        .root_source_file = b.path("tinywl.zig"),
         .target = target,
         .optimize = optimize,
     });
