@@ -46,9 +46,9 @@ pub const GammaControlV1 = extern struct {
 
     data: usize,
 
-    extern fn wlr_gamma_control_v1_apply(gamma_control: *GammaControlV1, output_state: *wlr.Output.State) bool;
+    extern fn wlr_gamma_control_v1_apply(gamma_control: ?*GammaControlV1, output_state: *wlr.Output.State) bool;
     pub const apply = wlr_gamma_control_v1_apply;
 
-    extern fn wlr_gamma_control_v1_send_failed_and_destroy(gamma_control: *GammaControlV1) void;
+    extern fn wlr_gamma_control_v1_send_failed_and_destroy(gamma_control: ?*GammaControlV1) void;
     pub const sendFailedAndDestroy = wlr_gamma_control_v1_send_failed_and_destroy;
 };
