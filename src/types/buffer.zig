@@ -27,10 +27,10 @@ pub const Buffer = extern struct {
 
     pub const Impl = extern struct {
         destroy: *const fn (buffer: *Buffer) callconv(.C) void,
-        get_dmabuf: *const fn (buffer: *Buffer, attribs: *wlr.DmabufAttributes) callconv(.C) bool,
-        get_shm: *const fn (buffer: *Buffer, attribs: *wlr.ShmAttributes) callconv(.C) bool,
-        begin_data_ptr_access: *const fn (buffer: *Buffer, flags: u32, data: **anyopaque, format: *u32, stride: *usize) callconv(.C) bool,
-        end_data_ptr_access: *const fn (buffer: *Buffer) callconv(.C) void,
+        get_dmabuf: ?*const fn (buffer: *Buffer, attribs: *wlr.DmabufAttributes) callconv(.C) bool,
+        get_shm: ?*const fn (buffer: *Buffer, attribs: *wlr.ShmAttributes) callconv(.C) bool,
+        begin_data_ptr_access: ?*const fn (buffer: *Buffer, flags: u32, data: **anyopaque, format: *u32, stride: *usize) callconv(.C) bool,
+        end_data_ptr_access: ?*const fn (buffer: *Buffer) callconv(.C) void,
     };
 
     pub const ResourceInterface = extern struct {
