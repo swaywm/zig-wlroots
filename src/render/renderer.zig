@@ -24,6 +24,12 @@ pub const Renderer = extern struct {
         return wlr_renderer_autocreate(backend) orelse error.RendererCreateFailed;
     }
 
+    extern fn wlr_renderer_is_gles2(renderer: *Renderer) bool;
+    pub const isGles2 = wlr_renderer_is_gles2;
+
+    extern fn wlr_renderer_is_pixman(renderer: *Renderer) bool;
+    pub const isPixman = wlr_renderer_is_pixman;
+
     extern fn wlr_renderer_begin(renderer: *Renderer, width: u32, height: u32) void;
     pub const begin = wlr_renderer_begin;
 
