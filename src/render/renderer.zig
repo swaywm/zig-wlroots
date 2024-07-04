@@ -168,6 +168,15 @@ pub const Renderer = extern struct {
     pub fn createRenderTimer(renderer: *Renderer) !*RenderTimer {
         return wlr_render_timer_create(renderer) orelse error.OutOfMemory;
     }
+
+    extern fn wlr_gles2_renderer_get_egl(renderer: *Renderer) *wlr.Egl;
+    pub const gles2GetEgl = wlr_gles2_renderer_get_egl;
+
+    extern fn wlr_gles2_renderer_check_ext(renderer: *Renderer, name: [*:0]const u8) bool;
+    pub const gles2CheckExt = wlr_gles2_renderer_check_ext;
+
+    extern fn wlr_gles2_renderer_get_current_fbo(renderer: *Renderer) c_uint;
+    pub const gles2GetCurrentFbo = wlr_gles2_renderer_get_current_fbo;
 };
 
 pub const RenderTimer = opaque {
