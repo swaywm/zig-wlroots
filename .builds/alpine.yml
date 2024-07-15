@@ -1,0 +1,61 @@
+image: alpine/edge
+packages:
+  - eudev-dev
+  - libinput-dev
+  - libseat-dev
+  - mesa-dev
+  - libffi-dev
+  - expat-dev
+  - hwdata-dev
+  - libdisplay-info-dev
+  - libxkbcommon-dev
+  - xcb-util-image-dev
+  - xcb-util-renderutil-dev
+  - xcb-util-wm-dev
+  - pixman-dev
+  - libevdev-dev
+  - wayland-protocols
+  - xwayland-dev
+  - meson
+  - scdoc
+  - tar
+  - wget
+  - xz
+sources:
+  - https://codeberg.org/ifreund/zig-wlroots
+  - https://gitlab.freedesktop.org/wayland/wayland.git
+  - https://gitlab.freedesktop.org/wlroots/wlroots.git
+tasks:
+  - install_deps: |
+      cd wayland
+      git checkout 1.23.0
+      meson setup build -Ddocumentation=false -Dtests=false --prefix /usr
+      sudo ninja -C build install
+      cd ..
+
+      cd wlroots
+      git checkout 0.18.0
+      meson setup build --auto-features=enabled -Drenderers=gles2 \
+            -Dcolor-management=disabled -Dlibliftoff=disabled \
+            -Dexamples=false -Dwerror=false -Db_ndebug=false \
+            -Dxcb-errors=disabled --prefix /usr
+      sudo ninja -C build/ install
+      cd ..
+
+      # Eat Github's resources rather than the Zig Software Foundation's resources!
+      wget -nv https://github.com/ifreund/zig-tarball-mirror/releases/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz
+      tar xf zig-linux-x86_64-0.13.0.tar.xz
+      sudo mv zig-linux-x86_64-0.13.0/zig /usr/bin/
+      sudo mv zig-linux-x86_64-0.13.0/lib /usr/lib/zig
+  - test: |
+      cd zig-wlroots
+      zig build -Denable-tests test --summary all
+  - tinywl: |
+      cd zig-wlroots/tinywl
+      zig build --summary all
+  - fmt: |
+      cd zig-wlroots
+      zig fmt --check src/
+      zig fmt --check tinywl/
+      zig fmt --check build.zig
+      zig fmt --check build.zig.zon
