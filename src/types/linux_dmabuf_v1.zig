@@ -68,6 +68,9 @@ pub const LinuxDmabufV1 = extern struct {
 
     server_destroy: wl.Listener(*wl.Server),
 
+    check_dmabuf_callback: *const fn (attribs: *wlr.DmabufAttributes, data: ?*anyopaque) callconv(.C) bool,
+    check_dmabuf_callback_data: ?*anyopaque,
+
     extern fn wlr_linux_dmabuf_v1_create(server: *wl.Server, version: u32, default_feedback: *const LinuxDmabufFeedbackV1) ?*LinuxDmabufV1;
     pub fn create(server: *wl.Server, version: u32, default_feedback: *const LinuxDmabufFeedbackV1) !*LinuxDmabufV1 {
         return wlr_linux_dmabuf_v1_create(server, version, default_feedback) orelse error.OutOfMemory;

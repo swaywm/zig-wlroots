@@ -57,8 +57,8 @@ pub const Session = extern struct {
 
     devices: wl.list.Head(Device, .link),
 
-    server: *wl.Server,
-    server_destroy: wl.Listener(*wl.Server),
+    event_loop: *wl.EventLoop,
+    event_loop_destroy: wl.Listener(*wl.EventLoop),
 
     events: extern struct {
         active: wl.Signal(void),
@@ -66,9 +66,9 @@ pub const Session = extern struct {
         destroy: wl.Signal(*Session),
     },
 
-    extern fn wlr_session_create(server: *wl.Server) ?*Session;
-    pub fn create(server: *wl.Server) !*Session {
-        return wlr_session_create(server) orelse error.SessionCreateFailed;
+    extern fn wlr_session_create(loop: *wl.EventLoop) ?*Session;
+    pub fn create(loop: *wl.EventLoop) !*Session {
+        return wlr_session_create(loop) orelse error.SessionCreateFailed;
     }
 
     extern fn wlr_session_destroy(session: *Session) void;

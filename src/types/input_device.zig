@@ -8,14 +8,12 @@ pub const InputDevice = extern struct {
         keyboard,
         pointer,
         touch,
-        tablet_tool,
+        tablet,
         tablet_pad,
         switch_device,
     };
 
     type: Type,
-    vendor: c_uint,
-    product: c_uint,
     name: ?[*:0]u8,
 
     events: extern struct {

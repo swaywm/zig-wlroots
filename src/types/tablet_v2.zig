@@ -44,7 +44,7 @@ pub const TabletV2Tablet = extern struct {
     wlr_device: *wlr.InputDevice,
     clients: wl.list.Link, // private to wlroots
 
-    tool_destroy: wl.Listener(void),
+    tablet_destroy: wl.Listener(void),
 
     current_client: ?*opaque {},
 };

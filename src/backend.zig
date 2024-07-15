@@ -6,6 +6,11 @@ const wl = wayland.server.wl;
 pub const Backend = extern struct {
     const Impl = opaque {};
 
+    pub const OutputState = extern struct {
+        output: *wlr.Output,
+        base: wlr.Output.State,
+    };
+
     impl: *const Impl,
     events: extern struct {
         destroy: wl.Signal(*Backend),
@@ -15,9 +20,9 @@ pub const Backend = extern struct {
 
     // backend.h
 
-    extern fn wlr_backend_autocreate(server: *wl.Server, session_ptr: ?*?*wlr.Session) ?*Backend;
-    pub fn autocreate(server: *wl.Server, session_ptr: ?*?*wlr.Session) !*Backend {
-        return wlr_backend_autocreate(server, session_ptr) orelse error.BackendCreateFailed;
+    extern fn wlr_backend_autocreate(loop: *wl.EventLoop, session_ptr: ?*?*wlr.Session) ?*Backend;
+    pub fn autocreate(loop: *wl.EventLoop, session_ptr: ?*?*wlr.Session) !*Backend {
+        return wlr_backend_autocreate(loop, session_ptr) orelse error.BackendCreateFailed;
     }
 
     extern fn wlr_backend_start(backend: *Backend) bool;
@@ -33,11 +38,21 @@ pub const Backend = extern struct {
     extern fn wlr_backend_get_drm_fd(backend: *Backend) c_int;
     pub const getDrmFd = wlr_backend_get_drm_fd;
 
+    extern fn wlr_backend_test(backend: *Backend, states: [*]const OutputState, states_len: usize) bool;
+    pub inline fn @"test"(backend: *Backend, states: []const OutputState) bool {
+        return wlr_backend_test(backend, states.ptr, states.len);
+    }
+
+    extern fn wlr_backend_commit(backend: *Backend, states: [*]const OutputState, states_len: usize) bool;
+    pub inline fn commit(backend: *Backend, states: []const OutputState) bool {
+        return wlr_backend_commit(backend, states.ptr, states.len);
+    }
+
     // backend/multi.h
 
-    extern fn wlr_multi_backend_create(server: *wl.Server) ?*Backend;
-    pub fn createMulti(server: *wl.Server) !*Backend {
-        return wlr_multi_backend_create(server) orelse error.BackendCreateFailed;
+    extern fn wlr_multi_backend_create(loop: *wl.EventLoop) ?*Backend;
+    pub fn createMulti(loop: *wl.EventLoop) !*Backend {
+        return wlr_multi_backend_create(loop) orelse error.BackendCreateFailed;
     }
 
     extern fn wlr_multi_backend_add(multi: *Backend, backend: *Backend) bool;
@@ -61,9 +76,9 @@ pub const Backend = extern struct {
 
     // backend/headless.h
 
-    extern fn wlr_headless_backend_create(server: *wl.Server) ?*Backend;
-    pub fn createHeadless(server: *wl.Server) !*Backend {
-        return wlr_headless_backend_create(server) orelse error.BackendCreateFailed;
+    extern fn wlr_headless_backend_create(loop: *wl.EventLoop) ?*Backend;
+    pub fn createHeadless(loop: *wl.EventLoop) !*Backend {
+        return wlr_headless_backend_create(loop) orelse error.BackendCreateFailed;
     }
 
     extern fn wlr_headless_add_output(headless: *Backend, width: c_uint, height: c_uint) ?*wlr.Output;

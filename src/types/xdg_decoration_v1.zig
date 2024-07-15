@@ -53,8 +53,6 @@ pub const XdgToplevelDecorationV1 = extern struct {
     scheduled_mode: Mode,
     requested_mode: Mode,
 
-    added: bool,
-
     configure_list: wl.list.Head(XdgToplevelDecorationV1.Configure, .link),
 
     events: extern struct {
@@ -62,12 +60,15 @@ pub const XdgToplevelDecorationV1 = extern struct {
         request_mode: wl.Signal(*XdgToplevelDecorationV1),
     },
 
-    surface_destroy: wl.Listener(*wlr.XdgSurface),
+    data: usize,
+
+    // private state
+
+    toplevel_destroy: wl.Listener(void),
     surface_configure: wl.Listener(*wlr.XdgSurface.Configure),
     surface_ack_configure: wl.Listener(*wlr.XdgSurface.Configure),
-    surface_commit: wl.Listener(*wlr.Surface),
 
-    data: usize,
+    synced: wlr.Surface.Synced,
 
     extern fn wlr_xdg_toplevel_decoration_v1_set_mode(decoration: *XdgToplevelDecorationV1, mode: Mode) u32;
     pub const setMode = wlr_xdg_toplevel_decoration_v1_set_mode;

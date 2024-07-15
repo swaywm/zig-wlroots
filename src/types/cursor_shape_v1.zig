@@ -25,6 +25,7 @@ pub const CursorShapeManagerV1 = extern struct {
         pub const RequestSetShape = extern struct {
             seat_client: *wlr.Seat.Client,
             device_type: DeviceType,
+            tablet_tool: ?*wlr.TabletV2TabletTool,
             serial: u32,
             shape: wp.CursorShapeDeviceV1.Shape,
         };

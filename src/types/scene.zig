@@ -146,12 +146,10 @@ pub const Scene = extern struct {
 
     outputs: wl.list.Head(SceneOutput, .link),
 
-    presentation: ?*wlr.Presentation,
     linux_dmabuf_v1: ?*wlr.LinuxDmabufV1,
 
     // private state
 
-    presentation_destroy: wl.Listener(void),
     linux_dmabuf_v1_destroy: wl.Listener(*wlr.LinuxDmabufV1),
 
     debug_damage_option: enum(c_int) {
@@ -162,6 +160,7 @@ pub const Scene = extern struct {
 
     direct_scanout: bool,
     calculate_visibility: bool,
+    highlight_transparent_region: bool,
 
     extern fn wlr_scene_create() ?*Scene;
     pub fn create() !*Scene {
@@ -175,9 +174,6 @@ pub const Scene = extern struct {
 
     extern fn wlr_scene_get_scene_output(scene: *Scene, output: *wlr.Output) ?*SceneOutput;
     pub const getSceneOutput = wlr_scene_get_scene_output;
-
-    extern fn wlr_scene_set_presentation(scene: *Scene, presentation: *wlr.Presentation) void;
-    pub const setPresentation = wlr_scene_set_presentation;
 
     extern fn wlr_scene_set_linux_dmabuf_v1(scene: *Scene, linux_dmabuf_v1: *wlr.LinuxDmabufV1) void;
     pub const setLinuxDmabufV1 = wlr_scene_set_linux_dmabuf_v1;
@@ -272,6 +268,14 @@ pub const SceneBuffer = extern struct {
     texture: ?*wlr.Texture,
     prev_feedback_options: wlr.LinuxDmabufFeedbackV1.InitOptions,
 
+    own_buffer: bool,
+    buffer_width: c_int,
+    buffer_height: c_int,
+    buffer_is_opaque: bool,
+
+    buffer_release: wl.Listener(void),
+    renderer_destroy: wl.Listener(void),
+
     extern fn wlr_scene_buffer_from_node(node: *SceneNode) *SceneBuffer;
     pub const fromNode = wlr_scene_buffer_from_node;
 
@@ -321,6 +325,8 @@ pub const SceneOutput = extern struct {
 
     // private state
 
+    pending_commit_damage: pixman.Region32,
+
     index: u8,
     prev_scanout: bool,
 
@@ -328,13 +334,14 @@ pub const SceneOutput = extern struct {
     output_damage: wl.Listener(void),
     output_needs_frame: wl.Listener(void),
 
-    // Actually the head of the list, but the element type is private.
     damage_highlight_regions: wl.list.Link,
 
     render_list: wl.Array,
 
     pub const StateOptions = extern struct {
         timer: ?*wlr.SceneTimer,
+        color_transform: ?*wlr.ColorTransform,
+        swapchain: ?*wlr.Swapchain,
     };
 
     extern fn wlr_scene_output_commit(scene_output: *SceneOutput, options: ?*const StateOptions) bool;

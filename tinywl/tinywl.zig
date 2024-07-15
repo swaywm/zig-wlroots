@@ -46,8 +46,9 @@ const Server = struct {
     new_output: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(newOutput),
 
     xdg_shell: *wlr.XdgShell,
-    new_xdg_surface: wl.Listener(*wlr.XdgSurface) = wl.Listener(*wlr.XdgSurface).init(newXdgSurface),
-    views: wl.list.Head(View, .link) = undefined,
+    new_xdg_toplevel: wl.Listener(*wlr.XdgToplevel) = wl.Listener(*wlr.XdgToplevel).init(newXdgToplevel),
+    new_xdg_popup: wl.Listener(*wlr.XdgPopup) = wl.Listener(*wlr.XdgPopup).init(newXdgPopup),
+    toplevels: wl.list.Head(Toplevel, .link) = undefined,
 
     seat: *wlr.Seat,
     new_input: wl.Listener(*wlr.InputDevice) = wl.Listener(*wlr.InputDevice).init(newInput),
@@ -64,7 +65,7 @@ const Server = struct {
     cursor_frame: wl.Listener(*wlr.Cursor) = wl.Listener(*wlr.Cursor).init(cursorFrame),
 
     cursor_mode: enum { passthrough, move, resize } = .passthrough,
-    grabbed_view: ?*View = null,
+    grabbed_view: ?*Toplevel = null,
     grab_x: f64 = 0,
     grab_y: f64 = 0,
     grab_box: wlr.Box = undefined,
@@ -72,9 +73,10 @@ const Server = struct {
 
     fn init(server: *Server) !void {
         const wl_server = try wl.Server.create();
-        const backend = try wlr.Backend.autocreate(wl_server, null);
+        const loop = wl_server.getEventLoop();
+        const backend = try wlr.Backend.autocreate(loop, null);
         const renderer = try wlr.Renderer.autocreate(backend);
-        const output_layout = try wlr.OutputLayout.create();
+        const output_layout = try wlr.OutputLayout.create(wl_server);
         const scene = try wlr.Scene.create();
         server.* = .{
             .wl_server = wl_server,
@@ -98,8 +100,9 @@ const Server = struct {
 
         server.backend.events.new_output.add(&server.new_output);
 
-        server.xdg_shell.events.new_surface.add(&server.new_xdg_surface);
-        server.views.init();
+        server.xdg_shell.events.new_toplevel.add(&server.new_xdg_toplevel);
+        server.xdg_shell.events.new_popup.add(&server.new_xdg_popup);
+        server.toplevels.init();
 
         server.backend.events.new_input.add(&server.new_input);
         server.seat.events.request_set_cursor.add(&server.request_set_cursor);
@@ -141,55 +144,66 @@ const Server = struct {
         };
     }
 
-    fn newXdgSurface(listener: *wl.Listener(*wlr.XdgSurface), xdg_surface: *wlr.XdgSurface) void {
-        const server: *Server = @fieldParentPtr("new_xdg_surface", listener);
+    fn newXdgToplevel(listener: *wl.Listener(*wlr.XdgToplevel), xdg_toplevel: *wlr.XdgToplevel) void {
+        const server: *Server = @fieldParentPtr("new_xdg_toplevel", listener);
+        const xdg_surface = xdg_toplevel.base;
 
-        switch (xdg_surface.role) {
-            .toplevel => {
-                // Don't add the view to server.views until it is mapped
-                const view = gpa.create(View) catch {
-                    std.log.err("failed to allocate new view", .{});
-                    return;
-                };
+        // Don't add the toplevel to server.toplevels until it is mapped
+        const toplevel = gpa.create(Toplevel) catch {
+            std.log.err("failed to allocate new toplevel", .{});
+            return;
+        };
 
-                view.* = .{
-                    .server = server,
-                    .xdg_surface = xdg_surface,
-                    .scene_tree = server.scene.tree.createSceneXdgSurface(xdg_surface) catch {
-                        gpa.destroy(view);
-                        std.log.err("failed to allocate new view", .{});
-                        return;
-                    },
-                };
-                view.scene_tree.node.data = @intFromPtr(view);
-                xdg_surface.data = @intFromPtr(view.scene_tree);
-
-                xdg_surface.surface.events.map.add(&view.map);
-                xdg_surface.surface.events.unmap.add(&view.unmap);
-                xdg_surface.events.destroy.add(&view.destroy);
-                xdg_surface.role_data.toplevel.?.events.request_move.add(&view.request_move);
-                xdg_surface.role_data.toplevel.?.events.request_resize.add(&view.request_resize);
+        toplevel.* = .{
+            .server = server,
+            .xdg_toplevel = xdg_toplevel,
+            .scene_tree = server.scene.tree.createSceneXdgSurface(xdg_surface) catch {
+                gpa.destroy(toplevel);
+                std.log.err("failed to allocate new toplevel", .{});
+                return;
             },
-            .popup => {
-                // These asserts are fine since tinywl.zig doesn't support anything else that can
-                // make xdg popups (e.g. layer shell).
-                const parent = wlr.XdgSurface.tryFromWlrSurface(xdg_surface.role_data.popup.?.parent.?) orelse return;
-                const parent_tree = @as(?*wlr.SceneTree, @ptrFromInt(parent.data)) orelse {
-                    // The xdg surface user data could be left null due to allocation failure.
-                    return;
-                };
-                const scene_tree = parent_tree.createSceneXdgSurface(xdg_surface) catch {
-                    std.log.err("failed to allocate xdg popup node", .{});
-                    return;
-                };
-                xdg_surface.data = @intFromPtr(scene_tree);
-            },
-            .none => unreachable,
-        }
+        };
+        toplevel.scene_tree.node.data = @intFromPtr(toplevel);
+        xdg_surface.data = @intFromPtr(toplevel.scene_tree);
+
+        xdg_surface.surface.events.commit.add(&toplevel.commit);
+        xdg_surface.surface.events.map.add(&toplevel.map);
+        xdg_surface.surface.events.unmap.add(&toplevel.unmap);
+        xdg_toplevel.events.destroy.add(&toplevel.destroy);
+        xdg_toplevel.events.request_move.add(&toplevel.request_move);
+        xdg_toplevel.events.request_resize.add(&toplevel.request_resize);
+    }
+
+    fn newXdgPopup(_: *wl.Listener(*wlr.XdgPopup), xdg_popup: *wlr.XdgPopup) void {
+        const xdg_surface = xdg_popup.base;
+
+        // These asserts are fine since tinywl.zig doesn't support anything else that can
+        // make xdg popups (e.g. layer shell).
+        const parent = wlr.XdgSurface.tryFromWlrSurface(xdg_popup.parent.?) orelse return;
+        const parent_tree = @as(?*wlr.SceneTree, @ptrFromInt(parent.data)) orelse {
+            // The xdg surface user data could be left null due to allocation failure.
+            return;
+        };
+        const scene_tree = parent_tree.createSceneXdgSurface(xdg_surface) catch {
+            std.log.err("failed to allocate xdg popup node", .{});
+            return;
+        };
+        xdg_surface.data = @intFromPtr(scene_tree);
+
+        const popup = gpa.create(Popup) catch {
+            std.log.err("failed to allocate new popup", .{});
+            return;
+        };
+        popup.* = .{
+            .xdg_popup = xdg_popup,
+        };
+
+        xdg_surface.surface.events.commit.add(&popup.commit);
+        xdg_popup.events.destroy.add(&popup.destroy);
     }
 
     const ViewAtResult = struct {
-        view: *View,
+        toplevel: *Toplevel,
         surface: *wlr.Surface,
         sx: f64,
         sy: f64,
@@ -205,9 +219,9 @@ const Server = struct {
 
             var it: ?*wlr.SceneTree = node.parent;
             while (it) |n| : (it = n.node.parent) {
-                if (@as(?*View, @ptrFromInt(n.node.data))) |view| {
+                if (@as(?*Toplevel, @ptrFromInt(n.node.data))) |toplevel| {
                     return ViewAtResult{
-                        .view = view,
+                        .toplevel = toplevel,
                         .surface = scene_surface.surface,
                         .sx = sx,
                         .sy = sy,
@@ -218,7 +232,7 @@ const Server = struct {
         return null;
     }
 
-    fn focusView(server: *Server, view: *View, surface: *wlr.Surface) void {
+    fn focusView(server: *Server, toplevel: *Toplevel, surface: *wlr.Surface) void {
         if (server.seat.keyboard_state.focused_surface) |previous_surface| {
             if (previous_surface == surface) return;
             if (wlr.XdgSurface.tryFromWlrSurface(previous_surface)) |xdg_surface| {
@@ -226,11 +240,11 @@ const Server = struct {
             }
         }
 
-        view.scene_tree.node.raiseToTop();
-        view.link.remove();
-        server.views.prepend(view);
+        toplevel.scene_tree.node.raiseToTop();
+        toplevel.link.remove();
+        server.toplevels.prepend(toplevel);
 
-        _ = view.xdg_surface.role_data.toplevel.?.setActivated(true);
+        _ = toplevel.xdg_toplevel.setActivated(true);
 
         const wlr_keyboard = server.seat.getKeyboard() orelse return;
         server.seat.keyboardNotifyEnter(
@@ -302,13 +316,13 @@ const Server = struct {
                 server.seat.pointerClearFocus();
             },
             .move => {
-                const view = server.grabbed_view.?;
-                view.x = @as(i32, @intFromFloat(server.cursor.x - server.grab_x));
-                view.y = @as(i32, @intFromFloat(server.cursor.y - server.grab_y));
-                view.scene_tree.node.setPosition(view.x, view.y);
+                const toplevel = server.grabbed_view.?;
+                toplevel.x = @as(i32, @intFromFloat(server.cursor.x - server.grab_x));
+                toplevel.y = @as(i32, @intFromFloat(server.cursor.y - server.grab_y));
+                toplevel.scene_tree.node.setPosition(toplevel.x, toplevel.y);
             },
             .resize => {
-                const view = server.grabbed_view.?;
+                const toplevel = server.grabbed_view.?;
                 const border_x = @as(i32, @intFromFloat(server.cursor.x - server.grab_x));
                 const border_y = @as(i32, @intFromFloat(server.cursor.y - server.grab_y));
 
@@ -338,14 +352,14 @@ const Server = struct {
                 }
 
                 var geo_box: wlr.Box = undefined;
-                view.xdg_surface.getGeometry(&geo_box);
-                view.x = new_left - geo_box.x;
-                view.y = new_top - geo_box.y;
-                view.scene_tree.node.setPosition(view.x, view.y);
+                toplevel.xdg_toplevel.base.getGeometry(&geo_box);
+                toplevel.x = new_left - geo_box.x;
+                toplevel.y = new_top - geo_box.y;
+                toplevel.scene_tree.node.setPosition(toplevel.x, toplevel.y);
 
                 const new_width = new_right - new_left;
                 const new_height = new_bottom - new_top;
-                _ = view.xdg_surface.role_data.toplevel.?.setSize(new_width, new_height);
+                _ = toplevel.xdg_toplevel.setSize(new_width, new_height);
             },
         }
     }
@@ -359,7 +373,7 @@ const Server = struct {
         if (event.state == .released) {
             server.cursor_mode = .passthrough;
         } else if (server.viewAt(server.cursor.x, server.cursor.y)) |res| {
-            server.focusView(res.view, res.surface);
+            server.focusView(res.toplevel, res.surface);
         }
     }
 
@@ -374,6 +388,7 @@ const Server = struct {
             event.delta,
             event.delta_discrete,
             event.source,
+            event.relative_direction,
         );
     }
 
@@ -388,11 +403,11 @@ const Server = struct {
         switch (@intFromEnum(key)) {
             // Exit the compositor
             xkb.Keysym.Escape => server.wl_server.terminate(),
-            // Focus the next view in the stack, pushing the current top to the back
+            // Focus the next toplevel in the stack, pushing the current top to the back
             xkb.Keysym.F1 => {
-                if (server.views.length() < 2) return true;
-                const view: *View = @fieldParentPtr("link", server.views.link.prev.?);
-                server.focusView(view, view.xdg_surface.surface);
+                if (server.toplevels.length() < 2) return true;
+                const toplevel: *Toplevel = @fieldParentPtr("link", server.toplevels.link.prev.?);
+                server.focusView(toplevel, toplevel.xdg_toplevel.base.surface);
             },
             else => return false,
         }
@@ -457,78 +472,110 @@ const Output = struct {
     }
 };
 
-const View = struct {
+const Toplevel = struct {
     server: *Server,
     link: wl.list.Link = undefined,
-    xdg_surface: *wlr.XdgSurface,
+    xdg_toplevel: *wlr.XdgToplevel,
     scene_tree: *wlr.SceneTree,
 
     x: i32 = 0,
     y: i32 = 0,
 
+    commit: wl.Listener(*wlr.Surface) = wl.Listener(*wlr.Surface).init(commit),
     map: wl.Listener(void) = wl.Listener(void).init(map),
     unmap: wl.Listener(void) = wl.Listener(void).init(unmap),
     destroy: wl.Listener(void) = wl.Listener(void).init(destroy),
     request_move: wl.Listener(*wlr.XdgToplevel.event.Move) = wl.Listener(*wlr.XdgToplevel.event.Move).init(requestMove),
     request_resize: wl.Listener(*wlr.XdgToplevel.event.Resize) = wl.Listener(*wlr.XdgToplevel.event.Resize).init(requestResize),
 
+    fn commit(listener: *wl.Listener(*wlr.Surface), _: *wlr.Surface) void {
+        const toplevel: *Toplevel = @fieldParentPtr("commit", listener);
+        if (toplevel.xdg_toplevel.base.initial_commit) {
+            _ = toplevel.xdg_toplevel.setSize(0, 0);
+        }
+    }
+
     fn map(listener: *wl.Listener(void)) void {
-        const view: *View = @fieldParentPtr("map", listener);
-        view.server.views.prepend(view);
-        view.server.focusView(view, view.xdg_surface.surface);
+        const toplevel: *Toplevel = @fieldParentPtr("map", listener);
+        toplevel.server.toplevels.prepend(toplevel);
+        toplevel.server.focusView(toplevel, toplevel.xdg_toplevel.base.surface);
     }
 
     fn unmap(listener: *wl.Listener(void)) void {
-        const view: *View = @fieldParentPtr("unmap", listener);
-        view.link.remove();
+        const toplevel: *Toplevel = @fieldParentPtr("unmap", listener);
+        toplevel.link.remove();
     }
 
     fn destroy(listener: *wl.Listener(void)) void {
-        const view: *View = @fieldParentPtr("destroy", listener);
+        const toplevel: *Toplevel = @fieldParentPtr("destroy", listener);
 
-        view.map.link.remove();
-        view.unmap.link.remove();
-        view.destroy.link.remove();
-        view.request_move.link.remove();
-        view.request_resize.link.remove();
+        toplevel.commit.link.remove();
+        toplevel.map.link.remove();
+        toplevel.unmap.link.remove();
+        toplevel.destroy.link.remove();
+        toplevel.request_move.link.remove();
+        toplevel.request_resize.link.remove();
 
-        gpa.destroy(view);
+        gpa.destroy(toplevel);
     }
 
     fn requestMove(
         listener: *wl.Listener(*wlr.XdgToplevel.event.Move),
         _: *wlr.XdgToplevel.event.Move,
     ) void {
-        const view: *View = @fieldParentPtr("request_move", listener);
-        const server = view.server;
-        server.grabbed_view = view;
+        const toplevel: *Toplevel = @fieldParentPtr("request_move", listener);
+        const server = toplevel.server;
+        server.grabbed_view = toplevel;
         server.cursor_mode = .move;
-        server.grab_x = server.cursor.x - @as(f64, @floatFromInt(view.x));
-        server.grab_y = server.cursor.y - @as(f64, @floatFromInt(view.y));
+        server.grab_x = server.cursor.x - @as(f64, @floatFromInt(toplevel.x));
+        server.grab_y = server.cursor.y - @as(f64, @floatFromInt(toplevel.y));
     }
 
     fn requestResize(
         listener: *wl.Listener(*wlr.XdgToplevel.event.Resize),
         event: *wlr.XdgToplevel.event.Resize,
     ) void {
-        const view: *View = @fieldParentPtr("request_resize", listener);
-        const server = view.server;
+        const toplevel: *Toplevel = @fieldParentPtr("request_resize", listener);
+        const server = toplevel.server;
 
-        server.grabbed_view = view;
+        server.grabbed_view = toplevel;
         server.cursor_mode = .resize;
         server.resize_edges = event.edges;
 
         var box: wlr.Box = undefined;
-        view.xdg_surface.getGeometry(&box);
+        toplevel.xdg_toplevel.base.getGeometry(&box);
 
-        const border_x = view.x + box.x + if (event.edges.right) box.width else 0;
-        const border_y = view.y + box.y + if (event.edges.bottom) box.height else 0;
+        const border_x = toplevel.x + box.x + if (event.edges.right) box.width else 0;
+        const border_y = toplevel.y + box.y + if (event.edges.bottom) box.height else 0;
         server.grab_x = server.cursor.x - @as(f64, @floatFromInt(border_x));
         server.grab_y = server.cursor.y - @as(f64, @floatFromInt(border_y));
 
         server.grab_box = box;
-        server.grab_box.x += view.x;
-        server.grab_box.y += view.y;
+        server.grab_box.x += toplevel.x;
+        server.grab_box.y += toplevel.y;
+    }
+};
+
+const Popup = struct {
+    xdg_popup: *wlr.XdgPopup,
+
+    commit: wl.Listener(*wlr.Surface) = wl.Listener(*wlr.Surface).init(commit),
+    destroy: wl.Listener(void) = wl.Listener(void).init(destroy),
+
+    fn commit(listener: *wl.Listener(*wlr.Surface), _: *wlr.Surface) void {
+        const popup: *Popup = @fieldParentPtr("commit", listener);
+        if (popup.xdg_popup.base.initial_commit) {
+            _ = popup.xdg_popup.base.scheduleConfigure();
+        }
+    }
+
+    fn destroy(listener: *wl.Listener(void)) void {
+        const popup: *Popup = @fieldParentPtr("destroy", listener);
+
+        popup.commit.link.remove();
+        popup.destroy.link.remove();
+
+        gpa.destroy(popup);
     }
 };
 

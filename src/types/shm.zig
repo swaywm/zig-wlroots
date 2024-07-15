@@ -3,7 +3,16 @@ const wlr = @import("../wlroots.zig");
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
-pub const Shm = opaque {
+pub const Shm = extern struct {
+    global: *wl.Global,
+
+    // private state
+
+    formats: [*]u32,
+    formats_len: usize,
+
+    server_destroy: wl.Listener(*wl.Server),
+
     extern fn wlr_shm_create(server: *wl.Server, version: u32, formats: [*]const u32, formats_len: usize) ?*Shm;
     pub fn create(server: *wl.Server, version: u32, formats: []const u32) error{OutOfMemory}!*Shm {
         return wlr_shm_create(server, version, formats.ptr, formats.len) orelse error.OutOfMemory;

@@ -191,7 +191,7 @@ pub const Output = extern struct {
 
     impl: *const Impl,
     backend: *wlr.Backend,
-    server: *wl.Server,
+    event_loop: *wl.EventLoop,
 
     global: ?*wl.Global,
     resources: wl.list.Head(wl.Output, null),
@@ -217,13 +217,12 @@ pub const Output = extern struct {
     adaptive_sync_status: AdaptiveSyncStatus,
     render_format: u32,
 
+    adaptive_sync_supported: bool,
+
     needs_frame: bool,
     frame_pending: bool,
-    transform_matrix: [9]f32,
 
     non_desktop: bool,
-
-    pending: State,
 
     commit_seq: u32,
 
@@ -258,7 +257,6 @@ pub const Output = extern struct {
     allocator: ?*wlr.Allocator,
     renderer: ?*wlr.Renderer,
     swapchain: ?*wlr.Swapchain,
-    back_buffer: ?*wlr.Buffer,
 
     server_destroy: wl.Listener(*wl.Server),
 
@@ -266,10 +264,7 @@ pub const Output = extern struct {
 
     data: usize,
 
-    extern fn wlr_output_enable(output: *Output, enable: bool) void;
-    pub const enable = wlr_output_enable;
-
-    extern fn wlr_output_create_global(output: *Output) void;
+    extern fn wlr_output_create_global(output: *Output, server: *wl.Server) void;
     pub const createGlobal = wlr_output_create_global;
 
     extern fn wlr_output_destroy_global(output: *Output) void;
@@ -280,27 +275,6 @@ pub const Output = extern struct {
 
     extern fn wlr_output_preferred_mode(output: *Output) ?*Mode;
     pub const preferredMode = wlr_output_preferred_mode;
-
-    extern fn wlr_output_set_mode(output: *Output, mode: *Mode) void;
-    pub const setMode = wlr_output_set_mode;
-
-    extern fn wlr_output_set_custom_mode(output: *Output, width: i32, height: i32, refresh: i32) void;
-    pub const setCustomMode = wlr_output_set_custom_mode;
-
-    extern fn wlr_output_set_transform(output: *Output, transform: wl.Output.Transform) void;
-    pub const setTransform = wlr_output_set_transform;
-
-    extern fn wlr_output_enable_adaptive_sync(output: *Output, enabled: bool) void;
-    pub const enableAdaptiveSync = wlr_output_enable_adaptive_sync;
-
-    extern fn wlr_output_set_render_format(output: *Output, format: u32) void;
-    pub const setRenderFormat = wlr_output_set_render_format;
-
-    extern fn wlr_output_set_scale(output: *Output, scale: f32) void;
-    pub const setScale = wlr_output_set_scale;
-
-    extern fn wlr_output_set_subpixel(output: *Output, subpixel: wl.Output.Subpixel) void;
-    pub const setSubpixel = wlr_output_set_subpixel;
 
     extern fn wlr_output_set_name(output: *Output, name: [*:0]const u8) void;
     pub const setName = wlr_output_set_name;
@@ -320,31 +294,6 @@ pub const Output = extern struct {
     extern fn wlr_output_effective_resolution(output: *Output, width: *c_int, height: *c_int) void;
     pub const effectiveResolution = wlr_output_effective_resolution;
 
-    extern fn wlr_output_attach_render(output: *Output, buffer_age: ?*c_int) bool;
-    pub fn attachRender(output: *Output, buffer_age: ?*c_int) !void {
-        if (!wlr_output_attach_render(output, buffer_age)) return error.AttachRenderFailed;
-    }
-
-    extern fn wlr_output_attach_buffer(output: *Output, buffer: *wlr.Buffer) void;
-    pub const attachBuffer = wlr_output_attach_buffer;
-
-    extern fn wlr_output_preferred_read_format(output: *Output) u32;
-    pub const preferredReadFormat = wlr_output_preferred_read_format;
-
-    extern fn wlr_output_set_damage(output: *Output, damage: *const pixman.Region32) void;
-    pub const setDamage = wlr_output_set_damage;
-
-    extern fn wlr_output_test(output: *Output) bool;
-    pub const testCommit = wlr_output_test;
-
-    extern fn wlr_output_commit(output: *Output) bool;
-    pub fn commit(output: *Output) !void {
-        if (!wlr_output_commit(output)) return error.OutputCommitFailed;
-    }
-
-    extern fn wlr_output_rollback(output: *Output) void;
-    pub const rollback = wlr_output_rollback;
-
     extern fn wlr_output_test_state(output: *Output, state: *const Output.State) bool;
     pub const testState = wlr_output_test_state;
 
@@ -357,9 +306,6 @@ pub const Output = extern struct {
     extern fn wlr_output_get_gamma_size(output: *Output) usize;
     pub const getGammaSize = wlr_output_get_gamma_size;
 
-    extern fn wlr_output_set_gamma(output: *Output, size: usize, r: [*]const u16, g: [*]const u16, b: [*]const u16) void;
-    pub const setGamma = wlr_output_set_gamma;
-
     extern fn wlr_output_from_resource(resource: *wl.Output) ?*Output;
     pub const fromWlOutput = wlr_output_from_resource;
 
@@ -369,17 +315,10 @@ pub const Output = extern struct {
     extern fn wlr_output_lock_software_cursors(output: *Output, lock: bool) void;
     pub const lockSoftwareCursors = wlr_output_lock_software_cursors;
 
-    extern fn wlr_output_render_software_cursors(output: *Output, damage: ?*const pixman.Region32) void;
-    pub const renderSoftwareCursors = wlr_output_render_software_cursors;
-
     extern fn wlr_output_is_direct_scanout_allowed(output: *Output) bool;
     pub const isDirectScanoutAllowed = wlr_output_is_direct_scanout_allowed;
 
-    extern fn wlr_output_transform_invert(tr: wl.Output.Transform) wl.Output.Transform;
-    pub const transformInvert = wlr_output_transform_invert;
-
-    extern fn wlr_output_transform_compose(tr_a: wl.Output.Transform, tr_b: wl.Output.Transform) wl.Output.Transform;
-    pub const transformCompose = wlr_output_transform_compose;
+    // TODO render pass API
 
     extern fn wlr_output_is_drm(output: *Output) bool;
     pub const isDrm = wlr_output_is_drm;
@@ -392,6 +331,9 @@ pub const Output = extern struct {
 
     extern fn wlr_wl_output_set_title(output: *Output, title: ?[*:0]const u8) void;
     pub const wlSetTitle = wlr_wl_output_set_title;
+
+    extern fn wlr_wl_output_set_app_id(output: *Output, app_id: ?[*:0]const u8) void;
+    pub const wlSetAppId = wlr_wl_output_set_app_id;
 
     pub usingnamespace if (wlr.config.has_x11_backend) struct {
         extern fn wlr_output_is_x11(output: *Output) bool;
@@ -416,6 +358,7 @@ pub const OutputCursor = extern struct {
     hotspot_y: i32,
     texture: ?*wlr.Texture,
     own_texture: bool,
+    renderer_destroy: wl.Listener(void),
     /// Output.cursors
     link: wl.list.Link,
 

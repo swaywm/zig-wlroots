@@ -85,6 +85,8 @@ pub const SessionLockSurfaceV1 = extern struct {
 
     // private state
 
+    synced: wlr.Surface.Synced,
+
     output_destroy: wl.Listener(*wlr.Output),
 
     extern fn wlr_session_lock_surface_v1_configure(lock_surface: *SessionLockSurfaceV1, width: u32, height: u32) u32;

@@ -97,4 +97,11 @@ pub const OutputConfigurationV1 = extern struct {
 
     extern fn wlr_output_configuration_v1_send_failed(config: *OutputConfigurationV1) void;
     pub const sendFailed = wlr_output_configuration_v1_send_failed;
+
+    extern fn wlr_output_configuration_v1_build_state(config: *const OutputConfigurationV1, states_len: *usize) ?[*]wlr.Backend.OutputState;
+    pub inline fn buildState(config: *const OutputConfigurationV1) ![]wlr.Backend.OutputState {
+        var len: usize = undefined;
+        const ptr = wlr_output_configuration_v1_build_state(config, &len) orelse return error.OutOfMemory;
+        return ptr[0..len];
+    }
 };

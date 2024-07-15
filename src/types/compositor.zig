@@ -12,16 +12,20 @@ pub const Compositor = extern struct {
     renderer: ?*wlr.Renderer,
 
     server_destroy: wl.Listener(*wl.Server),
+    renderer_destroy: wl.Listener(void),
 
     events: extern struct {
         new_surface: wl.Signal(*wlr.Surface),
         destroy: wl.Signal(*wlr.Compositor),
     },
 
-    extern fn wlr_compositor_create(server: *wl.Server, version: u32, renderer: *wlr.Renderer) ?*Compositor;
-    pub fn create(server: *wl.Server, version: u32, renderer: *wlr.Renderer) !*Compositor {
+    extern fn wlr_compositor_create(server: *wl.Server, version: u32, renderer: ?*wlr.Renderer) ?*Compositor;
+    pub fn create(server: *wl.Server, version: u32, renderer: ?*wlr.Renderer) !*Compositor {
         return wlr_compositor_create(server, version, renderer) orelse error.OutOfMemory;
     }
+
+    extern fn wlr_compositor_set_renderer(compositor: *Compositor, renderer: ?*wlr.Renderer) void;
+    pub const setRenderer = wlr_compositor_set_renderer;
 };
 
 pub const Surface = extern struct {
@@ -72,11 +76,17 @@ pub const Surface = extern struct {
 
         cached_state_locks: usize,
         cached_state_link: wl.list.Link,
+
+        synced: wl.Array,
+
+        extern fn wlr_surface_state_has_buffer(state: *State) bool;
+        pub const hasBuffer = wlr_surface_state_has_buffer;
     };
 
     pub const Role = extern struct {
         name: [*:0]const u8,
         no_object: bool,
+        client_commit: ?*const fn (surface: *Surface) callconv(.C) void,
         commit: ?*const fn (surface: *Surface) callconv(.C) void,
         unmap: ?*const fn (surface: *Surface) callconv(.C) void,
         destroy: ?*const fn (surface: *Surface) callconv(.C) void,
@@ -92,13 +102,52 @@ pub const Surface = extern struct {
         destroy: wl.Listener(*wlr.Output),
     };
 
+    pub const Synced = extern struct {
+        pub const Impl = extern struct {
+            state_size: usize,
+            init_state: ?*const fn (state: *anyopaque) callconv(.C) void,
+            finish_state: ?*const fn (state: *anyopaque) callconv(.C) void,
+            move_state: ?*const fn (dst: *anyopaque, src: *anyopaque) callconv(.C) void,
+        };
+
+        surface: *Surface,
+        impl: *const Impl,
+        /// wlr.Surface.synced
+        link: wl.list.Link,
+        index: usize,
+
+        extern fn wlr_surface_synced_init(
+            synced: *Synced,
+            surface: *Surface,
+            impl: *const Impl,
+            pending: *anyopaque,
+            current: *anyopaque,
+        ) bool;
+        pub inline fn init(
+            synced: *Synced,
+            surface: *Surface,
+            impl: *const Impl,
+            pending: *anyopaque,
+            current: *anyopaque,
+        ) error{OutOfMemory}!void {
+            if (!wlr_surface_synced_init(synced, surface, impl, pending, current)) {
+                return error.OutOfMemory;
+            }
+        }
+
+        extern fn wlr_surface_synced_finish(synced: *Synced) void;
+        pub const deinit = wlr_surface_synced_finish;
+
+        extern fn wlr_surface_synced_get_state(synced: *Synced, state: *const Surface.State) *anyopaque;
+        pub const getState = wlr_surface_synced_get_state;
+    };
+
     resource: *wl.Surface,
-    renderer: ?*wlr.Renderer,
+    compositor: *wlr.Compositor,
 
     buffer: ?*wlr.ClientBuffer,
 
     buffer_damage: pixman.Region32,
-    external_damage: pixman.Region32,
     opaque_region: pixman.Region32,
     input_region: pixman.Region32,
 
@@ -114,7 +163,6 @@ pub const Surface = extern struct {
 
     events: extern struct {
         client_commit: wl.Signal(void),
-        precommit: wl.Signal(*const wlr.Surface.State),
         commit: wl.Signal(*wlr.Surface),
         map: wl.Signal(void),
         unmap: wl.Signal(void),
@@ -129,7 +177,6 @@ pub const Surface = extern struct {
 
     // private state
 
-    renderer_destroy: wl.Listener(*wlr.Renderer),
     role_resource_destroy: wl.Listener(*wl.Resource),
 
     previous: extern struct {
@@ -143,11 +190,19 @@ pub const Surface = extern struct {
 
     unmap_commit: bool,
     @"opaque": bool,
-    has_buffer: bool,
+
+    handling_commit: bool,
+    pending_rejected: bool,
 
     preferred_buffer_scale: i32,
     preferred_buffer_transform_sent: bool,
     preferred_buffer_transform: wl.Output.Transform,
+
+    synced: wl.list.Head(Synced, .link),
+    synced_len: usize,
+
+    pending_buffer_resource: *wl.Resource,
+    pending_buffer_resource_destroy: wl.Listener(void),
 
     extern fn wlr_surface_set_role(
         surface: *Surface,
@@ -166,8 +221,8 @@ pub const Surface = extern struct {
     extern fn wlr_surface_unmap(surface: *Surface) void;
     pub const unmap = wlr_surface_unmap;
 
-    // Just check if Surface.buffer is null, that's all this function does
     extern fn wlr_surface_has_buffer(surface: *Surface) bool;
+    pub const hasBuffer = wlr_surface_has_buffer;
 
     extern fn wlr_surface_get_texture(surface: *Surface) ?*wlr.Texture;
     pub const getTexture = wlr_surface_get_texture;

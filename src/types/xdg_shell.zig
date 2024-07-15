@@ -15,6 +15,8 @@ pub const XdgShell = extern struct {
 
     events: extern struct {
         new_surface: wl.Signal(*wlr.XdgSurface),
+        new_toplevel: wl.Signal(*wlr.XdgToplevel),
+        new_popup: wl.Signal(*wlr.XdgPopup),
         destroy: wl.Signal(*wlr.XdgShell),
     },
 
@@ -111,7 +113,6 @@ pub const XdgPopup = extern struct {
     link: wl.list.Link,
 
     resource: *xdg.Popup,
-    sent_initial_configure: bool,
     parent: ?*wlr.Surface,
     seat: ?*wlr.Seat,
 
@@ -121,11 +122,16 @@ pub const XdgPopup = extern struct {
     pending: State,
 
     events: extern struct {
+        destroy: wl.Signal(void),
         reposition: wl.Signal(void),
     },
 
     /// Grab.popups
     grab_link: wl.list.Link,
+
+    // private state
+
+    synced: wlr.Surface.Synced,
 
     extern fn wlr_xdg_popup_from_resource(resource: *xdg.Popup) ?*wlr.XdgPopup;
     pub const fromResource = wlr_xdg_popup_from_resource;
@@ -235,6 +241,7 @@ pub const XdgToplevel = extern struct {
     title: ?[*:0]u8,
     app_id: ?[*:0]u8,
     events: extern struct {
+        destroy: wl.Signal(void),
         request_maximize: wl.Signal(void),
         request_fullscreen: wl.Signal(void),
         request_minimize: wl.Signal(void),
@@ -324,7 +331,6 @@ pub const XdgSurface = extern struct {
 
     popups: wl.list.Head(XdgPopup, .link),
 
-    added: bool,
     configured: bool,
     configure_idle: ?*wl.EventSource,
     scheduled_serial: u32,
@@ -347,6 +353,8 @@ pub const XdgSurface = extern struct {
     data: usize,
 
     // private state
+
+    synced: wlr.Surface.Synced,
 
     role_resource_destroy: wl.Listener(*wl.Resource),
 

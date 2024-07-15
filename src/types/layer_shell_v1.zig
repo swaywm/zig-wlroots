@@ -71,7 +71,6 @@ pub const LayerSurfaceV1 = extern struct {
 
     namespace: [*:0]u8,
 
-    added: bool,
     configured: bool,
 
     configure_list: wl.list.Head(LayerSurfaceV1.Configure, .link),
@@ -88,6 +87,10 @@ pub const LayerSurfaceV1 = extern struct {
     },
 
     data: usize,
+
+    // private state
+
+    synced: wlr.Surface.Synced,
 
     extern fn wlr_layer_surface_v1_configure(surface: *LayerSurfaceV1, width: u32, height: u32) u32;
     pub const configure = wlr_layer_surface_v1_configure;

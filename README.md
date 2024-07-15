@@ -22,7 +22,7 @@ request on [codeberg](https://codeberg.org/ifreund/zig-wlroots).
 ## Dependencies
 
 - [zig](https://ziglang.org/) 0.13
-- [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots) 0.17
+- [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots) 0.18
 - [zig-wayland](https://github.com/ifreund/zig-wayland)
 - [zig-xkbcommon](https://github.com/ifreund/zig-xkbcommon)
 - [zig-pixman](https://github.com/ifreund/zig-pixman)
@@ -39,9 +39,9 @@ See the C headers of wlroots for documentation.
 zig-wlroots versions have the form `major.minor.revision` where major and minor
 are the major and minor version numbers of the compatible wlroots release. The
 revision number is incremented for every zig-wlroots release compatible with a
-given wlroots release. Breaking bugfixes and breaking changes may occur in
-with only a revision version bump. The required Zig version may be updated with
-a revision version bump.
+given wlroots release. Breaking changes and bugfixes may occur with only a
+revision version bump. The required Zig version may be updated with a revision
+version bump.
 
 For example, zig-wlroots `0.16.42` would be compatible with wlroots 0.16, the 42
 indicating that there were 42 zig-wlroots releases since the initial wlroots 0.16

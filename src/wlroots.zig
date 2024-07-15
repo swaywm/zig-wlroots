@@ -12,9 +12,11 @@ pub const RenderTimer = @import("render/renderer.zig").RenderTimer;
 pub const RenderPass = @import("render/renderer.zig").RenderPass;
 pub const Texture = @import("render/texture.zig").Texture;
 pub const Allocator = @import("render/allocator.zig").Allocator;
-pub const Swapchain = opaque {};
+pub const Swapchain = opaque {}; // TODO
 pub const DrmFormat = @import("render/drm_format_set.zig").DrmFormat;
 pub const DrmFormatSet = @import("render/drm_format_set.zig").DrmFormatSet;
+
+pub const ColorTransform = opaque {}; // TODO
 
 pub const Drm = @import("types/drm.zig").Drm;
 
@@ -88,8 +90,6 @@ pub const Pointer = @import("types/pointer.zig").Pointer;
 pub const PointerConstraintV1 = @import("types/pointer_constraints_v1.zig").PointerConstraintV1;
 pub const PointerConstraintsV1 = @import("types/pointer_constraints_v1.zig").PointerConstraintsV1;
 pub const PointerGesturesV1 = @import("types/pointer_gestures_v1.zig").PointerGesturesV1;
-pub const AxisOrientation = @import("types/pointer.zig").AxisOrientation;
-pub const AxisSource = @import("types/pointer.zig").AxisSource;
 
 pub const RelativePointerManagerV1 = @import("types/relative_pointer_v1.zig").RelativePointerManagerV1;
 pub const RelativePointerV1 = @import("types/relative_pointer_v1.zig").RelativePointerV1;
@@ -117,8 +117,6 @@ pub const IdleInhibitManagerV1 = @import("types/idle_inhibit_v1.zig").IdleInhibi
 pub const IdleInhibitorV1 = @import("types/idle_inhibit_v1.zig").IdleInhibitorV1;
 
 pub const IdleNotifierV1 = @import("types/idle_notify_v1.zig").IdleNotifierV1;
-
-pub const InputInhibitManager = @import("types/input_inhibitor.zig").InputInhibitManager;
 
 pub const DataDeviceManager = @import("types/data_device.zig").DataDeviceManager;
 pub const DataOffer = @import("types/data_device.zig").DataOffer;
@@ -207,8 +205,8 @@ pub const config = @import("config.zig");
 pub const version = @import("version.zig");
 
 comptime {
-    if (version.major != 0 or version.minor != 17) {
-        @compileError("zig-wlroots requires wlroots version 0.17, found version " ++ version.str);
+    if (version.major != 0 or version.minor != 18) {
+        @compileError("zig-wlroots requires wlroots version 0.18, found version " ++ version.str);
     }
 }
 test {

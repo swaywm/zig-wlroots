@@ -30,7 +30,7 @@ pub const Keyboard = extern struct {
         depressed: xkb.ModMask,
         latched: xkb.ModMask,
         locked: xkb.ModMask,
-        group: xkb.ModMask,
+        group: xkb.LayoutIndex,
     };
 
     pub const event = struct {

@@ -96,6 +96,7 @@ pub const ClientBuffer = extern struct {
     // private state
 
     source_destroy: wl.Listener(void),
+    renderer_destroy: wl.Listener(void),
 
     n_ignore_locks: usize,
 

@@ -19,13 +19,13 @@ pub const Presentation = extern struct {
         return wlr_presentation_create(server, backend) orelse error.OutOfMemory;
     }
 
-    extern fn wlr_presentation_surface_sampled(presentation: *wlr.Presentation, surface: *wlr.Surface) ?*wlr.PresentationFeedback;
+    extern fn wlr_presentation_surface_sampled(surface: *wlr.Surface) ?*wlr.PresentationFeedback;
     pub const surfaceSampled = wlr_presentation_surface_sampled;
 
-    extern fn wlr_presentation_surface_textured_on_output(presentation: *wlr.Presentation, surface: *wlr.Surface, output: *wlr.Output) void;
+    extern fn wlr_presentation_surface_textured_on_output(surface: *wlr.Surface, output: *wlr.Output) void;
     pub const surfaceTexturedOnOutput = wlr_presentation_surface_textured_on_output;
 
-    extern fn wlr_presentation_surface_scanned_out_on_output(presentation: *wlr.Presentation, surface: *wlr.Surface, output: *wlr.Output) void;
+    extern fn wlr_presentation_surface_scanned_out_on_output(surface: *wlr.Surface, output: *wlr.Output) void;
     pub const surfaceScannedOutdOnOutput = wlr_presentation_surface_scanned_out_on_output;
 };
 

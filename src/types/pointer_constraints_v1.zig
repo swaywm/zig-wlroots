@@ -19,6 +19,7 @@ pub const PointerConstraintV1 = extern struct {
         region: pixman.Region32,
 
         cursor_hint: extern struct {
+            enabled: bool,
             x: f64,
             y: f64,
         },
@@ -40,10 +41,6 @@ pub const PointerConstraintV1 = extern struct {
     current: State,
     pending: State,
 
-    surface_commit: wl.Listener(*wlr.Surface),
-    surface_destroy: wl.Listener(*wlr.Surface),
-    seat_destroy: wl.Listener(*wl.Seat),
-
     link: wl.list.Link,
 
     events: extern struct {
@@ -52,6 +49,14 @@ pub const PointerConstraintV1 = extern struct {
     },
 
     data: usize,
+
+    // private state
+
+    surface_commit: wl.Listener(*wlr.Surface),
+    surface_destroy: wl.Listener(*wlr.Surface),
+    seat_destroy: wl.Listener(*wl.Seat),
+
+    synced: wlr.Surface.Synced,
 
     extern fn wlr_pointer_constraint_v1_send_activated(constraint: *PointerConstraintV1) void;
     pub const sendActivated = wlr_pointer_constraint_v1_send_activated;

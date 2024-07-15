@@ -8,9 +8,15 @@ const pixman = @import("pixman");
 pub const DamageRing = extern struct {
     width: i32,
     height: i32,
+
     current: pixman.Region32,
+
+    // private state
+
     previous: [2]pixman.Region32,
     previous_idx: usize,
+
+    buffers: wl.list.Link,
 
     extern fn wlr_damage_ring_init(ring: *DamageRing) void;
     pub const init = wlr_damage_ring_init;
@@ -35,4 +41,7 @@ pub const DamageRing = extern struct {
 
     extern fn wlr_damage_ring_get_buffer_damage(ring: *DamageRing, buffer_age: c_int, damage: *pixman.Region32) void;
     pub const getBufferDamage = wlr_damage_ring_get_buffer_damage;
+
+    extern fn wlr_damage_ring_rotate_buffer(ring: *DamageRing, buffer: *wlr.Buffer, damage: *pixman.Region32) void;
+    pub const rotateBuffer = wlr_damage_ring_rotate_buffer;
 };

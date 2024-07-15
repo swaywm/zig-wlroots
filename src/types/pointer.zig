@@ -3,18 +3,6 @@ const wlr = @import("../wlroots.zig");
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
-pub const AxisSource = enum(c_int) {
-    wheel,
-    finger,
-    continuous,
-    wheel_tilt,
-};
-
-pub const AxisOrientation = enum(c_int) {
-    vertical,
-    horizontal,
-};
-
 pub const Pointer = extern struct {
     pub const event = struct {
         pub const Motion = extern struct {
@@ -43,8 +31,9 @@ pub const Pointer = extern struct {
         pub const Axis = extern struct {
             device: *wlr.InputDevice,
             time_msec: u32,
-            source: AxisSource,
-            orientation: AxisOrientation,
+            source: wl.Pointer.AxisSource,
+            orientation: wl.Pointer.Axis,
+            relative_direction: wl.Pointer.AxisRelativeDirection,
             delta: f64,
             delta_discrete: i32,
         };

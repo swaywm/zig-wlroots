@@ -34,6 +34,7 @@ pub const OutputLayout = extern struct {
     };
 
     outputs: wl.list.Head(OutputLayout.Output, .link),
+    server: *wl.Server,
 
     events: extern struct {
         add: wl.Signal(*OutputLayout.Output),
@@ -43,9 +44,12 @@ pub const OutputLayout = extern struct {
 
     data: usize,
 
-    extern fn wlr_output_layout_create() ?*OutputLayout;
-    pub fn create() !*OutputLayout {
-        return wlr_output_layout_create() orelse error.OutOfMemory;
+    // private state
+    server_destroy: wl.Listener(*wl.Server),
+
+    extern fn wlr_output_layout_create(server: *wl.Server) ?*OutputLayout;
+    pub fn create(server: *wl.Server) !*OutputLayout {
+        return wlr_output_layout_create(server) orelse error.OutOfMemory;
     }
 
     extern fn wlr_output_layout_destroy(layout: *OutputLayout) void;

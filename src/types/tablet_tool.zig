@@ -118,6 +118,8 @@ pub const Tablet = extern struct {
 
     impl: *const Impl,
 
+    usb_vendor_id: u16,
+    usb_product_id: u16,
     width_mm: f64,
     height_mm: f64,
 
