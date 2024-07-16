@@ -10,7 +10,7 @@ pub const InputDevice = extern struct {
         touch,
         tablet,
         tablet_pad,
-        switch_device,
+        @"switch",
     };
 
     type: Type,
