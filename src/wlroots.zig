@@ -153,6 +153,9 @@ pub const ScreencopyFrameV1 = @import("types/screencopy_v1.zig").ScreencopyFrame
 pub const GammaControlManagerV1 = @import("types/gamma_control_v1.zig").GammaControlManagerV1;
 pub const GammaControlV1 = @import("types/gamma_control_v1.zig").GammaControlV1;
 
+pub const TearingControlManagerV1 = @import("types/tearing_control_v1.zig").TearingControlManagerV1;
+pub const TearingControlV1 = @import("types/tearing_control_v1.zig").TearingControlV1;
+
 pub const XcursorImage = @import("xcursor.zig").XcursorImage;
 pub const Xcursor = @import("xcursor.zig").Xcursor;
 pub const XcursorTheme = @import("xcursor.zig").XcursorTheme;
