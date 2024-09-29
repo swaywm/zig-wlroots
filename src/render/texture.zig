@@ -27,7 +27,7 @@ pub const Texture = extern struct {
     extern fn wlr_texture_preferred_read_format(texture: *Texture) u32;
     pub const preferredReadFormat = wlr_texture_preferred_read_format;
 
-    extern fn wlr_texture_from_pixels(renderer: *wlr.Renderer, wl_fmt: wl.Shm.Format, stride: u32, width: u32, height: u32, data: *const anyopaque) ?*Texture;
+    extern fn wlr_texture_from_pixels(renderer: *wlr.Renderer, fmt: u32, stride: u32, width: u32, height: u32, data: *const anyopaque) ?*Texture;
     pub const fromPixels = wlr_texture_from_pixels;
 
     extern fn wlr_texture_from_dmabuf(renderer: *wlr.Renderer, attribs: *wlr.DmabufAttributes) ?*Texture;
