@@ -5,7 +5,7 @@ pub const CursorShapeManagerV1 = @import("types/cursor_shape_v1.zig").CursorShap
 pub const Device = @import("backend/session.zig").Device;
 pub const Session = @import("backend/session.zig").Session;
 
-pub const Egl = @import("render/egl.zig");
+pub const Egl = @import("render/egl.zig").Egl;
 pub const DmabufAttributes = @import("render/dmabuf.zig").DmabufAttributes;
 pub const Renderer = @import("render/renderer.zig").Renderer;
 pub const RenderTimer = @import("render/renderer.zig").RenderTimer;
