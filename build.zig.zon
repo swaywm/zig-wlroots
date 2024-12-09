@@ -1,6 +1,6 @@
 .{
     .name = "zig-wlroots",
-    .version = "0.18.1-dev",
+    .version = "0.18.1",
     .paths = .{
         "build.zig",
         "build.zig.zon",
