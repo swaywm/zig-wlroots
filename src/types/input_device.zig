@@ -53,6 +53,11 @@ pub const InputDevice = extern struct {
 
     extern fn wlr_input_device_is_wl(wlr_dev: *InputDevice) bool;
     pub const isWl = wlr_input_device_is_wl;
+
+    pub usingnamespace if (wlr.config.has_x11_backend) struct {
+        extern fn wlr_input_device_is_x11(wlr_dev: *InputDevice) bool;
+        pub const isX11 = wlr_input_device_is_x11;
+    } else struct {};
 };
 
 const LibinputDevice = opaque {};

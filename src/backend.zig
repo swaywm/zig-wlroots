@@ -109,4 +109,21 @@ pub const Backend = extern struct {
 
     extern fn wlr_backend_is_wl(wayland_backend: *Backend) bool;
     pub const isWl = wlr_backend_is_wl;
+
+    // backend/x11.h
+
+    pub usingnamespace if (wlr.config.has_x11_backend) struct {
+        extern fn wlr_x11_backend_create(loop: *wl.EventLoop, x11_display: [*:0]const u8) ?*Backend;
+        pub fn createX11(loop: *wl.EventLoop, x11_display: [*:0]const u8) !*Backend {
+            return wlr_x11_backend_create(loop, x11_display) orelse error.BackendCreateFailed;
+        }
+
+        extern fn wlr_x11_output_create(x11: *Backend) ?*wlr.Output;
+        pub fn x11OutputCreate(x11: *Backend) !*wlr.Output {
+            return wlr_x11_output_create(x11) orelse error.OutOfMemory;
+        }
+
+        extern fn wlr_backend_is_x11(x11: *Backend) bool;
+        pub const isX11 = wlr_backend_is_x11;
+    } else struct {};
 };
