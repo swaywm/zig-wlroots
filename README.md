@@ -23,9 +23,9 @@ request on [codeberg](https://codeberg.org/ifreund/zig-wlroots).
 
 - [zig](https://ziglang.org/) 0.13
 - [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots) 0.18
-- [zig-wayland](https://github.com/ifreund/zig-wayland)
-- [zig-xkbcommon](https://github.com/ifreund/zig-xkbcommon)
-- [zig-pixman](https://github.com/ifreund/zig-pixman)
+- [zig-wayland](https://codeberg.org/ifreund/zig-wayland)
+- [zig-xkbcommon](https://codeberg.org/ifreund/zig-xkbcommon)
+- [zig-pixman](https://codeberg.org/ifreund/zig-pixman)
 
 ## Usage
 
