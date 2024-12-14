@@ -88,4 +88,25 @@ pub const Backend = extern struct {
 
     extern fn wlr_backend_is_headless(backend: *Backend) bool;
     pub const isHeadless = wlr_backend_is_headless;
+
+    // backend/wayland.h
+
+    extern fn wlr_wl_backend_create(loop: *wl.EventLoop, remote_server: ?*wl.Server) ?*Backend;
+    pub fn createWl(loop: *wl.EventLoop, remote_server: ?*wl.Server) !*Backend {
+        return wlr_wl_backend_create(loop, remote_server) orelse error.BackendCreateFailed;
+    }
+
+    extern fn wlr_wl_backend_get_remote_display(wayland_backend: *Backend) *wl.Server;
+    pub const wlGetRemoteServer = wlr_wl_backend_get_remote_display;
+
+    extern fn wlr_wl_output_create(wl_backend: *Backend) ?*wlr.Output;
+    pub fn wlOuputCreate(wayland_backend: *Backend) !*wlr.Output {
+        return wlr_wl_output_create(wayland_backend) orelse error.OutOfMemory;
+    }
+
+    extern fn wlr_wl_output_create_from_surface(wayland_backend: *Backend, wl_surface: *wayland.client.wl.Surface) *wlr.Output;
+    pub const wlOutputCreateFromSurface = wlr_wl_output_create_from_surface;
+
+    extern fn wlr_backend_is_wl(wayland_backend: *Backend) bool;
+    pub const isWl = wlr_backend_is_wl;
 };

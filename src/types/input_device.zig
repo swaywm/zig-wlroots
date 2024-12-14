@@ -50,6 +50,9 @@ pub const InputDevice = extern struct {
             return wlr_libinput_get_device_handle(wlr_dev);
         }
     } else struct {};
+
+    extern fn wlr_input_device_is_wl(wlr_dev: *InputDevice) bool;
+    pub const isWl = wlr_input_device_is_wl;
 };
 
 const LibinputDevice = opaque {};

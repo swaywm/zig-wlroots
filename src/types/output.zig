@@ -335,6 +335,9 @@ pub const Output = extern struct {
     extern fn wlr_wl_output_set_app_id(output: *Output, app_id: ?[*:0]const u8) void;
     pub const wlSetAppId = wlr_wl_output_set_app_id;
 
+    extern fn wlr_wl_output_get_surface(output: *Output) *wayland.client.wl.Surface;
+    pub const wlGetSurface = wlr_wl_output_get_surface;
+
     pub usingnamespace if (wlr.config.has_x11_backend) struct {
         extern fn wlr_output_is_x11(output: *Output) bool;
         pub const isX11 = wlr_output_is_x11;
