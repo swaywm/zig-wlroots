@@ -48,6 +48,40 @@ pub const Backend = extern struct {
         return wlr_backend_commit(backend, states.ptr, states.len);
     }
 
+    // backend/drm.h
+
+    const DrmBackend = opaque {};
+
+    pub const DrmLease = extern struct {
+        fd: c_int,
+        lessee_id: u32,
+        backend: *DrmBackend,
+        events: extern struct {
+            destroy: wl.Signal(void),
+        },
+        data: ?*anyopaque,
+
+        extern fn wlr_drm_lease_terminate(lease: *DrmLease) void;
+        pub const terminate = wlr_drm_lease_terminate;
+    };
+
+    extern fn wlr_drm_backend_create(session: *wlr.Session, dev: *wlr.Device, parent: *wlr.Backend) ?*wlr.Backend;
+    pub fn createDrm(session: *wlr.Session, dev: *wlr.Device, parent: *wlr.Backend) !*wlr.Backend {
+        return wlr_drm_backend_create(session, dev, parent) orelse error.BackendCreateFailed;
+    }
+
+    extern fn wlr_backend_is_drm(backend: *wlr.Backend) bool;
+    pub const isDrm = wlr_backend_is_drm;
+
+    extern fn wlr_drm_backend_get_parent(backend: *wlr.Backend) ?*wlr.Backend;
+    pub const drmGetParent = wlr_drm_backend_get_parent;
+
+    extern fn wlr_drm_backend_get_non_master_fd(backend: *wlr.Backend) c_int;
+    pub fn drmGetNonMasterFd(backend: *wlr.Backend) !c_int {
+        const fd = wlr_drm_backend_get_non_master_fd(backend);
+        return if (fd == -1) error.GetNonMasterFdFailed else fd;
+    }
+
     // backend/multi.h
 
     extern fn wlr_multi_backend_create(loop: *wl.EventLoop) ?*Backend;

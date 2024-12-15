@@ -323,6 +323,23 @@ pub const Output = extern struct {
     extern fn wlr_output_is_drm(output: *Output) bool;
     pub const isDrm = wlr_output_is_drm;
 
+    extern fn wlr_drm_connector_get_id(output: *Output) u32;
+    pub const drmConnectorGetId = wlr_drm_connector_get_id;
+
+    extern fn wlr_drm_create_lease(outputs: [*]*Output, n_outputs: usize, lease_fd: *c_int) ?*wlr.Backend.DrmLease;
+    pub fn drmCreateLease(outputs: []*Output, lease_fd: *c_int) !*wlr.Backend.DrmLease {
+        return wlr_drm_create_lease(outputs.ptr, outputs.len, lease_fd) orelse error.DrmLeaseCreateFailed;
+    }
+
+    extern fn wlr_drm_connector_add_mode(output: *Output, mode: *const drmModeModeInfo) ?*Output.Mode;
+    pub const drmConnectorAddMode = wlr_drm_connector_add_mode;
+
+    extern fn wlr_drm_mode_get_info(mode: *Output.Mode) *const drmModeModeInfo;
+    pub const drmModeGetInfo = wlr_drm_mode_get_info;
+
+    extern fn wlr_drm_connector_get_panel_orientation(output: *Output) wl.Output.Transform;
+    pub const drmConnectorGetPanelOrientation = wlr_drm_connector_get_panel_orientation;
+
     extern fn wlr_output_is_headless(outupt: *Output) bool;
     pub const isHeadless = wlr_output_is_headless;
 
@@ -379,3 +396,5 @@ pub const OutputCursor = extern struct {
     extern fn wlr_output_cursor_destroy(cursor: *OutputCursor) void;
     pub const destroy = wlr_output_cursor_destroy;
 };
+
+const drmModeModeInfo = opaque {};
