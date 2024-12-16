@@ -20,6 +20,12 @@ pub const ColorTransform = opaque {}; // TODO
 
 pub const Drm = @import("types/drm.zig").Drm;
 
+pub const DrmLeaseManagerV1 = @import("types/drm_lease_v1.zig").DrmLeaseManagerV1;
+pub const DrmLeaseDeviceV1 = @import("types/drm_lease_v1.zig").DrmLeaseDeviceV1;
+pub const DrmLeaseConnectorV1 = @import("types/drm_lease_v1.zig").DrmLeaseConnectorV1;
+pub const DrmLeaseRequestV1 = @import("types/drm_lease_v1.zig").DrmLeaseRequestV1;
+pub const DrmLeaseV1 = @import("types/drm_lease_v1.zig").DrmLeaseV1;
+
 pub const FractionalScaleManagerV1 = @import("types/fractional_scale_v1.zig").FractionalScaleManagerV1;
 
 pub const ShmAttributes = @import("types/buffer.zig").ShmAttributes;
