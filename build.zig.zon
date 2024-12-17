@@ -14,8 +14,8 @@
             .lazy = true,
         },
         .@"zig-wayland" = .{
-            .url = "https://codeberg.org/ifreund/zig-wayland/archive/v0.2.0.tar.gz",
-            .hash = "1220687c8c47a48ba285d26a05600f8700d37fc637e223ced3aa8324f3650bf52242",
+            .url = "https://codeberg.org/ifreund/zig-wayland/archive/4761e625bcc8218650625edc4734710b29a9ff0b.tar.gz",
+            .hash = "1220e1b6f822bda107aa1e3eca277ac82e0d833ba3182cd6f6ec56521046dc37cccc",
             .lazy = true,
         },
         .@"zig-xkbcommon" = .{

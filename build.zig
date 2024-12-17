@@ -27,8 +27,8 @@ pub fn build(b: *std.Build) void {
     scanner.addSystemProtocol("staging/cursor-shape/cursor-shape-v1.xml");
     scanner.addSystemProtocol("staging/tearing-control/tearing-control-v1.xml");
 
-    scanner.addCustomProtocol("protocol/wlr-layer-shell-unstable-v1.xml");
-    scanner.addCustomProtocol("protocol/wlr-output-power-management-unstable-v1.xml");
+    scanner.addCustomProtocol(b.path("protocol/wlr-layer-shell-unstable-v1.xml"));
+    scanner.addCustomProtocol(b.path("protocol/wlr-output-power-management-unstable-v1.xml"));
 
     // These must be manually kept in sync with the versions wlroots supports
     // until wlroots gives the option to request a specific version.
