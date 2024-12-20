@@ -339,9 +339,9 @@ pub const SceneOutput = extern struct {
     render_list: wl.Array,
 
     pub const StateOptions = extern struct {
-        timer: ?*wlr.SceneTimer,
-        color_transform: ?*wlr.ColorTransform,
-        swapchain: ?*wlr.Swapchain,
+        timer: ?*wlr.SceneTimer = null,
+        color_transform: ?*wlr.ColorTransform = null,
+        swapchain: ?*wlr.Swapchain = null,
     };
 
     extern fn wlr_scene_output_commit(scene_output: *SceneOutput, options: ?*const StateOptions) bool;
