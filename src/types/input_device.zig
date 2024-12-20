@@ -37,6 +37,9 @@ pub const InputDevice = extern struct {
     extern fn wlr_tablet_from_input_device(wlr_dev: *InputDevice) *wlr.Tablet;
     pub const toTablet = wlr_tablet_from_input_device;
 
+    extern fn wlr_tablet_pad_from_input_device(wlr_dev: *InputDevice) *wlr.TabletPad;
+    pub const toTabletPad = wlr_tablet_pad_from_input_device;
+
     extern fn wlr_input_device_get_virtual_keyboard(wlr_dev: *InputDevice) ?*wlr.VirtualKeyboardV1;
     pub const getVirtualKeyboard = wlr_input_device_get_virtual_keyboard;
 
