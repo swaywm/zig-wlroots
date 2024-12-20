@@ -143,6 +143,7 @@ pub const PrimarySelectionDeviceV1 = @import("types/primary_selection_v1.zig").P
 pub const Output = @import("types/output.zig").Output;
 pub const OutputCursor = @import("types/output.zig").OutputCursor;
 pub const OutputLayout = @import("types/output_layout.zig").OutputLayout;
+pub const OutputSwapchainManager = @import("types/output_swapchain_manager.zig").OutputSwapchainManager;
 
 pub const DamageRing = @import("types/damage_ring.zig").DamageRing;
 
