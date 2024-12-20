@@ -78,6 +78,9 @@ pub const SerialRange = @import("types/seat.zig").SerialRange;
 pub const SerialRingset = @import("types/seat.zig").SerialRingset;
 pub const TouchPoint = @import("types/seat.zig").TouchPoint;
 
+pub const TransientSeatManagerV1 = @import("types/transient_seat_v1.zig").TransientSeatManagerV1;
+pub const TransientSeatV1 = @import("types/transient_seat_v1.zig").TransientSeatV1;
+
 pub const InputDevice = @import("types/input_device.zig").InputDevice;
 pub const InputMethodV2 = @import("types/input_method_v2.zig").InputMethodV2;
 pub const InputMethodManagerV2 = @import("types/input_method_v2.zig").InputMethodManagerV2;
