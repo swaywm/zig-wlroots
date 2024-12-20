@@ -19,7 +19,7 @@ pub const OutputSwapchainManager = extern struct {
     }
 
     extern fn wlr_output_swapchain_manager_get_swapchain(manager: *OutputSwapchainManager, output: *wlr.Output) ?*wlr.Swapchain;
-    pub const get_swapchain = wlr_output_swapchain_manager_get_swapchain;
+    pub const getSwapchain = wlr_output_swapchain_manager_get_swapchain;
 
     extern fn wlr_output_swapchain_manager_apply(manager: *OutputSwapchainManager) void;
     pub const apply = wlr_output_swapchain_manager_apply;
