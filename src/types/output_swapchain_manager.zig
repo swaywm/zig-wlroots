@@ -1,7 +1,14 @@
 const wlr = @import("../wlroots.zig");
 
+const wayland = @import("wayland");
+const wl = wayland.server.wl;
+
 pub const OutputSwapchainManager = extern struct {
     backend: *wlr.Backend,
+
+    // private state
+
+    outputs: wl.Array,
 
     extern fn wlr_output_swapchain_manager_init(manager: *OutputSwapchainManager, backend: *wlr.Backend) void;
     pub const init = wlr_output_swapchain_manager_init;
