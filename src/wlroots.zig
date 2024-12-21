@@ -205,6 +205,8 @@ pub const ForeignToplevelHandleV1 = @import("types/foreign_toplevel_management_v
 pub const SecurityContextManagerV1 = @import("types/security_context_v1.zig").SecurityContextManagerV1;
 pub const SecurityContextV1State = @import("types/security_context_v1.zig").SecurityContextV1State;
 
+pub const ContentTypeManagerV1 = @import("types/content_type_v1.zig").ContentTypeManagerV1;
+
 pub const SceneNode = @import("types/scene.zig").SceneNode;
 pub const Scene = @import("types/scene.zig").Scene;
 pub const SceneTree = @import("types/scene.zig").SceneTree;
