@@ -85,11 +85,11 @@ pub const Surface = extern struct {
 
     pub const Role = extern struct {
         name: [*:0]const u8,
-        no_object: bool,
-        client_commit: ?*const fn (surface: *Surface) callconv(.C) void,
-        commit: ?*const fn (surface: *Surface) callconv(.C) void,
-        unmap: ?*const fn (surface: *Surface) callconv(.C) void,
-        destroy: ?*const fn (surface: *Surface) callconv(.C) void,
+        no_object: bool = false,
+        client_commit: ?*const fn (surface: *Surface) callconv(.C) void = null,
+        commit: ?*const fn (surface: *Surface) callconv(.C) void = null,
+        unmap: ?*const fn (surface: *Surface) callconv(.C) void = null,
+        destroy: ?*const fn (surface: *Surface) callconv(.C) void = null,
     };
 
     pub const Output = extern struct {
