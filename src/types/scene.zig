@@ -252,7 +252,7 @@ pub const SceneBuffer = extern struct {
 
     point_accepts_input: ?*const fn (buffer: *SceneBuffer, sx: *f64, sy: *f64) callconv(.C) bool,
 
-    primary_output: ?*wlr.Output,
+    primary_output: ?*wlr.SceneOutput,
 
     opacity: f32,
     filter_mode: wlr.RenderPass.ScaleFilterMode,
