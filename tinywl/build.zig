@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const Scanner = @import("zig-wayland").Scanner;
+const Scanner = @import("wayland").Scanner;
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
@@ -8,6 +8,7 @@ pub fn build(b: *std.Build) void {
 
     const scanner = Scanner.create(b, .{});
     scanner.addSystemProtocol("stable/xdg-shell/xdg-shell.xml");
+    scanner.addSystemProtocol("stable/tablet/tablet-v2.xml");
 
     // Some of these versions may be out of date with what wlroots implements.
     // This is not a problem in practice though as long as tinywl successfully compiles.
@@ -21,11 +22,12 @@ pub fn build(b: *std.Build) void {
     scanner.generate("wl_seat", 7);
     scanner.generate("wl_data_device_manager", 3);
     scanner.generate("xdg_wm_base", 2);
+    scanner.generate("zwp_tablet_manager_v2", 1);
 
     const wayland = b.createModule(.{ .root_source_file = scanner.result });
-    const xkbcommon = b.dependency("zig-xkbcommon", .{}).module("xkbcommon");
-    const pixman = b.dependency("zig-pixman", .{}).module("pixman");
-    const wlroots = b.dependency("zig-wlroots", .{}).module("wlroots");
+    const xkbcommon = b.dependency("xkbcommon", .{}).module("xkbcommon");
+    const pixman = b.dependency("pixman", .{}).module("pixman");
+    const wlroots = b.dependency("wlroots", .{}).module("wlroots");
 
     wlroots.addImport("wayland", wayland);
     wlroots.addImport("xkbcommon", xkbcommon);
@@ -53,9 +55,6 @@ pub fn build(b: *std.Build) void {
     tinywl.linkSystemLibrary("wayland-server");
     tinywl.linkSystemLibrary("xkbcommon");
     tinywl.linkSystemLibrary("pixman-1");
-
-    // TODO: remove when https://github.com/ziglang/zig/issues/131 is implemented
-    scanner.addCSource(tinywl);
 
     b.installArtifact(tinywl);
 }

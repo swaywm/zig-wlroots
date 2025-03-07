@@ -1,22 +1,23 @@
 .{
-    .name = "tinywl",
+    .name = .tinywl,
     .version = "0.0.0",
     .paths = .{""},
     .dependencies = .{
-        .@"zig-pixman" = .{
-            .url = "https://codeberg.org/ifreund/zig-pixman/archive/v0.2.0.tar.gz",
-            .hash = "12209db20ce873af176138b76632931def33a10539387cba745db72933c43d274d56",
+        .pixman = .{
+            .url = "https://codeberg.org/ifreund/zig-pixman/archive/v0.3.0.tar.gz",
+            .hash = "pixman-0.3.0-LClMnz2VAAAs7QSCGwLimV5VUYx0JFnX5xWU6HwtMuDX",
         },
-        .@"zig-wayland" = .{
-            .url = "https://codeberg.org/ifreund/zig-wayland/archive/4761e625bcc8218650625edc4734710b29a9ff0b.tar.gz",
-            .hash = "1220e1b6f822bda107aa1e3eca277ac82e0d833ba3182cd6f6ec56521046dc37cccc",
+        .wayland = .{
+            .url = "https://codeberg.org/ifreund/zig-wayland/archive/v0.3.0.tar.gz",
+            .hash = "wayland-0.3.0-lQa1kjPIAQDmhGYpY-zxiRzQJFHQ2VqhJkQLbKKdt5wl",
         },
-        .@"zig-wlroots" = .{
+        .wlroots = .{
             .path = "..",
         },
-        .@"zig-xkbcommon" = .{
-            .url = "https://codeberg.org/ifreund/zig-xkbcommon/archive/v0.2.0.tar.gz",
-            .hash = "1220c90b2228d65fd8427a837d31b0add83e9fade1dcfa539bb56fd06f1f8461605f",
+        .xkbcommon = .{
+            .url = "https://codeberg.org/ifreund/zig-xkbcommon/archive/v0.3.0.tar.gz",
+            .hash = "xkbcommon-0.3.0-VDqIe3K9AQB2fG5ZeRcMC9i7kfrp5m2rWgLrmdNn9azr",
         },
     },
+    .fingerprint = 0x11f0eae53700be85,
 }

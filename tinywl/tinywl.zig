@@ -43,26 +43,26 @@ const Server = struct {
 
     output_layout: *wlr.OutputLayout,
     scene_output_layout: *wlr.SceneOutputLayout,
-    new_output: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(newOutput),
+    new_output: wl.Listener(*wlr.Output) = .init(newOutput),
 
     xdg_shell: *wlr.XdgShell,
-    new_xdg_toplevel: wl.Listener(*wlr.XdgToplevel) = wl.Listener(*wlr.XdgToplevel).init(newXdgToplevel),
-    new_xdg_popup: wl.Listener(*wlr.XdgPopup) = wl.Listener(*wlr.XdgPopup).init(newXdgPopup),
+    new_xdg_toplevel: wl.Listener(*wlr.XdgToplevel) = .init(newXdgToplevel),
+    new_xdg_popup: wl.Listener(*wlr.XdgPopup) = .init(newXdgPopup),
     toplevels: wl.list.Head(Toplevel, .link) = undefined,
 
     seat: *wlr.Seat,
-    new_input: wl.Listener(*wlr.InputDevice) = wl.Listener(*wlr.InputDevice).init(newInput),
-    request_set_cursor: wl.Listener(*wlr.Seat.event.RequestSetCursor) = wl.Listener(*wlr.Seat.event.RequestSetCursor).init(requestSetCursor),
-    request_set_selection: wl.Listener(*wlr.Seat.event.RequestSetSelection) = wl.Listener(*wlr.Seat.event.RequestSetSelection).init(requestSetSelection),
+    new_input: wl.Listener(*wlr.InputDevice) = .init(newInput),
+    request_set_cursor: wl.Listener(*wlr.Seat.event.RequestSetCursor) = .init(requestSetCursor),
+    request_set_selection: wl.Listener(*wlr.Seat.event.RequestSetSelection) = .init(requestSetSelection),
     keyboards: wl.list.Head(Keyboard, .link) = undefined,
 
     cursor: *wlr.Cursor,
     cursor_mgr: *wlr.XcursorManager,
-    cursor_motion: wl.Listener(*wlr.Pointer.event.Motion) = wl.Listener(*wlr.Pointer.event.Motion).init(cursorMotion),
-    cursor_motion_absolute: wl.Listener(*wlr.Pointer.event.MotionAbsolute) = wl.Listener(*wlr.Pointer.event.MotionAbsolute).init(cursorMotionAbsolute),
-    cursor_button: wl.Listener(*wlr.Pointer.event.Button) = wl.Listener(*wlr.Pointer.event.Button).init(cursorButton),
-    cursor_axis: wl.Listener(*wlr.Pointer.event.Axis) = wl.Listener(*wlr.Pointer.event.Axis).init(cursorAxis),
-    cursor_frame: wl.Listener(*wlr.Cursor) = wl.Listener(*wlr.Cursor).init(cursorFrame),
+    cursor_motion: wl.Listener(*wlr.Pointer.event.Motion) = .init(cursorMotion),
+    cursor_motion_absolute: wl.Listener(*wlr.Pointer.event.MotionAbsolute) = .init(cursorMotionAbsolute),
+    cursor_button: wl.Listener(*wlr.Pointer.event.Button) = .init(cursorButton),
+    cursor_axis: wl.Listener(*wlr.Pointer.event.Axis) = .init(cursorAxis),
+    cursor_frame: wl.Listener(*wlr.Cursor) = .init(cursorFrame),
 
     cursor_mode: enum { passthrough, move, resize } = .passthrough,
     grabbed_view: ?*Toplevel = null,
@@ -120,6 +120,7 @@ const Server = struct {
 
     fn deinit(server: *Server) void {
         server.wl_server.destroyClients();
+        server.backend.destroy();
         server.wl_server.destroy();
     }
 
@@ -419,10 +420,9 @@ const Output = struct {
     server: *Server,
     wlr_output: *wlr.Output,
 
-    frame: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(frame),
-    request_state: wl.Listener(*wlr.Output.event.RequestState) =
-        wl.Listener(*wlr.Output.event.RequestState).init(request_state),
-    destroy: wl.Listener(*wlr.Output) = wl.Listener(*wlr.Output).init(destroy),
+    frame: wl.Listener(*wlr.Output) = .init(handleFrame),
+    request_state: wl.Listener(*wlr.Output.event.RequestState) = .init(handleRequestState),
+    destroy: wl.Listener(*wlr.Output) = .init(handleDestroy),
 
     // The wlr.Output should be destroyed by the caller on failure to trigger cleanup.
     fn create(server: *Server, wlr_output: *wlr.Output) !void {
@@ -442,18 +442,17 @@ const Output = struct {
         server.scene_output_layout.addOutput(layout_output, scene_output);
     }
 
-    fn frame(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
+    fn handleFrame(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
         const output: *Output = @fieldParentPtr("frame", listener);
 
         const scene_output = output.server.scene.getSceneOutput(output.wlr_output).?;
         _ = scene_output.commit(null);
 
-        var now: posix.timespec = undefined;
-        posix.clock_gettime(posix.CLOCK.MONOTONIC, &now) catch @panic("CLOCK_MONOTONIC not supported");
+        var now = posix.clock_gettime(posix.CLOCK.MONOTONIC) catch @panic("CLOCK_MONOTONIC not supported");
         scene_output.sendFrameDone(&now);
     }
 
-    fn request_state(
+    fn handleRequestState(
         listener: *wl.Listener(*wlr.Output.event.RequestState),
         event: *wlr.Output.event.RequestState,
     ) void {
@@ -462,7 +461,7 @@ const Output = struct {
         _ = output.wlr_output.commitState(event.state);
     }
 
-    fn destroy(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
+    fn handleDestroy(listener: *wl.Listener(*wlr.Output), _: *wlr.Output) void {
         const output: *Output = @fieldParentPtr("destroy", listener);
 
         output.frame.link.remove();
@@ -481,32 +480,32 @@ const Toplevel = struct {
     x: i32 = 0,
     y: i32 = 0,
 
-    commit: wl.Listener(*wlr.Surface) = wl.Listener(*wlr.Surface).init(commit),
-    map: wl.Listener(void) = wl.Listener(void).init(map),
-    unmap: wl.Listener(void) = wl.Listener(void).init(unmap),
-    destroy: wl.Listener(void) = wl.Listener(void).init(destroy),
-    request_move: wl.Listener(*wlr.XdgToplevel.event.Move) = wl.Listener(*wlr.XdgToplevel.event.Move).init(requestMove),
-    request_resize: wl.Listener(*wlr.XdgToplevel.event.Resize) = wl.Listener(*wlr.XdgToplevel.event.Resize).init(requestResize),
+    commit: wl.Listener(*wlr.Surface) = .init(handleCommit),
+    map: wl.Listener(void) = .init(handleMap),
+    unmap: wl.Listener(void) = .init(handleUnmap),
+    destroy: wl.Listener(void) = .init(handleDestroy),
+    request_move: wl.Listener(*wlr.XdgToplevel.event.Move) = .init(handleRequestMove),
+    request_resize: wl.Listener(*wlr.XdgToplevel.event.Resize) = .init(handleRequestResize),
 
-    fn commit(listener: *wl.Listener(*wlr.Surface), _: *wlr.Surface) void {
+    fn handleCommit(listener: *wl.Listener(*wlr.Surface), _: *wlr.Surface) void {
         const toplevel: *Toplevel = @fieldParentPtr("commit", listener);
         if (toplevel.xdg_toplevel.base.initial_commit) {
             _ = toplevel.xdg_toplevel.setSize(0, 0);
         }
     }
 
-    fn map(listener: *wl.Listener(void)) void {
+    fn handleMap(listener: *wl.Listener(void)) void {
         const toplevel: *Toplevel = @fieldParentPtr("map", listener);
         toplevel.server.toplevels.prepend(toplevel);
         toplevel.server.focusView(toplevel, toplevel.xdg_toplevel.base.surface);
     }
 
-    fn unmap(listener: *wl.Listener(void)) void {
+    fn handleUnmap(listener: *wl.Listener(void)) void {
         const toplevel: *Toplevel = @fieldParentPtr("unmap", listener);
         toplevel.link.remove();
     }
 
-    fn destroy(listener: *wl.Listener(void)) void {
+    fn handleDestroy(listener: *wl.Listener(void)) void {
         const toplevel: *Toplevel = @fieldParentPtr("destroy", listener);
 
         toplevel.commit.link.remove();
@@ -519,7 +518,7 @@ const Toplevel = struct {
         gpa.destroy(toplevel);
     }
 
-    fn requestMove(
+    fn handleRequestMove(
         listener: *wl.Listener(*wlr.XdgToplevel.event.Move),
         _: *wlr.XdgToplevel.event.Move,
     ) void {
@@ -531,7 +530,7 @@ const Toplevel = struct {
         server.grab_y = server.cursor.y - @as(f64, @floatFromInt(toplevel.y));
     }
 
-    fn requestResize(
+    fn handleRequestResize(
         listener: *wl.Listener(*wlr.XdgToplevel.event.Resize),
         event: *wlr.XdgToplevel.event.Resize,
     ) void {
@@ -559,17 +558,17 @@ const Toplevel = struct {
 const Popup = struct {
     xdg_popup: *wlr.XdgPopup,
 
-    commit: wl.Listener(*wlr.Surface) = wl.Listener(*wlr.Surface).init(commit),
-    destroy: wl.Listener(void) = wl.Listener(void).init(destroy),
+    commit: wl.Listener(*wlr.Surface) = .init(handleCommit),
+    destroy: wl.Listener(void) = .init(handleDestroy),
 
-    fn commit(listener: *wl.Listener(*wlr.Surface), _: *wlr.Surface) void {
+    fn handleCommit(listener: *wl.Listener(*wlr.Surface), _: *wlr.Surface) void {
         const popup: *Popup = @fieldParentPtr("commit", listener);
         if (popup.xdg_popup.base.initial_commit) {
             _ = popup.xdg_popup.base.scheduleConfigure();
         }
     }
 
-    fn destroy(listener: *wl.Listener(void)) void {
+    fn handleDestroy(listener: *wl.Listener(void)) void {
         const popup: *Popup = @fieldParentPtr("destroy", listener);
 
         popup.commit.link.remove();
@@ -584,8 +583,9 @@ const Keyboard = struct {
     link: wl.list.Link = undefined,
     device: *wlr.InputDevice,
 
-    modifiers: wl.Listener(*wlr.Keyboard) = wl.Listener(*wlr.Keyboard).init(modifiers),
-    key: wl.Listener(*wlr.Keyboard.event.Key) = wl.Listener(*wlr.Keyboard.event.Key).init(key),
+    modifiers: wl.Listener(*wlr.Keyboard) = .init(handleModifiers),
+    key: wl.Listener(*wlr.Keyboard.event.Key) = .init(handleKey),
+    destroy: wl.Listener(void) = .init(handleDestroy),
 
     fn create(server: *Server, device: *wlr.InputDevice) !void {
         const keyboard = try gpa.create(Keyboard);
@@ -612,13 +612,13 @@ const Keyboard = struct {
         server.keyboards.append(keyboard);
     }
 
-    fn modifiers(listener: *wl.Listener(*wlr.Keyboard), wlr_keyboard: *wlr.Keyboard) void {
+    fn handleModifiers(listener: *wl.Listener(*wlr.Keyboard), wlr_keyboard: *wlr.Keyboard) void {
         const keyboard: *Keyboard = @fieldParentPtr("modifiers", listener);
         keyboard.server.seat.setKeyboard(wlr_keyboard);
         keyboard.server.seat.keyboardNotifyModifiers(&wlr_keyboard.modifiers);
     }
 
-    fn key(listener: *wl.Listener(*wlr.Keyboard.event.Key), event: *wlr.Keyboard.event.Key) void {
+    fn handleKey(listener: *wl.Listener(*wlr.Keyboard.event.Key), event: *wlr.Keyboard.event.Key) void {
         const keyboard: *Keyboard = @fieldParentPtr("key", listener);
         const wlr_keyboard = keyboard.device.toKeyboard();
 
@@ -639,5 +639,13 @@ const Keyboard = struct {
             keyboard.server.seat.setKeyboard(wlr_keyboard);
             keyboard.server.seat.keyboardNotifyKey(event.time_msec, event.keycode, event.state);
         }
+    }
+
+    fn handleDestroy(listener: *wl.Listener(void)) void {
+        const keyboard: *Keyboard = @fieldParentPtr("destroy", listener);
+
+        keyboard.link.remove();
+
+        gpa.destroy(keyboard);
     }
 };

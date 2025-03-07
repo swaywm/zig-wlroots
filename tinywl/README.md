@@ -6,13 +6,7 @@ in zig using zig-wlroots.
 
 ## Building
 
-First make sure the submodules are initialized and updated with
-
-```
-git submodule update --init
-```
-
-Then simply run `zig build` to build tinywl.zig.
+Run `zig build` in the tinywl directory.
 
 ## License
 

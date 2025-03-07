@@ -13,7 +13,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const Scanner = (b.lazyImport(@This(), "zig-wayland") orelse return).Scanner;
+    const Scanner = (b.lazyImport(@This(), "wayland") orelse return).Scanner;
 
     const scanner = Scanner.create(b, .{});
 
@@ -57,8 +57,8 @@ pub fn build(b: *std.Build) void {
     scanner.generate("zwlr_output_power_manager_v1", 1);
 
     const wayland = b.createModule(.{ .root_source_file = scanner.result });
-    const xkbcommon = (b.lazyDependency("zig-xkbcommon", .{}) orelse return).module("xkbcommon");
-    const pixman = (b.lazyDependency("zig-pixman", .{}) orelse return).module("pixman");
+    const xkbcommon = (b.lazyDependency("xkbcommon", .{}) orelse return).module("xkbcommon");
+    const pixman = (b.lazyDependency("pixman", .{}) orelse return).module("pixman");
 
     const wlr_test = b.addTest(.{
         .root_source_file = b.path("src/wlroots.zig"),
@@ -70,9 +70,6 @@ pub fn build(b: *std.Build) void {
 
     wlr_test.root_module.addImport("wayland", wayland);
     wlr_test.linkSystemLibrary("wayland-server");
-
-    // TODO: remove when https://github.com/ziglang/zig/issues/131 is implemented
-    scanner.addCSource(wlr_test);
 
     wlr_test.root_module.addImport("xkbcommon", xkbcommon);
     wlr_test.linkSystemLibrary("xkbcommon");
