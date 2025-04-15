@@ -106,7 +106,22 @@ pub const Backend = extern struct {
         callback: *const fn (backend: *Backend, data: ?*anyopaque) callconv(.C) void,
         data: ?*anyopaque,
     ) void;
-    pub const multiForEachBackend = wlr_multi_for_each_backend;
+    pub inline fn multiForEachBackend(
+        backend: *Backend,
+        comptime T: type,
+        comptime callback: fn (backend: *Backend, data: T) void,
+        data: T,
+    ) void {
+        wlr_multi_for_each_backend(
+            backend,
+            struct {
+                fn wrapper(b: *Backend, d: ?*anyopaque) callconv(.C) void {
+                    callback(b, @ptrCast(@alignCast(d)));
+                }
+            }.wrapper,
+            data,
+        );
+    }
 
     // backend/headless.h
 
