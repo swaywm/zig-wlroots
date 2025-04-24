@@ -44,7 +44,6 @@ pub const Session = extern struct {
 
     active: bool,
 
-    vtnr: c_uint,
     seat: [256]u8,
 
     // TODO: do we need libudev bindings?
@@ -58,7 +57,6 @@ pub const Session = extern struct {
     devices: wl.list.Head(Device, .link),
 
     event_loop: *wl.EventLoop,
-    event_loop_destroy: wl.Listener(*wl.EventLoop),
 
     events: extern struct {
         active: wl.Signal(void),

@@ -46,7 +46,9 @@ pub const Output = extern struct {
             render_format: bool = false,
             subpixel: bool = false,
             layers: bool = false,
-            _: u21 = 0,
+            wait_timeline: bool = false,
+            signal_timeline: bool = false,
+            _: u19 = 0,
         };
 
         pub const ModeType = enum(c_int) {
@@ -65,6 +67,9 @@ pub const Output = extern struct {
         subpixel: wl.Output.Subpixel,
 
         buffer: ?*wlr.Buffer,
+        buffer_src_box: wlr.FBox,
+        buffer_dst_box: wlr.FBox,
+
         tearing_page_flip: bool,
 
         mode_type: ModeType,
@@ -81,6 +86,12 @@ pub const Output = extern struct {
         // TODO: Bind wlr_output_layer and related structs
         layers: ?*anyopaque,
         layers_len: usize,
+
+        wait_timeline: *wlr.DrmSyncobjTimeline,
+        wait_point: u64,
+
+        signal_timeline: *wlr.DrmSyncobjTimeline,
+        signal_point: u64,
 
         extern fn wlr_output_state_init(state: *State) void;
         pub fn init() State {
@@ -170,7 +181,7 @@ pub const Output = extern struct {
             output: *wlr.Output,
             commit_seq: u32,
             presented: bool,
-            when: *posix.timespec,
+            when: posix.timespec,
             seq: c_uint,
             refresh: c_int,
             flags: Flags,
@@ -258,11 +269,9 @@ pub const Output = extern struct {
     renderer: ?*wlr.Renderer,
     swapchain: ?*wlr.Swapchain,
 
-    server_destroy: wl.Listener(*wl.Server),
-
     addons: wlr.AddonSet,
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_output_create_global(output: *Output, server: *wl.Server) void;
     pub const createGlobal = wlr_output_create_global;
@@ -378,7 +387,8 @@ pub const OutputCursor = extern struct {
     hotspot_y: i32,
     texture: ?*wlr.Texture,
     own_texture: bool,
-    renderer_destroy: wl.Listener(void),
+    wait_timeline: ?*wlr.DrmSyncobjTimeline,
+    wait_point: u64,
     /// Output.cursors
     link: wl.list.Link,
 

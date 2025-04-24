@@ -16,6 +16,9 @@ pub const Box = extern struct {
     extern fn wlr_box_contains_point(box: ?*const Box, x: f64, y: f64) bool;
     pub const containsPoint = wlr_box_contains_point;
 
+    extern fn wlr_box_contains_box(bigger: *const Box, smaller: *const Box) bool;
+    pub const containsBox = wlr_box_contains_box;
+
     extern fn wlr_box_empty(box: ?*const Box) bool;
     pub const empty = wlr_box_empty;
 

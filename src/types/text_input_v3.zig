@@ -7,8 +7,6 @@ pub const TextInputManagerV3 = extern struct {
     global: *wl.Global,
     text_inputs: wl.list.Head(TextInputV3, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         text_input: wl.Signal(*wlr.TextInputV3),
         destroy: wl.Signal(*wlr.TextInputManagerV3),
@@ -58,9 +56,6 @@ pub const TextInputV3 = extern struct {
     active_features: Features,
 
     link: wl.list.Link,
-
-    surface_destroy: wl.Listener(*wlr.Surface),
-    seat_destroy: wl.Listener(*wlr.Seat),
 
     events: extern struct {
         enable: wl.Signal(*wlr.TextInputV3),

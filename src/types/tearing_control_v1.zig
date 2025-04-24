@@ -24,8 +24,6 @@ pub const TearingControlManagerV1 = extern struct {
     global: *wl.Global,
     surface_hints: wl.list.Head(TearingControlV1, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         new_object: wl.Signal(*TearingControlV1),
         destroy: wl.Signal(void),

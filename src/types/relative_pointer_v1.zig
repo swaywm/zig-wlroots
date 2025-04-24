@@ -12,9 +12,7 @@ pub const RelativePointerManagerV1 = extern struct {
         new_relative_pointer: wl.Signal(*RelativePointerV1),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
-
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_relative_pointer_manager_v1_create(server: *wl.Server) ?*RelativePointerManagerV1;
     pub fn create(server: *wl.Server) !*RelativePointerManagerV1 {
@@ -43,10 +41,7 @@ pub const RelativePointerV1 = extern struct {
         destroy: wl.Signal(*RelativePointerV1),
     },
 
-    seat_destroy: wl.Listener(*wlr.Seat),
-    pointer_destroy: wl.Listener(*wlr.Pointer),
-
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_relative_pointer_v1_from_resource(resource: *wl.Resource) ?*RelativePointerV1;
     pub const fromResource = wlr_relative_pointer_v1_from_resource;

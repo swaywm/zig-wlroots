@@ -19,6 +19,9 @@ pub const DrmFormatSet = extern struct {
     extern fn wlr_drm_format_set_get(set: *const DrmFormatSet, format: u32) *const DrmFormat;
     pub const get = wlr_drm_format_set_get;
 
+    extern fn wlr_drm_format_set_remove(set: *const DrmFormatSet, format: u32, modifier: u64) bool;
+    pub const remove = wlr_drm_format_set_remove;
+
     extern fn wlr_drm_format_set_has(set: *const DrmFormatSet, format: u32, modifier: u64) bool;
     pub const has = wlr_drm_format_set_has;
 

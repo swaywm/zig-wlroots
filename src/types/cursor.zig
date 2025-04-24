@@ -37,7 +37,7 @@ pub const Cursor = extern struct {
         tablet_tool_button: wl.Signal(*wlr.Tablet.event.Button),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_cursor_create() ?*Cursor;
     pub fn create() !*Cursor {

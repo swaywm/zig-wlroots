@@ -7,8 +7,6 @@ pub const VirtualKeyboardManagerV1 = extern struct {
     global: *wl.Global,
     virtual_keyboards: wl.list.Head(VirtualKeyboardV1, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         new_virtual_keyboard: wl.Signal(*VirtualKeyboardV1),
         destroy: wl.Signal(*VirtualKeyboardManagerV1),

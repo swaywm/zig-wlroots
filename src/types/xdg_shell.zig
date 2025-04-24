@@ -11,8 +11,6 @@ pub const XdgShell = extern struct {
     popup_grabs: wl.list.Head(XdgPopupGrab, .link),
     ping_timeout: u32,
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         new_surface: wl.Signal(*wlr.XdgSurface),
         new_toplevel: wl.Signal(*wlr.XdgToplevel),
@@ -20,7 +18,7 @@ pub const XdgShell = extern struct {
         destroy: wl.Signal(*wlr.XdgShell),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_xdg_shell_create(server: *wl.Server, version: u32) ?*wlr.XdgShell;
     pub fn create(server: *wl.Server, version: u32) !*wlr.XdgShell {
@@ -91,8 +89,6 @@ pub const XdgPopupGrab = extern struct {
     popups: wl.list.Head(XdgPopup, .grab_link),
     /// XdgShell.popup_grabs
     link: wl.list.Link,
-
-    seat_destroy: wl.Listener(*wlr.Seat),
 };
 
 pub const XdgPopup = extern struct {
@@ -128,10 +124,6 @@ pub const XdgPopup = extern struct {
 
     /// Grab.popups
     grab_link: wl.list.Link,
-
-    // private state
-
-    synced: wlr.Surface.Synced,
 
     extern fn wlr_xdg_popup_from_resource(resource: *xdg.Popup) ?*wlr.XdgPopup;
     pub const fromResource = wlr_xdg_popup_from_resource;
@@ -202,7 +194,6 @@ pub const XdgToplevel = extern struct {
         fullscreen: bool,
 
         fullscreen_output: ?*wlr.Output,
-        fullscreen_output_destroy: wl.Listener(*wlr.Output),
     };
 
     pub const event = struct {
@@ -231,7 +222,6 @@ pub const XdgToplevel = extern struct {
     resource: *xdg.Toplevel,
     base: *wlr.XdgSurface,
     parent: ?*wlr.XdgToplevel,
-    parent_unmap: wl.Listener(*XdgSurface),
 
     current: State,
     pending: State,
@@ -255,6 +245,9 @@ pub const XdgToplevel = extern struct {
 
     extern fn wlr_xdg_toplevel_from_resource(resource: *xdg.Toplevel) ?*wlr.XdgToplevel;
     pub const fromResource = wlr_xdg_toplevel_from_resource;
+
+    extern fn wlr_xdg_toplevel_configure(toplevel: *wlr.XdgToplevel, configure: *const Configure) u32;
+    pub const configure = wlr_xdg_toplevel_configure;
 
     extern fn wlr_xdg_toplevel_set_size(toplevel: *wlr.XdgToplevel, width: i32, height: i32) u32;
     pub const setSize = wlr_xdg_toplevel_set_size;
@@ -300,8 +293,14 @@ pub const XdgSurface = extern struct {
     };
 
     pub const State = extern struct {
-        configure_serial: u32,
+        committed: packed struct(u32) {
+            geometry: bool = false,
+            _: u31 = 0,
+        },
+
         geometry: wlr.Box,
+
+        configure_serial: u32,
     };
 
     pub const Configure = extern struct {
@@ -342,6 +341,8 @@ pub const XdgSurface = extern struct {
     initialized: bool,
     initial_commit: bool,
 
+    geometry: wlr.Box,
+
     events: extern struct {
         destroy: wl.Signal(void),
         ping_timeout: wl.Signal(void),
@@ -350,13 +351,7 @@ pub const XdgSurface = extern struct {
         ack_configure: wl.Signal(*wlr.XdgSurface.Configure),
     },
 
-    data: usize,
-
-    // private state
-
-    synced: wlr.Surface.Synced,
-
-    role_resource_destroy: wl.Listener(*wl.Resource),
+    data: ?*anyopaque,
 
     extern fn wlr_xdg_surface_from_resource(resource: *xdg.Surface) ?*wlr.XdgSurface;
     pub const fromResource = wlr_xdg_surface_from_resource;
@@ -372,9 +367,6 @@ pub const XdgSurface = extern struct {
 
     extern fn wlr_xdg_surface_try_from_wlr_surface(surface: *wlr.Surface) ?*wlr.XdgSurface;
     pub const tryFromWlrSurface = wlr_xdg_surface_try_from_wlr_surface;
-
-    extern fn wlr_xdg_surface_get_geometry(surface: *wlr.XdgSurface, box: *wlr.Box) void;
-    pub const getGeometry = wlr_xdg_surface_get_geometry;
 
     extern fn wlr_xdg_surface_for_each_surface(
         surface: *wlr.XdgSurface,

@@ -14,14 +14,12 @@ pub const GammaControlManagerV1 = extern struct {
     global: *wl.Global,
     controls: wl.list.Head(GammaControlV1, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         destroy: wl.Signal(*GammaControlManagerV1),
         set_gamma: wl.Signal(*event.SetGamma),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_gamma_control_manager_v1_create(server: *wl.Server) ?*GammaControlManagerV1;
     pub fn create(server: *wl.Server) !*GammaControlManagerV1 {
@@ -42,9 +40,7 @@ pub const GammaControlV1 = extern struct {
     table: *u16,
     ramp_size: usize,
 
-    output_destroy_listener: wl.Listener(*wlr.Output),
-
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_gamma_control_v1_apply(gamma_control: ?*GammaControlV1, output_state: *wlr.Output.State) bool;
     pub const apply = wlr_gamma_control_v1_apply;

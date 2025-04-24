@@ -9,8 +9,6 @@ pub const TabletManagerV2 = extern struct {
     clients: wl.list.Link, // private to wlroots
     seats: wl.list.Link, // private to wlroots
 
-    server_destroy: wl.Listener(void),
-
     events: extern struct {
         destroy: wl.Listener(void),
     },
@@ -43,8 +41,6 @@ pub const TabletV2Tablet = extern struct {
     wlr_tablet: *wlr.Tablet,
     wlr_device: *wlr.InputDevice,
     clients: wl.list.Link, // private to wlroots
-
-    tablet_destroy: wl.Listener(void),
 
     current_client: ?*opaque {},
 };
@@ -85,11 +81,8 @@ pub const TabletV2TabletTool = extern struct {
     wlr_tool: *wlr.TabletTool,
     clients: wl.list.Link, // private to wlroots
 
-    tool_destroy: wl.Listener(void),
-
     current_client: ?*opaque {},
     focused_surface: ?*wlr.Surface,
-    surface_destroy: wl.Listener(void),
 
     grab: *Grab,
     default_grab: Grab,
@@ -222,8 +215,6 @@ pub const TabletV2TabletPad = extern struct {
 
     group_count: usize,
     groups: [*]u32,
-
-    pad_destroy: wl.Listener(void),
 
     current_client: ?*opaque {},
 

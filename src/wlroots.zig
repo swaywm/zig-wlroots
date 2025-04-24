@@ -185,8 +185,6 @@ pub usingnamespace if (config.has_xwayland) struct {
     pub const XwaylandSurfaceV1 = @import("xwayland/shell.zig").XwaylandSurfaceV1;
 } else struct {};
 
-pub const matrix = @import("types/matrix.zig");
-
 pub const AddonSet = @import("util/addon.zig").AddonSet;
 pub const Addon = @import("util/addon.zig").Addon;
 pub const Box = @import("util/box.zig").Box;
@@ -222,8 +220,8 @@ pub const config = @import("config.zig");
 pub const version = @import("version.zig");
 
 comptime {
-    if (version.major != 0 or version.minor != 18) {
-        @compileError("zig-wlroots requires wlroots version 0.18, found version " ++ version.str);
+    if (version.major != 0 or version.minor != 19) {
+        @compileError("zig-wlroots requires wlroots version 0.19, found version " ++ version.str);
     }
 }
 test {

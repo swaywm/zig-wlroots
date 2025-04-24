@@ -8,13 +8,11 @@ pub const PrimarySelectionDeviceManagerV1 = extern struct {
     /// PrimarySelectionV1Device.link
     devices: wl.list.Head(PrimarySelectionDeviceV1, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         destroy: wl.Signal(*PrimarySelectionDeviceManagerV1),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_primary_selection_v1_device_manager_create(server: *wl.Server) ?*PrimarySelectionDeviceManagerV1;
     pub fn create(server: *wl.Server) !*PrimarySelectionDeviceManagerV1 {
@@ -31,9 +29,5 @@ pub const PrimarySelectionDeviceV1 = extern struct {
 
     offers: wl.list.Head(wl.Resource, null),
 
-    seat_destroy: wl.Listener(*wlr.Seat),
-    seat_focus_change: wl.Listener(*wlr.Seat.event.KeyboardFocusChange),
-    seat_set_primary_selection: wl.Listener(*wlr.Seat.event.RequestSetPrimarySelection),
-
-    data: usize,
+    data: ?*anyopaque,
 };

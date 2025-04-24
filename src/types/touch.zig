@@ -55,5 +55,5 @@ pub const Touch = extern struct {
         frame: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 };

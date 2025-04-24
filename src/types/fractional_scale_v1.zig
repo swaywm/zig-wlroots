@@ -10,8 +10,6 @@ pub const FractionalScaleManagerV1 = extern struct {
         destroy: wl.Signal(void),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
-
     extern fn wlr_fractional_scale_manager_v1_create(server: *wl.Server, version: u32) ?*FractionalScaleManagerV1;
     pub fn create(server: *wl.Server, version: u32) !*FractionalScaleManagerV1 {
         return wlr_fractional_scale_manager_v1_create(server, version) orelse error.OutOfMemory;

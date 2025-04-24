@@ -13,10 +13,6 @@ pub const DmabufBufferV1 = extern struct {
     resource: ?*wl.Resource,
     attributes: wlr.DmabufAttributes,
 
-    // private state
-
-    release: wl.Listener(void),
-
     extern fn wlr_dmabuf_v1_buffer_try_from_buffer_resource(buffer_resource: *wl.Resource) ?*DmabufBufferV1;
     pub const tryFromBufferResource = wlr_dmabuf_v1_buffer_try_from_buffer_resource;
 };
@@ -57,19 +53,6 @@ pub const LinuxDmabufV1 = extern struct {
     events: extern struct {
         destroy: wl.Signal(*LinuxDmabufV1),
     },
-
-    // private state
-
-    default_feedback: *LinuxDmabufFeedbackV1Compiled,
-    default_formats: wlr.DrmFormatSet,
-    surfaces: wl.list.Link,
-
-    main_device_fd: c_int,
-
-    server_destroy: wl.Listener(*wl.Server),
-
-    check_dmabuf_callback: *const fn (attribs: *wlr.DmabufAttributes, data: ?*anyopaque) callconv(.C) bool,
-    check_dmabuf_callback_data: ?*anyopaque,
 
     extern fn wlr_linux_dmabuf_v1_create(server: *wl.Server, version: u32, default_feedback: *const LinuxDmabufFeedbackV1) ?*LinuxDmabufV1;
     pub fn create(server: *wl.Server, version: u32, default_feedback: *const LinuxDmabufFeedbackV1) !*LinuxDmabufV1 {

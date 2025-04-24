@@ -7,8 +7,6 @@ pub const ExportDmabufManagerV1 = extern struct {
     global: *wl.Global,
     frames: wl.list.Head(ExportDmabufFrameV1, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         destroy: wl.Signal(*ExportDmabufManagerV1),
     },
@@ -28,7 +26,4 @@ pub const ExportDmabufFrameV1 = extern struct {
     output: ?*wlr.Output,
 
     cursor_locked: bool,
-
-    output_commit: wl.Listener(*wlr.Output.event.Commit),
-    output_destroy: wl.Listener(*wlr.Output),
 };

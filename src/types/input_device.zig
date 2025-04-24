@@ -20,7 +20,7 @@ pub const InputDevice = extern struct {
         destroy: wl.Signal(*InputDevice),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_keyboard_from_input_device(wlr_dev: *InputDevice) *wlr.Keyboard;
     pub const toKeyboard = wlr_keyboard_from_input_device;

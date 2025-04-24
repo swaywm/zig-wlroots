@@ -6,8 +6,6 @@ const wl = wayland.server.wl;
 const pixman = @import("pixman");
 
 pub const Renderer = extern struct {
-    const Impl = opaque {};
-
     /// Bitmask of wlr.BufferCap
     render_buffer_caps: u32,
 
@@ -18,11 +16,8 @@ pub const Renderer = extern struct {
 
     features: extern struct {
         output_color_transform: bool,
+        timeline: bool,
     },
-
-    // private state
-
-    impl: *const Impl,
 
     extern fn wlr_renderer_autocreate(backend: *wlr.Backend) ?*Renderer;
     pub fn autocreate(backend: *wlr.Backend) !*Renderer {
@@ -55,6 +50,8 @@ pub const Renderer = extern struct {
     pub const BufferPassOptions = extern struct {
         timer: ?*RenderTimer = null,
         color_transform: ?*wlr.ColorTransform = null,
+        signal_timeline: ?*wlr.DrmSyncobjTimeline = null,
+        signal_point: u64 = 0,
     };
     extern fn wlr_renderer_begin_buffer_pass(renderer: *Renderer, buffer: *wlr.Buffer, options: ?*const BufferPassOptions) ?*RenderPass;
     pub fn beginBufferPass(renderer: *Renderer, buffer: *wlr.Buffer, options: ?*const BufferPassOptions) !*RenderPass {
@@ -117,6 +114,8 @@ pub const RenderPass = opaque {
         transform: wl.Output.Transform,
         filter_mode: ScaleFilterMode,
         blend_mode: BlendMode,
+        wait_timeline: ?*wlr.DrmSyncobjTimeline = null,
+        wait_point: u64,
     };
 
     pub const RectOptions = extern struct {

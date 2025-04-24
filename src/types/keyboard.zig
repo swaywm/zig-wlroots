@@ -74,7 +74,7 @@ pub const Keyboard = extern struct {
         repeat_info: wl.Signal(*Keyboard),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_keyboard_set_keymap(kb: *Keyboard, keymap: ?*xkb.Keymap) bool;
     pub const setKeymap = wlr_keyboard_set_keymap;

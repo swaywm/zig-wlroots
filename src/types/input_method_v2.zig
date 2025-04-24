@@ -7,8 +7,6 @@ pub const InputMethodManagerV2 = extern struct {
     global: *wl.Global,
     input_methods: wl.list.Head(InputMethodV2, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         input_method: wl.Signal(*wlr.InputMethodV2),
         destroy: wl.Signal(*wlr.InputMethodManagerV2),
@@ -43,10 +41,6 @@ pub const InputMethodV2 = extern struct {
         input_method: *wlr.InputMethodV2,
         keyboard: ?*wlr.Keyboard,
 
-        keyboard_keymap: wl.Listener(*wlr.Keyboard),
-        keyboard_repeat_info: wl.Listener(*wlr.Keyboard),
-        keyboard_destroy: wl.Listener(*wlr.Keyboard),
-
         events: extern struct {
             destroy: wl.Signal(*wlr.InputMethodV2.KeyboardGrab),
         },
@@ -80,8 +74,6 @@ pub const InputMethodV2 = extern struct {
     keyboard_grab: ?*KeyboardGrab,
 
     link: wl.list.Link,
-
-    seat_client_destroy: wl.Listener(*wlr.Seat.Client),
 
     events: extern struct {
         commit: wl.Signal(*wlr.InputMethodV2),
@@ -123,7 +115,7 @@ pub const InputPopupSurfaceV2 = extern struct {
         destroy: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_input_popup_surface_v2_try_from_wlr_surface(surface: *wlr.Surface) ?*wlr.InputPopupSurfaceV2;
     pub const tryFromWlrSurface = wlr_input_popup_surface_v2_try_from_wlr_surface;

@@ -6,13 +6,6 @@ const wl = wayland.server.wl;
 pub const IdleNotifierV1 = extern struct {
     global: *wl.Global,
 
-    // private state
-
-    inhibited: bool,
-    notifications: wl.list.Link,
-
-    server_destroy: wl.Listener(*wl.Server),
-
     extern fn wlr_idle_notifier_v1_create(server: *wl.Server) ?*IdleNotifierV1;
     pub fn create(server: *wl.Server) !*IdleNotifierV1 {
         return wlr_idle_notifier_v1_create(server) orelse error.OutOfMemory;

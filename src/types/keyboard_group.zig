@@ -16,7 +16,7 @@ pub const KeyboardGroup = extern struct {
         leave: wl.Signal(*wl.Array),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_keyboard_group_create() ?*KeyboardGroup;
     pub fn create() !*KeyboardGroup {

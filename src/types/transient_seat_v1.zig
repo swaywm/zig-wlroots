@@ -5,7 +5,7 @@ const wl = wayland.server.wl;
 
 pub const TransientSeatManagerV1 = extern struct {
     global: *wl.Global,
-    server_destroy: wl.Listener(*wl.Server),
+
     events: extern struct {
         create_seat: wl.Signal(*TransientSeatV1),
     },

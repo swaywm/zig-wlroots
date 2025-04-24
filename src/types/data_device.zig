@@ -7,13 +7,11 @@ pub const DataDeviceManager = extern struct {
     global: *wl.Global,
     data_sources: wl.list.Head(wl.DataSource, null),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         destroy: wl.Signal(*DataDeviceManager),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_data_device_manager_create(server: *wl.Server) ?*DataDeviceManager;
     pub fn create(server: *wl.Server) !*DataDeviceManager {
@@ -36,8 +34,6 @@ pub const DataOffer = extern struct {
     actions: u32,
     preferred_action: wl.DataDeviceManager.DndAction.Enum,
     in_ask: bool,
-
-    source_destroy: wl.Listener(*DataSource),
 };
 
 pub const DataSource = extern struct {
@@ -95,9 +91,7 @@ pub const Drag = extern struct {
             destroy: wl.Signal(*Drag.Icon),
         },
 
-        surface_destroy: wl.Listener(*wlr.Surface),
-
-        data: usize,
+        data: ?*anyopaque,
     };
 
     pub const GrabType = enum(c_int) {
@@ -146,11 +140,7 @@ pub const Drag = extern struct {
         destroy: wl.Signal(*Drag),
     },
 
-    source_destroy: wl.Listener(*DataSource),
-    seat_client_destroy: wl.Listener(*wlr.Seat.Client),
-    icon_destroy: wl.Listener(*Drag.Icon),
-
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_drag_create(
         seat_client: *wlr.Seat.Client,
