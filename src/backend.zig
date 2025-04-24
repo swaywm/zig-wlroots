@@ -12,6 +12,13 @@ pub const Backend = extern struct {
     };
 
     impl: *const Impl,
+
+    buffer_caps: u32,
+
+    features: extern struct {
+        timeline: bool,
+    },
+
     events: extern struct {
         destroy: wl.Signal(*Backend),
         new_input: wl.Signal(*wlr.InputDevice),

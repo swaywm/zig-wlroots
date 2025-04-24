@@ -44,7 +44,7 @@ pub const TabletTool = extern struct {
         destroy: wl.Signal(*TabletTool),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 };
 
 pub const Tablet = extern struct {
@@ -132,5 +132,5 @@ pub const Tablet = extern struct {
 
     paths: wl.Array,
 
-    data: usize,
+    data: ?*anyopaque,
 };

@@ -10,7 +10,9 @@ pub const Viewporter = extern struct {
         destroy: wl.Signal(void),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_viewporter_create(server: *wl.Server) ?*Viewporter;
     pub fn create(server: *wl.Server) !*Viewporter {

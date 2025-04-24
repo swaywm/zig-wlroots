@@ -32,5 +32,5 @@ pub const Switch = extern struct {
         toggle: wl.Signal(*event.Toggle),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 };

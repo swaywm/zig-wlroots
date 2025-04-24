@@ -48,15 +48,16 @@ pub const PointerConstraintV1 = extern struct {
         destroy: wl.Signal(*PointerConstraintV1),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
+    private: extern struct {
+        surface_destroy: wl.Listener(void),
+        seat_destroy: wl.Listener(void),
 
-    surface_commit: wl.Listener(*wlr.Surface),
-    surface_destroy: wl.Listener(*wlr.Surface),
-    seat_destroy: wl.Listener(*wl.Seat),
+        synced: wlr.Surface.Synced,
 
-    synced: wlr.Surface.Synced,
+        destroying: bool,
+    },
 
     extern fn wlr_pointer_constraint_v1_send_activated(constraint: *PointerConstraintV1) void;
     pub const sendActivated = wlr_pointer_constraint_v1_send_activated;
@@ -70,12 +71,15 @@ pub const PointerConstraintsV1 = extern struct {
     constraints: wl.list.Head(PointerConstraintV1, .link),
 
     events: extern struct {
+        destroy: wl.Signal(void),
         new_constraint: wl.Signal(*PointerConstraintV1),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
+    data: ?*anyopaque,
 
-    data: usize,
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_pointer_constraints_v1_create(server: *wl.Server) ?*PointerConstraintsV1;
     pub fn create(server: *wl.Server) !*PointerConstraintsV1 {

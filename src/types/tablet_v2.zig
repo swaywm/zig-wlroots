@@ -9,13 +9,15 @@ pub const TabletManagerV2 = extern struct {
     clients: wl.list.Link, // private to wlroots
     seats: wl.list.Link, // private to wlroots
 
-    server_destroy: wl.Listener(void),
-
     events: extern struct {
         destroy: wl.Listener(void),
     },
 
     data: ?*anyopaque,
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_tablet_v2_create(server: *wl.Server) ?*TabletManagerV2;
     pub fn create(server: *wl.Server) !*TabletManagerV2 {
@@ -44,9 +46,11 @@ pub const TabletV2Tablet = extern struct {
     wlr_device: *wlr.InputDevice,
     clients: wl.list.Link, // private to wlroots
 
-    tablet_destroy: wl.Listener(void),
-
     current_client: ?*opaque {},
+
+    private: extern struct {
+        tablet_destroy: wl.Listener(void),
+    },
 };
 
 pub const TabletV2TabletTool = extern struct {
@@ -85,11 +89,8 @@ pub const TabletV2TabletTool = extern struct {
     wlr_tool: *wlr.TabletTool,
     clients: wl.list.Link, // private to wlroots
 
-    tool_destroy: wl.Listener(void),
-
     current_client: ?*opaque {},
     focused_surface: ?*wlr.Surface,
-    surface_destroy: wl.Listener(void),
 
     grab: *Grab,
     default_grab: Grab,
@@ -103,6 +104,11 @@ pub const TabletV2TabletTool = extern struct {
 
     events: extern struct {
         set_cursor: wl.Signal(*event.SetCursor),
+    },
+
+    private: extern struct {
+        surface_destroy: wl.Listener(void),
+        tool_destroy: wl.Listener(void),
     },
 
     extern fn wlr_send_tablet_v2_tablet_tool_proximity_in(tool: *TabletV2TabletTool, tablet: *TabletV2Tablet, surface: *wlr.Surface) void;
@@ -223,8 +229,6 @@ pub const TabletV2TabletPad = extern struct {
     group_count: usize,
     groups: [*]u32,
 
-    pad_destroy: wl.Listener(void),
-
     current_client: ?*opaque {},
 
     grab: *Grab,
@@ -234,6 +238,10 @@ pub const TabletV2TabletPad = extern struct {
         button_feedback: wl.Signal(*event.Feedback),
         strip_feedback: wl.Signal(*event.Feedback),
         ring_feedback: wl.Signal(*event.Feedback),
+    },
+
+    private: extern struct {
+        pad_destroy: wl.Listener(void),
     },
 
     extern fn wlr_send_tablet_v2_tablet_pad_enter(pad: *TabletV2TabletPad, tablet: *TabletV2Tablet, surface: *wlr.Surface) u32;

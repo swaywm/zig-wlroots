@@ -13,6 +13,10 @@ pub const ContentTypeManagerV1 = extern struct {
 
     data: ?*anyopaque,
 
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
+
     extern fn wlr_content_type_manager_v1_create(server: *wl.Server, version: u32) ?*ContentTypeManagerV1;
     pub fn create(server: *wl.Server, version: u32) !*ContentTypeManagerV1 {
         return wlr_content_type_manager_v1_create(server, version) orelse error.OutOfMemory;

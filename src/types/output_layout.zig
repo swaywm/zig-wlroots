@@ -19,11 +19,10 @@ pub const OutputLayout = extern struct {
             destroy: wl.Signal(*OutputLayout.Output),
         },
 
-        // private state
-
-        addon: *wlr.Addon,
-
-        commit: wl.Listener(*wlr.Output.event.Commit),
+        private: extern struct {
+            addon: wlr.Addon,
+            commit: wl.Listener(void),
+        },
     };
 
     pub const Direction = enum(c_int) {
@@ -42,10 +41,11 @@ pub const OutputLayout = extern struct {
         destroy: wl.Signal(*OutputLayout),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_output_layout_create(server: *wl.Server) ?*OutputLayout;
     pub fn create(server: *wl.Server) !*OutputLayout {

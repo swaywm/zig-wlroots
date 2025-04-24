@@ -6,10 +6,12 @@ const wl = wayland.server.wl;
 pub const Subcompositor = extern struct {
     global: *wl.Global,
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         destroy: wl.Signal(*wlr.Compositor),
+    },
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
     },
 
     extern fn wlr_subcompositor_create(server: *wl.Server) ?*Subcompositor;
@@ -25,9 +27,9 @@ pub const Subsurface = extern struct {
         /// wlr.Surface.State.subsurfaces_above/subsurfaces_below
         link: wl.list.Link,
 
-        // private state
-
-        synced: *wlr.Surface.Synced,
+        private: extern struct {
+            synced: *wlr.Surface.Synced,
+        },
     };
 
     resource: *wl.Subsurface,
@@ -44,22 +46,17 @@ pub const Subsurface = extern struct {
     reordered: bool,
     added: bool,
 
-    surface_client_commit: wl.Listener(void),
-    parent_destroy: wl.Listener(*wlr.Surface),
-
     events: extern struct {
         destroy: wl.Signal(*Subsurface),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
+    private: extern struct {
+        parent_synced: wlr.Surface.Synced,
 
-    parent_synced: wlr.Surface.Synced,
-
-    previous: extern struct {
-        x: i32,
-        y: i32,
+        surface_client_commit: wl.Listener(void),
+        parent_destroy: wl.Listener(void),
     },
 
     extern fn wlr_subsurface_try_from_wlr_surface(surface: *wlr.Surface) ?*wlr.Subsurface;

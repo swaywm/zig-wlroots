@@ -110,22 +110,23 @@ pub const Xwayland = extern struct {
     seat: ?*wlr.Seat,
 
     events: extern struct {
+        destroy: wl.Signal(void),
         ready: wl.Signal(void),
         new_surface: wl.Signal(*XwaylandSurface),
         remove_startup_info: wl.Signal(*event.RemoveStartupInfo),
     },
 
-    user_event_handler: ?*const fn (*Xwm, *xcb.GenericEvent) callconv(.C) c_int,
+    user_event_handler: ?*const fn (*Xwayland, *xcb.GenericEvent) callconv(.C) bool,
 
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
-
-    server_start: wl.Listener(void),
-    server_ready: wl.Listener(*wlr.XwaylandServer.event.Ready),
-    server_destroy: wl.Listener(void),
-    seat_destroy: wl.Listener(*wlr.Seat),
-    shell_destroy: wl.Listener(void),
+    private: extern struct {
+        server_start: wl.Listener(void),
+        server_ready: wl.Listener(void),
+        server_destroy: wl.Listener(void),
+        seat_destroy: wl.Listener(void),
+        shell_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_xwayland_create(server: *wl.Server, compositor: *wlr.Compositor, lazy: bool) ?*Xwayland;
     pub fn create(server: *wl.Server, compositor: *wlr.Compositor, lazy: bool) !*Xwayland {
@@ -194,15 +195,13 @@ pub const XwaylandSurface = extern struct {
 
     surface: ?*wlr.Surface,
     surface_addon: wlr.Addon,
-    surface_commit: wl.Listener(*wlr.Surface),
-    surface_map: wl.Listener(void),
-    surface_unmap: wl.Listener(void),
 
     x: i16,
     y: i16,
     width: u16,
     height: u16,
     override_redirect: bool,
+    opacity: f32,
 
     title: ?[*:0]u8,
     class: ?[*:0]u8,
@@ -237,6 +236,13 @@ pub const XwaylandSurface = extern struct {
     maximized_horz: bool,
     minimized: bool,
     withdrawn: bool,
+    sticky: bool,
+    shaded: bool,
+    skip_taskbar: bool,
+    skip_pager: bool,
+    above: bool,
+    below: bool,
+    demands_attention: bool,
 
     has_alpha: bool,
 
@@ -249,6 +255,14 @@ pub const XwaylandSurface = extern struct {
         request_maximize: wl.Signal(void),
         request_fullscreen: wl.Signal(void),
         request_activate: wl.Signal(void),
+        request_close: wl.Signal(void),
+        request_sticky: wl.Signal(void),
+        request_shaded: wl.Signal(void),
+        request_skip_taskbar: wl.Signal(void),
+        request_skip_pager: wl.Signal(void),
+        request_above: wl.Signal(void),
+        request_below: wl.Signal(void),
+        request_demands_attention: wl.Signal(void),
 
         associate: wl.Signal(void),
         dissociate: wl.Signal(void),
@@ -264,13 +278,22 @@ pub const XwaylandSurface = extern struct {
         set_strut_partial: wl.Signal(void),
         set_override_redirect: wl.Signal(void),
         set_geometry: wl.Signal(void),
+        set_opacity: wl.Signal(void),
+        focus_in: wl.Signal(void),
+        grab_focus: wl.Signal(void),
 
         map_request: wl.Signal(void),
 
         ping_timeout: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
+
+    private: extern struct {
+        surface_commit: wl.Listener(void),
+        surface_map: wl.Listener(void),
+        surface_unmap: wl.Listener(void),
+    },
 
     extern fn wlr_xwayland_surface_activate(surface: *XwaylandSurface, activated: bool) void;
     pub const activate = wlr_xwayland_surface_activate;
@@ -290,7 +313,7 @@ pub const XwaylandSurface = extern struct {
     extern fn wlr_xwayland_surface_set_minimized(surface: *XwaylandSurface, minimized: bool) void;
     pub const setMinimized = wlr_xwayland_surface_set_minimized;
 
-    extern fn wlr_xwayland_surface_set_maximized(surface: *XwaylandSurface, maximized: bool) void;
+    extern fn wlr_xwayland_surface_set_maximized(surface: *XwaylandSurface, maximized_horz: bool, maximized_vert: bool) void;
     pub const setMaximized = wlr_xwayland_surface_set_maximized;
 
     extern fn wlr_xwayland_surface_set_fullscreen(surface: *XwaylandSurface, fullscreen: bool) void;
@@ -302,9 +325,9 @@ pub const XwaylandSurface = extern struct {
     extern fn wlr_xwayland_surface_ping(surface: *XwaylandSurface) void;
     pub const ping = wlr_xwayland_surface_ping;
 
-    extern fn wlr_xwayland_or_surface_wants_focus(surface: *const XwaylandSurface) bool;
-    pub const overrideRedirectWantsFocus = wlr_xwayland_or_surface_wants_focus;
+    extern fn wlr_xwayland_surface_override_redirect_wants_focus(surface: *const XwaylandSurface) bool;
+    pub const overrideRedirectWantsFocus = wlr_xwayland_surface_override_redirect_wants_focus;
 
-    extern fn wlr_xwayland_icccm_input_model(surface: *const XwaylandSurface) IcccmInputModel;
-    pub const icccmInputModel = wlr_xwayland_icccm_input_model;
+    extern fn wlr_xwayland_surface_icccm_input_model(surface: *const XwaylandSurface) IcccmInputModel;
+    pub const icccmInputModel = wlr_xwayland_surface_icccm_input_model;
 };

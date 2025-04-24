@@ -43,10 +43,12 @@ pub const XwaylandServer = extern struct {
         destroy: wl.Signal(void),
     },
 
-    client_destroy: wl.Listener(*wl.Client),
-    display_destroy: wl.Listener(*wl.Server),
+    data: ?*anyopaque,
 
-    data: usize,
+    private: extern struct {
+        client_destroy: wl.Listener(void),
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_xwayland_server_create(server: *wl.Server, options: *Options) ?*XwaylandServer;
     pub fn create(server: *wl.Server, options: *Options) !*XwaylandServer {

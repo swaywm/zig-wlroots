@@ -12,6 +12,8 @@ pub const XdgActivationV1 = extern struct {
         };
     };
 
+    global: *wl.Global,
+
     /// token timeout in milliseconds (0 to disable)
     token_timeout_msec: u32,
 
@@ -23,13 +25,10 @@ pub const XdgActivationV1 = extern struct {
         new_token: wl.Signal(*XdgActivationTokenV1),
     },
 
-    // Private state
-
-    server: *wl.Server,
-
-    global: *wl.Global,
-
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        server: *wl.Server,
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_xdg_activation_v1_create(server: *wl.Server) ?*XdgActivationV1;
     pub fn create(server: *wl.Server) !*XdgActivationV1 {
@@ -57,19 +56,20 @@ pub const XdgActivationTokenV1 = extern struct {
 
     link: wl.list.Link,
 
-    data: usize,
+    data: ?*anyopaque,
 
     events: extern struct {
         destroy: wl.Signal(void),
     },
 
-    // Private state
-    token: [*:0]u8,
-    resource: ?*wl.Resource,
-    timeout: ?*wl.EventSource,
+    private: extern struct {
+        token: ?[*:0]u8,
+        resource: ?*wl.Resource,
+        timeout: ?*wl.EventSource,
 
-    seat_destroy: wl.Listener(*wlr.Seat),
-    surface_destroy: wl.Listener(*wlr.Surface),
+        seat_destroy: wl.Listener(void),
+        surface_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_xdg_activation_token_v1_destroy(token: *XdgActivationTokenV1) void;
     pub const destroy = wlr_xdg_activation_token_v1_destroy;

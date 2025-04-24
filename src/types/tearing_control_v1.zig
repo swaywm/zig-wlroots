@@ -18,13 +18,19 @@ pub const TearingControlV1 = extern struct {
     },
 
     surface: *wlr.Surface,
+
+    private: extern struct {
+        previous: wp.TearingControlV1.PresentationHint,
+        addon: wlr.Addon,
+        synced: wlr.Surface.Synced,
+
+        surface_commit: wl.Listener(void),
+    },
 };
 
 pub const TearingControlManagerV1 = extern struct {
     global: *wl.Global,
     surface_hints: wl.list.Head(TearingControlV1, .link),
-
-    server_destroy: wl.Listener(*wl.Server),
 
     events: extern struct {
         new_object: wl.Signal(*TearingControlV1),
@@ -32,6 +38,10 @@ pub const TearingControlManagerV1 = extern struct {
     },
 
     data: ?*anyopaque,
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_tearing_control_manager_v1_create(server: *wl.Server, version: u32) ?*TearingControlManagerV1;
     pub fn create(server: *wl.Server, version: u32) !*TearingControlManagerV1 {

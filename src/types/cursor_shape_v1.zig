@@ -12,9 +12,11 @@ pub const CursorShapeManagerV1 = extern struct {
         destroy: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     pub const DeviceType = enum(c_int) {
         pointer,

@@ -10,7 +10,9 @@ pub const FractionalScaleManagerV1 = extern struct {
         destroy: wl.Signal(void),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_fractional_scale_manager_v1_create(server: *wl.Server, version: u32) ?*FractionalScaleManagerV1;
     pub fn create(server: *wl.Server, version: u32) !*FractionalScaleManagerV1 {

@@ -16,9 +16,11 @@ pub const OutputManagerV1 = extern struct {
         destroy: wl.Signal(*OutputManagerV1),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
+    data: ?*anyopaque,
 
-    data: usize,
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_output_manager_v1_create(server: *wl.Server) ?*OutputManagerV1;
     pub fn create(server: *wl.Server) !*OutputManagerV1 {
@@ -57,7 +59,9 @@ pub const OutputHeadV1 = extern struct {
     resources: wl.list.Head(wl.Resource, null),
     mode_resources: wl.list.Head(wl.Resource, null),
 
-    output_destroy: wl.Listener(*wlr.Output),
+    private: extern struct {
+        output_destroy: wl.Listener(void),
+    },
 };
 
 pub const OutputConfigurationV1 = extern struct {
@@ -68,7 +72,9 @@ pub const OutputConfigurationV1 = extern struct {
 
         resource: ?*wl.Resource,
 
-        output_destroy: wl.Listener(*wlr.Output),
+        private: extern struct {
+            output_destroy: wl.Listener(void),
+        },
 
         extern fn wlr_output_configuration_head_v1_create(config: *OutputConfigurationV1, output: *wlr.Output) ?*Head;
         pub fn create(config: *OutputConfigurationV1, output: *wlr.Output) !*Head {

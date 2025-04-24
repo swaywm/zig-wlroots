@@ -101,6 +101,9 @@ pub const Pointer = extern struct {
 
     output_name: [*:0]u8,
 
+    buttons: [16]u32,
+    button_count: usize,
+
     events: extern struct {
         motion: wl.Signal(*event.Motion),
         motion_absolute: wl.Signal(*event.MotionAbsolute),

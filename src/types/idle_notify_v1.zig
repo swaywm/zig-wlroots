@@ -6,12 +6,12 @@ const wl = wayland.server.wl;
 pub const IdleNotifierV1 = extern struct {
     global: *wl.Global,
 
-    // private state
+    private: extern struct {
+        inhibited: bool,
+        notifications: wl.list.Link,
 
-    inhibited: bool,
-    notifications: wl.list.Link,
-
-    server_destroy: wl.Listener(*wl.Server),
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_idle_notifier_v1_create(server: *wl.Server) ?*IdleNotifierV1;
     pub fn create(server: *wl.Server) !*IdleNotifierV1 {

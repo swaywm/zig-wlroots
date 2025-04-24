@@ -9,13 +9,15 @@ pub const ForeignToplevelManagerV1 = extern struct {
     resources: wl.list.Head(wl.Resource, null),
     toplevels: wl.list.Head(ForeignToplevelHandleV1, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         destroy: wl.Signal(*ForeignToplevelManagerV1),
     },
 
-    data: usize,
+    data: ?*anyopaque,
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_foreign_toplevel_manager_v1_create(wl_server: *wl.Server) ?*ForeignToplevelManagerV1;
     pub fn create(wl_server: *wl.Server) !*ForeignToplevelManagerV1 {
@@ -37,10 +39,10 @@ pub const ForeignToplevelHandleV1 = extern struct {
         output: *wlr.Output,
         toplevel: *ForeignToplevelHandleV1,
 
-        // private state
-
-        output_bind: wl.Listener(*wlr.Output.event.Bind),
-        output_destroy: wl.Listener(*wlr.Output),
+        private: extern struct {
+            output_bind: wl.Listener(void),
+            output_destroy: wl.Listener(void),
+        },
     };
 
     pub const event = struct {
@@ -96,7 +98,7 @@ pub const ForeignToplevelHandleV1 = extern struct {
         destroy: wl.Signal(*ForeignToplevelHandleV1),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_foreign_toplevel_handle_v1_create(manager: *ForeignToplevelManagerV1) ?*ForeignToplevelHandleV1;
     pub fn create(manager: *ForeignToplevelManagerV1) !*ForeignToplevelHandleV1 {

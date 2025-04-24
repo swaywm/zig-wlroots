@@ -11,13 +11,15 @@ pub const PointerGesturesV1 = extern struct {
     pinches: wl.list.Head(zwp.PointerGesturePinchV1, null),
     holds: wl.list.Head(zwp.PointerGestureHoldV1, null),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         destroy: wl.Signal(*PointerGesturesV1),
     },
 
-    data: usize,
+    data: ?*anyopaque,
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_pointer_gestures_v1_create(server: *wl.Server) ?*PointerGesturesV1;
     pub fn create(server: *wl.Server) !*PointerGesturesV1 {

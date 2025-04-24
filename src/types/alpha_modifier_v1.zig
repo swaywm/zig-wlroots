@@ -10,6 +10,10 @@ pub const AlphaModifierV1 = extern struct {
 
     global: *wl.Global,
 
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
+
     extern fn wlr_alpha_modifier_v1_create(server: *wl.Server) ?*AlphaModifierV1;
     pub fn create(server: *wl.Server) !*AlphaModifierV1 {
         return wlr_alpha_modifier_v1_create(server) orelse error.OutOfMemory;

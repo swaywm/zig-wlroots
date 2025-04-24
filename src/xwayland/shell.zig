@@ -14,13 +14,13 @@ pub const XwaylandShellV1 = extern struct {
         new_surface: wl.Signal(*XwaylandSurfaceV1),
     },
 
-    // private state
+    private: extern struct {
+        client: *wl.Client,
+        surfaces: wl.list.Link,
 
-    client: ?*wl.Client,
-    surfaces: wl.list.Head(XwaylandSurfaceV1, .link),
-
-    display_destroy: wl.Listener(void),
-    client_destroy: wl.Listener(void),
+        server_destroy: wl.Listener(void),
+        client_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_xwayland_shell_v1_create(server: *wl.Server, version: u32) ?*XwaylandShellV1;
     pub fn create(server: *wl.Server, version: u32) !*XwaylandShellV1 {
@@ -41,11 +41,10 @@ pub const XwaylandSurfaceV1 = extern struct {
     surface: *wlr.Surface,
     serial: u64,
 
-    // private state
-
-    resource: *wl.Resource,
-    /// XwaylandShellV1.surfaces
-    link: wl.list.Link,
-    shell: *XwaylandShellV1,
-    added: bool,
+    private: extern struct {
+        resource: *wl.Resource,
+        link: wl.list.Link,
+        shell: *wlr.XwaylandShellV1,
+        added: bool,
+    },
 };

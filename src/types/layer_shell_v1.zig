@@ -7,14 +7,16 @@ const zwlr = wayland.server.zwlr;
 pub const LayerShellV1 = extern struct {
     global: *wl.Global,
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         new_surface: wl.Signal(*LayerSurfaceV1),
         destroy: wl.Signal(*LayerShellV1),
     },
 
-    data: usize,
+    data: ?*anyopaque,
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_layer_shell_v1_create(server: *wl.Server, version: u32) ?*LayerShellV1;
     pub fn create(server: *wl.Server, version: u32) !*LayerShellV1 {
@@ -31,7 +33,8 @@ pub const LayerSurfaceV1 = extern struct {
             margin: bool = false,
             keyboard_interactivity: bool = false,
             layer: bool = false,
-            _: u26 = 0,
+            exclusive_edge: bool = false,
+            _: u25 = 0,
         };
 
         committed: Fields,
@@ -47,6 +50,7 @@ pub const LayerSurfaceV1 = extern struct {
         desired_width: u32,
         desired_height: u32,
         layer: zwlr.LayerShellV1.Layer,
+        exclusive_edge: u32,
 
         configure_serial: u32,
         actual_width: u32,
@@ -86,11 +90,11 @@ pub const LayerSurfaceV1 = extern struct {
         new_popup: wl.Signal(*wlr.XdgPopup),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
-
-    synced: wlr.Surface.Synced,
+    private: extern struct {
+        synced: wlr.Surface.Synced,
+    },
 
     extern fn wlr_layer_surface_v1_configure(surface: *LayerSurfaceV1, width: u32, height: u32) u32;
     pub const configure = wlr_layer_surface_v1_configure;

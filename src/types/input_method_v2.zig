@@ -7,11 +7,13 @@ pub const InputMethodManagerV2 = extern struct {
     global: *wl.Global,
     input_methods: wl.list.Head(InputMethodV2, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         input_method: wl.Signal(*wlr.InputMethodV2),
         destroy: wl.Signal(*wlr.InputMethodManagerV2),
+    },
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
     },
 
     extern fn wlr_input_method_manager_v2_create(server: *wl.Server) ?*wlr.InputMethodManagerV2;
@@ -43,12 +45,14 @@ pub const InputMethodV2 = extern struct {
         input_method: *wlr.InputMethodV2,
         keyboard: ?*wlr.Keyboard,
 
-        keyboard_keymap: wl.Listener(*wlr.Keyboard),
-        keyboard_repeat_info: wl.Listener(*wlr.Keyboard),
-        keyboard_destroy: wl.Listener(*wlr.Keyboard),
-
         events: extern struct {
             destroy: wl.Signal(*wlr.InputMethodV2.KeyboardGrab),
+        },
+
+        private: extern struct {
+            keyboard_keymap: wl.Listener(void),
+            keyboard_repeat_info: wl.Listener(void),
+            keyboard_destroy: wl.Listener(void),
         },
 
         extern fn wlr_input_method_keyboard_grab_v2_send_key(keyboard_grab: *wlr.InputMethodV2.KeyboardGrab, time: u32, key: u32, state: u32) void;
@@ -81,13 +85,15 @@ pub const InputMethodV2 = extern struct {
 
     link: wl.list.Link,
 
-    seat_client_destroy: wl.Listener(*wlr.Seat.Client),
-
     events: extern struct {
         commit: wl.Signal(*wlr.InputMethodV2),
         new_popup_surface: wl.Signal(*wlr.InputPopupSurfaceV2),
         grab_keyboard: wl.Signal(*wlr.InputMethodV2.KeyboardGrab),
         destroy: wl.Signal(*wlr.InputMethodV2),
+    },
+
+    private: extern struct {
+        seat_client_destroy: wl.Listener(void),
     },
 
     extern fn wlr_input_method_v2_send_activate(input_method: *wlr.InputMethodV2) void;
@@ -123,7 +129,7 @@ pub const InputPopupSurfaceV2 = extern struct {
         destroy: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_input_popup_surface_v2_try_from_wlr_surface(surface: *wlr.Surface) ?*wlr.InputPopupSurfaceV2;
     pub const tryFromWlrSurface = wlr_input_popup_surface_v2_try_from_wlr_surface;

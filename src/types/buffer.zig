@@ -80,6 +80,9 @@ pub const Buffer = extern struct {
     extern fn wlr_buffer_try_from_resource(resource: *wl.Buffer) ?*Buffer;
     pub const tryFromWlBuffer = wlr_buffer_try_from_resource;
 
+    extern fn wlr_buffer_is_opaque(buffer: *Buffer) bool;
+    pub const isOpaque = wlr_buffer_is_opaque;
+
     extern fn wlr_buffer_begin_data_ptr_access(buffer: *Buffer, flags: u32, data: **anyopaque, format: *u32, stride: *usize) bool;
     pub const beginDataPtrAccess = wlr_buffer_begin_data_ptr_access;
 
@@ -93,12 +96,11 @@ pub const ClientBuffer = extern struct {
     texture: ?*wlr.Texture,
     source: ?*wlr.Buffer,
 
-    // private state
-
-    source_destroy: wl.Listener(void),
-    renderer_destroy: wl.Listener(void),
-
-    n_ignore_locks: usize,
+    private: extern struct {
+        source_destroy: wl.Listener(void),
+        renderer_destroy: wl.Listener(void),
+        n_ignore_locks: usize,
+    },
 
     extern fn wlr_client_buffer_get(buffer: *wlr.Buffer) ?*ClientBuffer;
     pub const get = wlr_client_buffer_get;

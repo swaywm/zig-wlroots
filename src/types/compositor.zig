@@ -11,12 +11,14 @@ pub const Compositor = extern struct {
     global: *wl.Global,
     renderer: ?*wlr.Renderer,
 
-    server_destroy: wl.Listener(*wl.Server),
-    renderer_destroy: wl.Listener(void),
-
     events: extern struct {
         new_surface: wl.Signal(*wlr.Surface),
         destroy: wl.Signal(*wlr.Compositor),
+    },
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+        renderer_destroy: wl.Listener(void),
     },
 
     extern fn wlr_compositor_create(server: *wl.Server, version: u32, renderer: ?*wlr.Renderer) ?*Compositor;
@@ -88,6 +90,7 @@ pub const Surface = extern struct {
         no_object: bool = false,
         client_commit: ?*const fn (surface: *Surface) callconv(.C) void = null,
         commit: ?*const fn (surface: *Surface) callconv(.C) void = null,
+        map: ?*const fn (surface: *Surface) callconv(.C) void = null,
         unmap: ?*const fn (surface: *Surface) callconv(.C) void = null,
         destroy: ?*const fn (surface: *Surface) callconv(.C) void = null,
     };
@@ -98,8 +101,11 @@ pub const Surface = extern struct {
 
         // Surface.current_outputs
         link: wl.list.Link,
-        bind: wl.Listener(*wlr.Output.event.Bind),
-        destroy: wl.Listener(*wlr.Output),
+
+        private: extern struct {
+            bind: wl.Listener(void),
+            destroy: wl.Listener(void),
+        },
     };
 
     pub const Synced = extern struct {
@@ -108,6 +114,7 @@ pub const Surface = extern struct {
             init_state: ?*const fn (state: *anyopaque) callconv(.C) void,
             finish_state: ?*const fn (state: *anyopaque) callconv(.C) void,
             move_state: ?*const fn (dst: *anyopaque, src: *anyopaque) callconv(.C) void,
+            commit: ?*const fn (synced: *Synced) callconv(.C) void = null,
         };
 
         surface: *Surface,
@@ -173,36 +180,37 @@ pub const Surface = extern struct {
     current_outputs: wl.list.Head(Surface.Output, .link),
 
     addons: wlr.AddonSet,
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
+    private: extern struct {
+        role_resource_destroy: wl.Listener(void),
 
-    role_resource_destroy: wl.Listener(*wl.Resource),
+        previous: extern struct {
+            scale: i32,
+            transform: wl.Output.Transform,
+            width: c_int,
+            height: c_int,
+            buffer_width: c_int,
+            buffer_height: c_int,
+        },
 
-    previous: extern struct {
-        scale: i32,
-        transform: wl.Output.Transform,
-        width: c_int,
-        height: c_int,
-        buffer_width: c_int,
-        buffer_height: c_int,
+        unmap_commit: bool,
+
+        @"opaque": bool,
+
+        handling_commit: bool,
+        pending_rejected: bool,
+
+        preferred_buffer_scale: i32,
+        preferred_buffer_transform_sent: bool,
+        preferred_buffer_transform: wl.Output.Transform,
+
+        synced: wl.list.Link,
+        synced_len: usize,
+
+        pending_buffer_resource: *wl.Resource,
+        pending_buffer_resource_destroy: wl.Listener(void),
     },
-
-    unmap_commit: bool,
-    @"opaque": bool,
-
-    handling_commit: bool,
-    pending_rejected: bool,
-
-    preferred_buffer_scale: i32,
-    preferred_buffer_transform_sent: bool,
-    preferred_buffer_transform: wl.Output.Transform,
-
-    synced: wl.list.Head(Synced, .link),
-    synced_len: usize,
-
-    pending_buffer_resource: *wl.Resource,
-    pending_buffer_resource_destroy: wl.Listener(void),
 
     extern fn wlr_surface_set_role(
         surface: *Surface,
@@ -245,8 +253,8 @@ pub const Surface = extern struct {
     extern fn wlr_surface_send_frame_done(surface: *Surface, when: *const posix.timespec) void;
     pub const sendFrameDone = wlr_surface_send_frame_done;
 
-    extern fn wlr_surface_get_extends(surface: *Surface, box: *wlr.Box) void;
-    pub const getExtends = wlr_surface_get_extends;
+    extern fn wlr_surface_get_extents(surface: *Surface, box: *wlr.Box) void;
+    pub const getExtents = wlr_surface_get_extents;
 
     extern fn wlr_surface_from_resource(resource: *wl.Surface) *Surface;
     pub const fromWlSurface = wlr_surface_from_resource;
@@ -279,15 +287,11 @@ pub const Surface = extern struct {
     extern fn wlr_surface_get_buffer_source_box(surface: *Surface, box: *wlr.FBox) void;
     pub const getBufferSourceBox = wlr_surface_get_buffer_source_box;
 
-    extern fn wlr_surface_accepts_touch(seat: *wlr.Seat, surface: *Surface) bool;
-    pub fn acceptsTouch(surface: *Surface, seat: *wlr.Seat) bool {
-        return wlr_surface_accepts_touch(seat, surface);
-    }
+    extern fn wlr_surface_accepts_touch(surface: *Surface, seat: *wlr.Seat) bool;
+    pub const acceptsTouch = wlr_surface_accepts_touch;
 
-    extern fn wlr_surface_accepts_tablet_v2(tablet: *wlr.TabletV2Tablet, surface: *Surface) bool;
-    pub fn acceptsTabletV2(surface: *Surface, tablet: *wlr.TabletV2Tablet) bool {
-        return wlr_surface_accepts_tablet_v2(tablet, surface);
-    }
+    extern fn wlr_surface_accepts_tablet_v2(surface: *Surface, tablet: *wlr.TabletV2Tablet) bool;
+    pub const acceptsTabletV2 = wlr_surface_accepts_tablet_v2;
 
     extern fn wlr_surface_lock_pending(surface: *Surface) u32;
     pub const lockPending = wlr_surface_lock_pending;

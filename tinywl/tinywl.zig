@@ -120,6 +120,20 @@ const Server = struct {
 
     fn deinit(server: *Server) void {
         server.wl_server.destroyClients();
+
+        server.new_input.link.remove();
+        server.new_output.link.remove();
+
+        server.new_xdg_toplevel.link.remove();
+        server.new_xdg_popup.link.remove();
+        server.request_set_cursor.link.remove();
+        server.request_set_selection.link.remove();
+        server.cursor_motion.link.remove();
+        server.cursor_motion_absolute.link.remove();
+        server.cursor_button.link.remove();
+        server.cursor_axis.link.remove();
+        server.cursor_frame.link.remove();
+
         server.backend.destroy();
         server.wl_server.destroy();
     }
@@ -164,8 +178,8 @@ const Server = struct {
                 return;
             },
         };
-        toplevel.scene_tree.node.data = @intFromPtr(toplevel);
-        xdg_surface.data = @intFromPtr(toplevel.scene_tree);
+        toplevel.scene_tree.node.data = toplevel;
+        xdg_surface.data = toplevel.scene_tree;
 
         xdg_surface.surface.events.commit.add(&toplevel.commit);
         xdg_surface.surface.events.map.add(&toplevel.map);
@@ -181,7 +195,7 @@ const Server = struct {
         // These asserts are fine since tinywl.zig doesn't support anything else that can
         // make xdg popups (e.g. layer shell).
         const parent = wlr.XdgSurface.tryFromWlrSurface(xdg_popup.parent.?) orelse return;
-        const parent_tree = @as(?*wlr.SceneTree, @ptrFromInt(parent.data)) orelse {
+        const parent_tree = @as(?*wlr.SceneTree, @alignCast(@ptrCast(parent.data))) orelse {
             // The xdg surface user data could be left null due to allocation failure.
             return;
         };
@@ -189,7 +203,7 @@ const Server = struct {
             std.log.err("failed to allocate xdg popup node", .{});
             return;
         };
-        xdg_surface.data = @intFromPtr(scene_tree);
+        xdg_surface.data = scene_tree;
 
         const popup = gpa.create(Popup) catch {
             std.log.err("failed to allocate new popup", .{});
@@ -220,7 +234,7 @@ const Server = struct {
 
             var it: ?*wlr.SceneTree = node.parent;
             while (it) |n| : (it = n.node.parent) {
-                if (@as(?*Toplevel, @ptrFromInt(n.node.data))) |toplevel| {
+                if (@as(?*Toplevel, @alignCast(@ptrCast(n.node.data)))) |toplevel| {
                     return ViewAtResult{
                         .toplevel = toplevel,
                         .surface = scene_surface.surface,
@@ -352,10 +366,8 @@ const Server = struct {
                         new_right = new_left + 1;
                 }
 
-                var geo_box: wlr.Box = undefined;
-                toplevel.xdg_toplevel.base.getGeometry(&geo_box);
-                toplevel.x = new_left - geo_box.x;
-                toplevel.y = new_top - geo_box.y;
+                toplevel.x = new_left - toplevel.xdg_toplevel.base.geometry.x;
+                toplevel.y = new_top - toplevel.xdg_toplevel.base.geometry.y;
                 toplevel.scene_tree.node.setPosition(toplevel.x, toplevel.y);
 
                 const new_width = new_right - new_left;
@@ -465,6 +477,7 @@ const Output = struct {
         const output: *Output = @fieldParentPtr("destroy", listener);
 
         output.frame.link.remove();
+        output.request_state.link.remove();
         output.destroy.link.remove();
 
         gpa.destroy(output);
@@ -541,8 +554,7 @@ const Toplevel = struct {
         server.cursor_mode = .resize;
         server.resize_edges = event.edges;
 
-        var box: wlr.Box = undefined;
-        toplevel.xdg_toplevel.base.getGeometry(&box);
+        const box = toplevel.xdg_toplevel.base.geometry;
 
         const border_x = toplevel.x + box.x + if (event.edges.right) box.width else 0;
         const border_y = toplevel.y + box.y + if (event.edges.bottom) box.height else 0;
@@ -585,7 +597,7 @@ const Keyboard = struct {
 
     modifiers: wl.Listener(*wlr.Keyboard) = .init(handleModifiers),
     key: wl.Listener(*wlr.Keyboard.event.Key) = .init(handleKey),
-    destroy: wl.Listener(void) = .init(handleDestroy),
+    destroy: wl.Listener(*wlr.InputDevice) = .init(handleDestroy),
 
     fn create(server: *Server, device: *wlr.InputDevice) !void {
         const keyboard = try gpa.create(Keyboard);
@@ -607,6 +619,7 @@ const Keyboard = struct {
 
         wlr_keyboard.events.modifiers.add(&keyboard.modifiers);
         wlr_keyboard.events.key.add(&keyboard.key);
+        device.events.destroy.add(&keyboard.destroy);
 
         server.seat.setKeyboard(wlr_keyboard);
         server.keyboards.append(keyboard);
@@ -641,10 +654,14 @@ const Keyboard = struct {
         }
     }
 
-    fn handleDestroy(listener: *wl.Listener(void)) void {
+    fn handleDestroy(listener: *wl.Listener(*wlr.InputDevice), _: *wlr.InputDevice) void {
         const keyboard: *Keyboard = @fieldParentPtr("destroy", listener);
 
         keyboard.link.remove();
+
+        keyboard.modifiers.link.remove();
+        keyboard.key.link.remove();
+        keyboard.destroy.link.remove();
 
         gpa.destroy(keyboard);
     }

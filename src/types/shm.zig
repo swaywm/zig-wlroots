@@ -6,12 +6,12 @@ const wl = wayland.server.wl;
 pub const Shm = extern struct {
     global: *wl.Global,
 
-    // private state
+    private: extern struct {
+        formats: ?[*]u32,
+        formats_len: usize,
 
-    formats: [*]u32,
-    formats_len: usize,
-
-    server_destroy: wl.Listener(*wl.Server),
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_shm_create(server: *wl.Server, version: u32, formats: [*]const u32, formats_len: usize) ?*Shm;
     pub fn create(server: *wl.Server, version: u32, formats: []const u32) error{OutOfMemory}!*Shm {

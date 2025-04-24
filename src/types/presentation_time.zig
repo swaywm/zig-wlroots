@@ -12,11 +12,13 @@ pub const Presentation = extern struct {
         destroy: wl.Signal(*wlr.Presentation),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
-    extern fn wlr_presentation_create(server: *wl.Server, backend: *wlr.Backend) ?*wlr.Presentation;
-    pub fn create(server: *wl.Server, backend: *wlr.Backend) !*wlr.Presentation {
-        return wlr_presentation_create(server, backend) orelse error.OutOfMemory;
+    extern fn wlr_presentation_create(server: *wl.Server, backend: *wlr.Backend, version: u32) ?*wlr.Presentation;
+    pub fn create(server: *wl.Server, backend: *wlr.Backend, version: c_int) !*wlr.Presentation {
+        return wlr_presentation_create(server, backend, version) orelse error.OutOfMemory;
     }
 
     extern fn wlr_presentation_surface_sampled(surface: *wlr.Surface) ?*wlr.PresentationFeedback;
@@ -37,9 +39,11 @@ pub const PresentationFeedback = extern struct {
     output_commit_seq: u32,
     zero_copy: bool,
 
-    output_commit: wl.Listener(*wlr.Output.event.Commit),
-    output_present: wl.Listener(*wlr.Output.event.Present),
-    output_destroy: wl.Listener(*wlr.Output),
+    private: extern struct {
+        output_commit: wl.Listener(void),
+        output_present: wl.Listener(void),
+        output_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_presentation_feedback_send_presented(feedback: *wlr.PresentationFeedback, event: *const wlr.PresentationEvent) void;
     pub const sendPresented = wlr_presentation_feedback_send_presented;

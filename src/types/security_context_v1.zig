@@ -20,10 +20,11 @@ pub const SecurityContextManagerV1 = extern struct {
 
     data: ?*anyopaque,
 
-    // private state
+    private: extern struct {
+        contexts: wl.list.Link,
 
-    contexts: wl.list.Link,
-    server_destroy: wl.Listener(void),
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_security_context_manager_v1_create(server: *wl.Server) ?*SecurityContextManagerV1;
     pub fn create(server: *wl.Server) error{OutOfMemory}!*SecurityContextManagerV1 {

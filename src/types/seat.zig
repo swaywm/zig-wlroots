@@ -26,16 +26,18 @@ pub const TouchPoint = extern struct {
     sx: f64,
     sy: f64,
 
-    surface_destroy: wl.Listener(*wlr.Surface),
-    focus_surface_destroy: wl.Listener(*wlr.Surface),
-    client_destroy: wl.Listener(*Seat.Client),
-
     events: extern struct {
         destroy: wl.Signal(*TouchPoint),
     },
 
     /// Seat.TouchState.touch_points
     link: wl.list.Link,
+
+    private: extern struct {
+        surface_destroy: wl.Listener(void),
+        focus_surface_destroy: wl.Listener(void),
+        client_destroy: wl.Listener(void),
+    },
 };
 
 pub const Seat = extern struct {
@@ -108,7 +110,7 @@ pub const Seat = extern struct {
 
         interface: *const Interface,
         seat: *Seat,
-        data: usize,
+        data: ?*anyopaque,
     };
 
     pub const KeyboardGrab = extern struct {
@@ -128,7 +130,7 @@ pub const Seat = extern struct {
 
         interface: *const Interface,
         seat: *Seat,
-        data: usize,
+        data: ?*anyopaque,
     };
 
     pub const TouchGrab = extern struct {
@@ -144,10 +146,15 @@ pub const Seat = extern struct {
 
         interface: *const Interface,
         seat: *Seat,
-        data: usize,
+        data: ?*anyopaque,
     };
 
     pub const PointerState = extern struct {
+        pub const Button = extern struct {
+            button: u32,
+            n_pressed: usize,
+        };
+
         seat: *Seat,
         focused_client: ?*Seat.Client,
         focused_surface: ?*wlr.Surface,
@@ -160,16 +167,18 @@ pub const Seat = extern struct {
         sent_axis_source: bool,
         cached_axis_source: wl.Pointer.AxisSource,
 
-        buttons: [16]u32,
+        buttons: [16]Button,
         button_count: usize,
         grab_button: u32,
         grab_serial: u32,
         grab_time: u32,
 
-        surface_destroy: wl.Listener(*wlr.Surface),
-
         events: extern struct {
             focus_change: wl.Signal(*event.PointerFocusChange),
+        },
+
+        private: extern struct {
+            surface_destroy: wl.Listener(void),
         },
     };
 
@@ -180,17 +189,19 @@ pub const Seat = extern struct {
         focused_client: ?*Seat.Client,
         focused_surface: ?*wlr.Surface,
 
-        keyboard_destroy: wl.Listener(*wlr.Keyboard),
-        keyboard_keymap: wl.Listener(*wlr.Keyboard),
-        keyboard_repeat_info: wl.Listener(*wlr.Keyboard),
-
-        surface_destroy: wl.Listener(*wlr.Surface),
-
         grab: *KeyboardGrab,
         default_grab: *KeyboardGrab,
 
         events: extern struct {
             focus_change: wl.Signal(*event.KeyboardFocusChange),
+        },
+
+        private: extern struct {
+            keyboard_destroy: wl.Listener(void),
+            keyboard_keymap: wl.Listener(void),
+            keyboard_repeat_info: wl.Listener(void),
+
+            surface_destroy: wl.Listener(void),
         },
     };
 
@@ -253,7 +264,6 @@ pub const Seat = extern struct {
 
     capabilities: u32,
     accumulated_capabilities: u32,
-    last_event: posix.timespec,
 
     selection_source: ?*wlr.DataSource,
     selection_serial: u32,
@@ -272,11 +282,6 @@ pub const Seat = extern struct {
     pointer_state: PointerState,
     keyboard_state: KeyboardState,
     touch_state: TouchState,
-
-    server_destroy: wl.Listener(*wl.Server),
-    selection_source_destroy: wl.Listener(*wlr.DataSource),
-    primary_selection_source_destroy: wl.Listener(*wlr.PrimarySelectionSource),
-    drag_source_destroy: wl.Listener(*wlr.DataSource),
 
     events: extern struct {
         pointer_grab_begin: wl.Signal(*PointerGrab),
@@ -302,7 +307,14 @@ pub const Seat = extern struct {
         destroy: wl.Signal(*wlr.Seat),
     },
 
-    data: usize,
+    data: ?*anyopaque,
+
+    private: extern struct {
+        display_destroy: wl.Listener(void),
+        selection_source_destroy: wl.Listener(void),
+        primary_selection_source_destroy: wl.Listener(void),
+        drag_source_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_seat_create(server: *wl.Server, name: [*:0]const u8) ?*Seat;
     pub fn create(server: *wl.Server, name: [*:0]const u8) !*Seat {

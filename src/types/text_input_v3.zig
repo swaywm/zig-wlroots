@@ -7,11 +7,13 @@ pub const TextInputManagerV3 = extern struct {
     global: *wl.Global,
     text_inputs: wl.list.Head(TextInputV3, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         text_input: wl.Signal(*wlr.TextInputV3),
         destroy: wl.Signal(*wlr.TextInputManagerV3),
+    },
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
     },
 
     extern fn wlr_text_input_manager_v3_create(server: *wl.Server) ?*wlr.TextInputManagerV3;
@@ -59,14 +61,16 @@ pub const TextInputV3 = extern struct {
 
     link: wl.list.Link,
 
-    surface_destroy: wl.Listener(*wlr.Surface),
-    seat_destroy: wl.Listener(*wlr.Seat),
-
     events: extern struct {
         enable: wl.Signal(*wlr.TextInputV3),
         commit: wl.Signal(*wlr.TextInputV3),
         disable: wl.Signal(*wlr.TextInputV3),
         destroy: wl.Signal(*wlr.TextInputV3),
+    },
+
+    private: extern struct {
+        surface_destroy: wl.Listener(void),
+        seat_destroy: wl.Listener(void),
     },
 
     extern fn wlr_text_input_v3_send_enter(text_input: *wlr.TextInputV3, surface: *wlr.Surface) void;

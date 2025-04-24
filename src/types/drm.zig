@@ -10,12 +10,11 @@ pub const Drm = extern struct {
         destroy: wl.Signal(void),
     },
 
-    // private state
-
-    node_name: [*:0]u8,
-    formats: wlr.DrmFormatSet,
-
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        node_name: ?[*:0]u8,
+        formats: wlr.DrmFormatSet,
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_drm_create(server: *wl.Server, renderer: *wlr.Renderer) ?*Drm;
     pub fn create(server: *wl.Server, renderer: *wlr.Renderer) !*Drm {

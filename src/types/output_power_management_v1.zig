@@ -15,14 +15,16 @@ pub const OutputPowerManagerV1 = extern struct {
     global: *wl.Global,
     output_powers: wl.list.Head(OutputPowerV1, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         set_mode: wl.Signal(*event.SetMode),
         destroy: wl.Signal(*OutputPowerManagerV1),
     },
 
-    data: usize,
+    data: ?*anyopaque,
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_output_power_manager_v1_create(server: *wl.Server) ?*OutputPowerManagerV1;
     pub fn create(server: *wl.Server) !*OutputPowerManagerV1 {
@@ -37,8 +39,10 @@ pub const OutputPowerV1 = extern struct {
     /// OutputPowerManagerV1.output_powers
     link: wl.list.Link,
 
-    output_destroy_listener: wl.Listener(*wlr.Output),
-    output_commit_listener: wl.Listener(*wlr.Output.event.Commit),
+    data: ?*anyopaque,
 
-    data: usize,
+    private: extern struct {
+        output_destroy: wl.Listener(void),
+        output_commit: wl.Listener(void),
+    },
 };

@@ -6,9 +6,14 @@ const wl = wayland.server.wl;
 pub const DrmLeaseManagerV1 = extern struct {
     devices: wl.list.Head(DrmLeaseDeviceV1, .link),
     server: *wl.Server,
-    server_destroy: wl.Listener(*wl.Server),
+
     events: extern struct {
+        destroy: wl.Signal(void),
         request: wl.Signal(*DrmLeaseRequestV1),
+    },
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
     },
 
     extern fn wlr_drm_lease_v1_manager_create(server: *wl.Server, backend: *wlr.Backend) ?*DrmLeaseManagerV1;
@@ -34,9 +39,11 @@ pub const DrmLeaseDeviceV1 = extern struct {
     /// DrmLeaseManagerV1.devices
     link: wl.list.Link,
 
-    backend_destroy: wl.Listener(*wlr.Backend),
-
     data: ?*anyopaque,
+
+    private: extern struct {
+        backend_destroy: wl.Listener(void),
+    },
 };
 
 pub const DrmLeaseConnectorV1 = extern struct {
@@ -47,9 +54,12 @@ pub const DrmLeaseConnectorV1 = extern struct {
 
     active_lease: ?*DrmLeaseV1,
 
-    destroy: wl.Listener(void),
     /// DrmLeaseDeviceV1.connectors
     link: wl.list.Link,
+
+    private: extern struct {
+        destroy: wl.Listener(void),
+    },
 };
 
 pub const DrmLeaseRequestV1 = extern struct {
@@ -84,9 +94,11 @@ pub const DrmLeaseV1 = extern struct {
     /// DrmLeaseDeviceV1.leases
     link: wl.list.Link,
 
-    destroy: wl.Listener(void),
-
     data: ?*anyopaque,
+
+    private: extern struct {
+        destroy: wl.Listener(void),
+    },
 
     extern fn wlr_drm_lease_v1_revoke(lease: *DrmLeaseV1) void;
     pub const revoke = wlr_drm_lease_v1_revoke;

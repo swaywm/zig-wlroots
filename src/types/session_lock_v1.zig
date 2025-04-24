@@ -12,11 +12,11 @@ pub const SessionLockManagerV1 = extern struct {
         destroy: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
-
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_session_lock_manager_v1_create(server: *wl.Server) ?*SessionLockManagerV1;
     pub fn create(server: *wl.Server) !*SessionLockManagerV1 {
@@ -35,11 +35,11 @@ pub const SessionLockV1 = extern struct {
         destroy: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
-
-    locked_sent: bool,
+    private: extern struct {
+        locked_sent: bool,
+    },
 
     extern fn wlr_session_lock_v1_send_locked(lock: *SessionLockV1) void;
     pub const sendLocked = wlr_session_lock_v1_send_locked;
@@ -81,13 +81,12 @@ pub const SessionLockSurfaceV1 = extern struct {
         destroy: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
-    // private state
-
-    synced: wlr.Surface.Synced,
-
-    output_destroy: wl.Listener(*wlr.Output),
+    private: extern struct {
+        synced: wlr.Surface.Synced,
+        output_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_session_lock_surface_v1_configure(lock_surface: *SessionLockSurfaceV1, width: u32, height: u32) u32;
     pub const configure = wlr_session_lock_surface_v1_configure;

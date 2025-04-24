@@ -28,13 +28,13 @@ pub const SceneNode = extern struct {
         destroy: wl.Signal(void),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     addons: wlr.AddonSet,
 
-    // private state
-
-    visible: pixman.Region32,
+    private: extern struct {
+        visible: pixman.Region32,
+    },
 
     extern fn wlr_scene_node_at(node: *SceneNode, lx: f64, ly: f64, nx: *f64, ny: *f64) ?*SceneNode;
     pub const at = wlr_scene_node_at;
@@ -147,20 +147,18 @@ pub const Scene = extern struct {
     outputs: wl.list.Head(SceneOutput, .link),
 
     linux_dmabuf_v1: ?*wlr.LinuxDmabufV1,
+    gamma_control_manager_v1: ?*wlr.GammaControlManagerV1,
 
-    // private state
+    private: extern struct {
+        linux_dmabuf_v1_destroy: wl.Listener(void),
+        gamma_control_manager_v1_destroy: wl.Listener(void),
+        gamma_control_manager_v1_set_gamma: wl.Listener(void),
 
-    linux_dmabuf_v1_destroy: wl.Listener(*wlr.LinuxDmabufV1),
-
-    debug_damage_option: enum(c_int) {
-        none,
-        rerender,
-        highlight,
+        debug_damage_option: c_int,
+        direct_scanout: bool,
+        calculate_visibility: bool,
+        highlight_transparent_region: bool,
     },
-
-    direct_scanout: bool,
-    calculate_visibility: bool,
-    highlight_transparent_region: bool,
 
     extern fn wlr_scene_create() ?*Scene;
     pub fn create() !*Scene {
@@ -178,6 +176,9 @@ pub const Scene = extern struct {
     extern fn wlr_scene_set_linux_dmabuf_v1(scene: *Scene, linux_dmabuf_v1: *wlr.LinuxDmabufV1) void;
     pub const setLinuxDmabufV1 = wlr_scene_set_linux_dmabuf_v1;
 
+    extern fn wlr_scene_set_gamma_control_manager_v1(scene: *Scene, gamma_control: *wlr.GammaControlManagerV1) void;
+    pub const setGammaControlManagerV1 = wlr_scene_set_gamma_control_manager_v1;
+
     extern fn wlr_scene_output_create(scene: *Scene, output: *wlr.Output) ?*SceneOutput;
     pub fn createSceneOutput(scene: *Scene, output: *wlr.Output) !*SceneOutput {
         return wlr_scene_output_create(scene, output) orelse error.OutOfMemory;
@@ -193,19 +194,18 @@ pub const SceneSurface = extern struct {
     buffer: *SceneBuffer,
     surface: *wlr.Surface,
 
-    // private state
+    private: extern struct {
+        clip: wlr.Box,
+        addon: wlr.Addon,
 
-    clip: wlr.Box,
-
-    addon: wlr.Addon,
-
-    outputs_update: wl.Listener(*SceneBuffer.event.OutputsUpdate),
-    output_enter: wl.Listener(*SceneOutput),
-    output_leave: wl.Listener(*SceneOutput),
-    output_sample: wl.Listener(*SceneBuffer.event.OutputSample),
-    frame_done: wl.Listener(*posix.timespec),
-    surface_destroy: wl.Listener(void),
-    surface_commit: wl.Listener(void),
+        outputs_update: wl.Listener(void),
+        output_enter: wl.Listener(void),
+        output_leave: wl.Listener(void),
+        output_sample: wl.Listener(void),
+        frame_done: wl.Listener(void),
+        surface_destroy: wl.Listener(void),
+        surface_commit: wl.Listener(void),
+    },
 
     extern fn wlr_scene_surface_try_from_buffer(buffer: *SceneBuffer) ?*SceneSurface;
     pub const tryFromBuffer = wlr_scene_surface_try_from_buffer;
@@ -262,19 +262,25 @@ pub const SceneBuffer = extern struct {
     transform: wl.Output.Transform,
     opaque_region: pixman.Region32,
 
-    // private state
+    private: extern struct {
+        active_outputs: u64,
+        texture: ?*wlr.Texture,
+        prev_feedback_options: wlr.LinuxDmabufFeedbackV1.InitOptions,
 
-    active_outputs: u64,
-    texture: ?*wlr.Texture,
-    prev_feedback_options: wlr.LinuxDmabufFeedbackV1.InitOptions,
+        own_buffer: bool,
+        buffer_width: c_int,
+        buffer_height: c_int,
+        buffer_is_opaque: bool,
 
-    own_buffer: bool,
-    buffer_width: c_int,
-    buffer_height: c_int,
-    buffer_is_opaque: bool,
+        wait_timeline: ?*wlr.DrmSyncobjTimeline,
+        wait_point: u64,
 
-    buffer_release: wl.Listener(void),
-    renderer_destroy: wl.Listener(void),
+        buffer_release: wl.Listener(void),
+        renderer_destroy: wl.Listener(void),
+
+        is_single_pixel_buffer: bool,
+        single_pixel_buffer_color: [4]u32,
+    },
 
     extern fn wlr_scene_buffer_from_node(node: *SceneNode) *SceneBuffer;
     pub const fromNode = wlr_scene_buffer_from_node;
@@ -323,26 +329,37 @@ pub const SceneOutput = extern struct {
         destroy: wl.Signal(void),
     },
 
-    // private state
+    private: extern struct {
+        pending_commit_damage: pixman.Region32,
 
-    pending_commit_damage: pixman.Region32,
+        index: u8,
 
-    index: u8,
-    prev_scanout: bool,
+        dmabuf_feedback_debounce: u8,
+        prev_scanout: bool,
 
-    output_commit: wl.Listener(*wlr.Output.event.Commit),
-    output_damage: wl.Listener(void),
-    output_needs_frame: wl.Listener(void),
+        gamma_lut_changed: bool,
+        gamma_lut: ?*wlr.GammaControlV1,
 
-    damage_highlight_regions: wl.list.Link,
+        output_commit: wl.Listener(void),
+        output_damage: wl.Listener(void),
+        output_needs_frame: wl.Listener(void),
 
-    render_list: wl.Array,
+        damage_highlight_regions: wl.list.Link,
+
+        render_list: wl.Array,
+
+        in_timeline: ?*wlr.DrmSyncobjTimeline,
+        in_point: u64,
+    },
 
     pub const StateOptions = extern struct {
         timer: ?*wlr.SceneTimer = null,
         color_transform: ?*wlr.ColorTransform = null,
         swapchain: ?*wlr.Swapchain = null,
     };
+
+    extern fn wlr_scene_output_needs_frame(scene_output: *SceneOutput) bool;
+    pub const needsFrame = wlr_scene_output_needs_frame;
 
     extern fn wlr_scene_output_commit(scene_output: *SceneOutput, options: ?*const StateOptions) bool;
     pub const commit = wlr_scene_output_commit;
@@ -397,12 +414,12 @@ pub const SceneLayerSurfaceV1 = extern struct {
     tree: *SceneTree,
     layer_surface: *wlr.LayerSurfaceV1,
 
-    // private state
-
-    tree_destroy: wl.Listener(void),
-    layer_surface_destroy: wl.Listener(*wlr.LayerSurfaceV1),
-    layer_surface_map: wl.Listener(*wlr.LayerSurfaceV1),
-    layer_surface_unmap: wl.Listener(*wlr.LayerSurfaceV1),
+    private: extern struct {
+        tree_destroy: wl.Listener(void),
+        layer_surface_destroy: wl.Listener(void),
+        layer_surface_map: wl.Listener(void),
+        layer_surface_unmap: wl.Listener(void),
+    },
 
     extern fn wlr_scene_layer_surface_v1_configure(
         scene_layer_surface: *SceneLayerSurfaceV1,

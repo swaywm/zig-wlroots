@@ -2,8 +2,9 @@ const wayland = @import("wayland");
 const wl = wayland.server.wl;
 
 pub const AddonSet = extern struct {
-    // private state
-    addons: wl.list.Head(Addon, .link),
+    private: extern struct {
+        addons: wl.list.Head(Addon, .link),
+    },
 
     extern fn wlr_addon_set_init(set: *AddonSet) void;
     pub const init = wlr_addon_set_init;
@@ -23,10 +24,10 @@ pub const Addon = extern struct {
 
     impl: *const Interface,
 
-    // private state
-
-    owner: ?*const anyopaque,
-    link: wl.list.Link,
+    private: extern struct {
+        owner: ?*const anyopaque,
+        link: wl.list.Link,
+    },
 
     extern fn wlr_addon_init(addon: *Addon, set: *AddonSet, owner: ?*const anyopaque, impl: *const Interface) void;
     pub const init = wlr_addon_init;

@@ -12,7 +12,9 @@ pub const DataControlManagerV1 = extern struct {
         new_device: wl.Signal(*DataControlDeviceV1),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_data_control_manager_v1_create(server: *wl.Server) ?*DataControlManagerV1;
     pub fn create(server: *wl.Server) !*DataControlManagerV1 {
@@ -30,9 +32,11 @@ pub const DataControlDeviceV1 = extern struct {
     selection_offer_resource: ?*wl.Resource,
     primary_selection_offer_resource: ?*wl.Resource,
 
-    seat_destroy: wl.Listener(*wlr.Seat),
-    seat_set_selection: wl.Listener(*wlr.Seat),
-    seat_set_primary_selection: wl.Listener(*wlr.Seat),
+    private: extern struct {
+        seat_destroy: wl.Listener(void),
+        seat_set_selection: wl.Listener(void),
+        seat_set_primary_selection: wl.Listener(void),
+    },
 
     extern fn wlr_data_control_device_v1_destroy(device: *DataControlDeviceV1) void;
     pub const destroy = wlr_data_control_device_v1_destroy;

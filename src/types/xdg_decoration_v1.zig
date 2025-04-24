@@ -8,14 +8,12 @@ pub const XdgDecorationManagerV1 = extern struct {
     global: *wl.Global,
     decorations: wl.list.Head(XdgToplevelDecorationV1, .link),
 
-    server_destroy: wl.Listener(*wl.Server),
-
     events: extern struct {
         new_toplevel_decoration: wl.Signal(*XdgToplevelDecorationV1),
         destroy: wl.Signal(*XdgDecorationManagerV1),
     },
 
-    data: usize,
+    data: ?*anyopaque,
 
     extern fn wlr_xdg_decoration_manager_v1_create(server: *wl.Server) ?*XdgDecorationManagerV1;
     pub fn create(server: *wl.Server) !*XdgDecorationManagerV1 {
@@ -60,15 +58,7 @@ pub const XdgToplevelDecorationV1 = extern struct {
         request_mode: wl.Signal(*XdgToplevelDecorationV1),
     },
 
-    data: usize,
-
-    // private state
-
-    toplevel_destroy: wl.Listener(void),
-    surface_configure: wl.Listener(*wlr.XdgSurface.Configure),
-    surface_ack_configure: wl.Listener(*wlr.XdgSurface.Configure),
-
-    synced: wlr.Surface.Synced,
+    data: ?*anyopaque,
 
     extern fn wlr_xdg_toplevel_decoration_v1_set_mode(decoration: *XdgToplevelDecorationV1, mode: Mode) u32;
     pub const setMode = wlr_xdg_toplevel_decoration_v1_set_mode;

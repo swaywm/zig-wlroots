@@ -13,10 +13,12 @@ pub const XdgOutputManagerV1 = extern struct {
         destroy: wl.Signal(*XdgOutputManagerV1),
     },
 
-    server_destroy: wl.Listener(*wl.Server),
-    layout_add: wl.Listener(*wlr.OutputLayout),
-    layout_change: wl.Listener(*wlr.OutputLayout),
-    layout_destroy: wl.Listener(*wlr.OutputLayout),
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+        layout_add: wl.Listener(void),
+        layout_change: wl.Listener(void),
+        layout_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_xdg_output_manager_v1_create(server: *wl.Server, layout: *wlr.OutputLayout) ?*XdgOutputManagerV1;
     pub fn create(server: *wl.Server, layout: *wlr.OutputLayout) !*XdgOutputManagerV1 {
@@ -37,6 +39,8 @@ pub const XdgOutputV1 = extern struct {
     width: i32,
     height: i32,
 
-    destroy: wl.Listener(*wlr.OutputLayout.Output),
-    description: wl.Listener(*wlr.Output),
+    private: extern struct {
+        destroy: wl.Listener(void),
+        description: wl.Listener(void),
+    },
 };
