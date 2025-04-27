@@ -43,6 +43,8 @@ pub const DmabufBufferV1 = @import("types/linux_dmabuf_v1.zig").DmabufBufferV1;
 pub const LinuxDmabufV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufV1;
 pub const LinuxDmabufFeedbackV1 = @import("types/linux_dmabuf_v1.zig").LinuxDmabufFeedbackV1;
 
+pub const LinuxDrmSyncobjManagerV1 = @import("types/linux_drm_syncobj_v1.zig").LinuxDrmSyncobjManagerV1;
+
 pub const Compositor = @import("types/compositor.zig").Compositor;
 pub const Surface = @import("types/compositor.zig").Surface;
 pub const Subcompositor = @import("types/subcompositor.zig").Subcompositor;
