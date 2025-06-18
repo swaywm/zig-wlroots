@@ -290,6 +290,9 @@ pub const XwaylandSurface = extern struct {
     data: ?*anyopaque,
 
     private: extern struct {
+        wm_name: ?[*:0]u8,
+        net_wm_name: ?[*:0]u8,
+
         surface_commit: wl.Listener(void),
         surface_map: wl.Listener(void),
         surface_unmap: wl.Listener(void),
