@@ -17,7 +17,7 @@ pub const Presentation = extern struct {
     },
 
     extern fn wlr_presentation_create(server: *wl.Server, backend: *wlr.Backend, version: u32) ?*wlr.Presentation;
-    pub fn create(server: *wl.Server, backend: *wlr.Backend, version: c_int) !*wlr.Presentation {
+    pub fn create(server: *wl.Server, backend: *wlr.Backend, version: u32) !*wlr.Presentation {
         return wlr_presentation_create(server, backend, version) orelse error.OutOfMemory;
     }
 
