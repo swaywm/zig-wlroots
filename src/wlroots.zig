@@ -204,6 +204,9 @@ pub const OutputConfigurationV1 = @import("types/output_management_v1.zig").Outp
 pub const ForeignToplevelManagerV1 = @import("types/foreign_toplevel_management_v1.zig").ForeignToplevelManagerV1;
 pub const ForeignToplevelHandleV1 = @import("types/foreign_toplevel_management_v1.zig").ForeignToplevelHandleV1;
 
+pub const ExtForeignToplevelListV1 = @import("types/foreign_toplevel_list_v1.zig").ExtForeignToplevelListV1;
+pub const ExtForeignToplevelHandleV1 = @import("types/foreign_toplevel_list_v1.zig").ExtForeignToplevelHandleV1;
+
 pub const SecurityContextManagerV1 = @import("types/security_context_v1.zig").SecurityContextManagerV1;
 pub const SecurityContextV1State = @import("types/security_context_v1.zig").SecurityContextV1State;
 
