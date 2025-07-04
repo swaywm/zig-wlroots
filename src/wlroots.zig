@@ -207,8 +207,11 @@ pub const ForeignToplevelHandleV1 = @import("types/foreign_toplevel_management_v
 pub const ExtForeignToplevelListV1 = @import("types/foreign_toplevel_list_v1.zig").ExtForeignToplevelListV1;
 pub const ExtForeignToplevelHandleV1 = @import("types/foreign_toplevel_list_v1.zig").ExtForeignToplevelHandleV1;
 
-pub const ImageCopyCaptureManagerV1 = @import("types/image_copy_capture_v1.zig").ImageCopyCaptureManagerV1;
-pub const OutputImageCaptureSourceManagerV1 = @import("types/image_capture_source_v1.zig").OutputImageCaptureSourceManagerV1;
+pub const ExtImageCaptureSourceV1 = @import("types/ext_image_capture_source_v1.zig").ExtImageCaptureSourceV1;
+pub const ExtOutputImageCaptureSourceManagerV1 = @import("types/ext_image_capture_source_v1.zig").ExtOutputImageCaptureSourceManagerV1;
+
+pub const ExtImageCopyCaptureManagerV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureManagerV1;
+pub const ExtImageCopyCaptureFrameV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureFrameV1;
 
 pub const SecurityContextManagerV1 = @import("types/security_context_v1.zig").SecurityContextManagerV1;
 pub const SecurityContextV1State = @import("types/security_context_v1.zig").SecurityContextV1State;
