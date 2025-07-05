@@ -68,7 +68,7 @@ pub const Output = extern struct {
 
         buffer: ?*wlr.Buffer,
         buffer_src_box: wlr.FBox,
-        buffer_dst_box: wlr.FBox,
+        buffer_dst_box: wlr.Box,
 
         tearing_page_flip: bool,
 
