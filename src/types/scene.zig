@@ -211,6 +211,9 @@ pub const SceneSurface = extern struct {
 
     extern fn wlr_scene_surface_try_from_buffer(buffer: *SceneBuffer) ?*SceneSurface;
     pub const tryFromBuffer = wlr_scene_surface_try_from_buffer;
+
+    extern fn wlr_scene_surface_send_frame_done(scene_surface: *SceneSurface, when: *const posix.timespec) void;
+    pub const sendFrameDone = wlr_scene_surface_send_frame_done;
 };
 
 pub const SceneRect = extern struct {
