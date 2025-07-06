@@ -91,6 +91,26 @@ pub const ExtImageCaptureSourceV1 = extern struct {
 
     extern fn wlr_output_try_from_ext_image_capture_source_v1(source: *ExtImageCaptureSourceV1) ?*wlr.Output;
     pub const toOutput = wlr_output_try_from_ext_image_capture_source_v1;
+
+    extern fn wlr_ext_image_capture_source_v1_create_with_scene_node(
+        node: *wlr.SceneNode,
+        event_loop: *wl.EventLoop,
+        allocator: *wlr.Allocator,
+        renderer: *wlr.Renderer,
+    ) ?*ExtImageCaptureSourceV1;
+    pub fn createWithSceneNode(
+        node: *wlr.SceneNode,
+        event_loop: *wl.EventLoop,
+        allocator: *wlr.Allocator,
+        renderer: *wlr.Renderer,
+    ) !*ExtImageCaptureSourceV1 {
+        return wlr_ext_image_capture_source_v1_create_with_scene_node(
+            node,
+            event_loop,
+            allocator,
+            renderer,
+        ) orelse error.OutOfMemory;
+    }
 };
 
 pub const ExtOutputImageCaptureSourceManagerV1 = extern struct {
@@ -107,4 +127,46 @@ pub const ExtOutputImageCaptureSourceManagerV1 = extern struct {
     pub fn create(display: *wl.Server, version: u32) !*ExtOutputImageCaptureSourceManagerV1 {
         return wlr_ext_output_image_capture_source_manager_v1_create(display, version) orelse error.OutOfMemory;
     }
+};
+
+pub const ExtForeignToplevelImageCaptureSourceManagerV1 = extern struct {
+    global: *wl.Global,
+
+    events: extern struct {
+        destroy: wl.Signal(void),
+        new_request: wl.Signal(*ExtForeignToplevelImageCaptureSourceManagerV1Request),
+    },
+
+    private: extern struct {
+        display_destroy: wl.Listener(void),
+    },
+
+    extern fn wlr_ext_foreign_toplevel_image_capture_source_manager_v1_create(
+        display: *wl.Server,
+        version: u32,
+    ) ?*ExtForeignToplevelImageCaptureSourceManagerV1;
+    pub fn create(
+        display: *wl.Server,
+        version: u32,
+    ) !*ExtForeignToplevelImageCaptureSourceManagerV1 {
+        return wlr_ext_foreign_toplevel_image_capture_source_manager_v1_create(
+            display,
+            version,
+        ) orelse error.OutOfMemory;
+    }
+};
+
+pub const ExtForeignToplevelImageCaptureSourceManagerV1Request = extern struct {
+    toplevel_handle: *wlr.ExtForeignToplevelHandleV1,
+    client: *wl.Client,
+
+    private: extern struct {
+        new_id: u32,
+    },
+
+    extern fn wlr_ext_foreign_toplevel_image_capture_source_manager_v1_request_accept(
+        request: *ExtForeignToplevelImageCaptureSourceManagerV1Request,
+        source: *ExtImageCaptureSourceV1,
+    ) bool;
+    pub const accept = wlr_ext_foreign_toplevel_image_capture_source_manager_v1_request_accept;
 };

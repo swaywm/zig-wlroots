@@ -213,6 +213,8 @@ pub const ExtForeignToplevelHandleV1 = @import("types/foreign_toplevel_list_v1.z
 
 pub const ExtImageCaptureSourceV1 = @import("types/ext_image_capture_source_v1.zig").ExtImageCaptureSourceV1;
 pub const ExtOutputImageCaptureSourceManagerV1 = @import("types/ext_image_capture_source_v1.zig").ExtOutputImageCaptureSourceManagerV1;
+pub const ExtForeignToplevelImageCaptureSourceManagerV1 = @import("types/ext_image_capture_source_v1.zig").ExtForeignToplevelImageCaptureSourceManagerV1;
+pub const ExtForeignToplevelImageCaptureSourceManagerV1Request = @import("types/ext_image_capture_source_v1.zig").ExtForeignToplevelImageCaptureSourceManagerV1Request;
 
 pub const ExtImageCopyCaptureManagerV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureManagerV1;
 pub const ExtImageCopyCaptureFrameV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureFrameV1;
