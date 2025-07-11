@@ -41,9 +41,11 @@ pub fn build(b: *std.Build) void {
 
     const tinywl = b.addExecutable(.{
         .name = "tinywl",
-        .root_source_file = b.path("tinywl.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tinywl.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     tinywl.linkLibC();

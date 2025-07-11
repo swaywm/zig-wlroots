@@ -47,7 +47,7 @@ pub const SceneNode = extern struct {
 
     extern fn wlr_scene_node_for_each_buffer(
         node: *SceneNode,
-        iterator: *const fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.c) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachBuffer(
@@ -59,7 +59,7 @@ pub const SceneNode = extern struct {
         wlr_scene_node_for_each_buffer(
             node,
             struct {
-                fn wrapper(b: *SceneBuffer, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                fn wrapper(b: *SceneBuffer, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.c) void {
                     iterator(b, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,
@@ -250,7 +250,7 @@ pub const SceneBuffer = extern struct {
         frame_done: wl.Signal(*posix.timespec),
     },
 
-    point_accepts_input: ?*const fn (buffer: *SceneBuffer, sx: *f64, sy: *f64) callconv(.C) bool,
+    point_accepts_input: ?*const fn (buffer: *SceneBuffer, sx: *f64, sy: *f64) callconv(.c) bool,
 
     primary_output: ?*wlr.SceneOutput,
 
@@ -372,7 +372,7 @@ pub const SceneOutput = extern struct {
 
     extern fn wlr_scene_output_for_each_buffer(
         scene_output: *SceneOutput,
-        iterator: *const fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (buffer: *SceneBuffer, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.c) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachBuffer(
@@ -384,7 +384,7 @@ pub const SceneOutput = extern struct {
         wlr_scene_output_for_each_buffer(
             scene_output,
             struct {
-                fn wrapper(b: *SceneBuffer, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                fn wrapper(b: *SceneBuffer, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.c) void {
                     iterator(b, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,

@@ -66,19 +66,19 @@ pub const TabletV2TabletTool = extern struct {
 
     pub const Grab = extern struct {
         pub const Interface = extern struct {
-            proximity_in: ?*const fn (*Grab, *TabletV2Tablet, *wlr.Surface) callconv(.C) void,
-            down: ?*const fn (*Grab) callconv(.C) void,
-            up: ?*const fn (*Grab) callconv(.C) void,
-            motion: ?*const fn (*Grab, f64, f64) callconv(.C) void,
-            pressure: ?*const fn (*Grab, f64) callconv(.C) void,
-            distance: ?*const fn (*Grab, f64) callconv(.C) void,
-            tilt: ?*const fn (*Grab, f64, f64) callconv(.C) void,
-            rotation: ?*const fn (*Grab, f64) callconv(.C) void,
-            slider: ?*const fn (*Grab, f64) callconv(.C) void,
-            wheel: ?*const fn (*Grab, f64, i32) callconv(.C) void,
-            proximity_out: ?*const fn (*Grab) callconv(.C) void,
-            button: ?*const fn (*Grab, u32, zwp.TabletToolV2.ButtonState) callconv(.C) void,
-            cancel: ?*const fn (*Grab) callconv(.C) void,
+            proximity_in: ?*const fn (*Grab, *TabletV2Tablet, *wlr.Surface) callconv(.c) void,
+            down: ?*const fn (*Grab) callconv(.c) void,
+            up: ?*const fn (*Grab) callconv(.c) void,
+            motion: ?*const fn (*Grab, f64, f64) callconv(.c) void,
+            pressure: ?*const fn (*Grab, f64) callconv(.c) void,
+            distance: ?*const fn (*Grab, f64) callconv(.c) void,
+            tilt: ?*const fn (*Grab, f64, f64) callconv(.c) void,
+            rotation: ?*const fn (*Grab, f64) callconv(.c) void,
+            slider: ?*const fn (*Grab, f64) callconv(.c) void,
+            wheel: ?*const fn (*Grab, f64, i32) callconv(.c) void,
+            proximity_out: ?*const fn (*Grab) callconv(.c) void,
+            button: ?*const fn (*Grab, u32, zwp.TabletToolV2.ButtonState) callconv(.c) void,
+            cancel: ?*const fn (*Grab) callconv(.c) void,
         };
         interface: *const Interface,
         tool: *TabletV2TabletTool,
@@ -207,13 +207,13 @@ pub const TabletV2TabletPad = extern struct {
 
     pub const Grab = extern struct {
         pub const Interface = extern struct {
-            enter: ?*const fn (*Grab, *TabletV2Tablet, *wlr.Surface) callconv(.C) u32,
-            button: ?*const fn (*Grab, usize, u32, zwp.TabletPadV2.ButtonState) callconv(.C) void,
-            strip: ?*const fn (*Grab, u32, f64, bool, u32) callconv(.C) void,
-            ring: ?*const fn (*Grab, u32, f64, bool, u32) callconv(.C) void,
-            leave: ?*const fn (*Grab, *wlr.Surface) callconv(.C) u32,
-            mode: ?*const fn (*Grab, usize, u32, u32) callconv(.C) u32,
-            cancel: ?*const fn (*Grab) callconv(.C) void,
+            enter: ?*const fn (*Grab, *TabletV2Tablet, *wlr.Surface) callconv(.c) u32,
+            button: ?*const fn (*Grab, usize, u32, zwp.TabletPadV2.ButtonState) callconv(.c) void,
+            strip: ?*const fn (*Grab, u32, f64, bool, u32) callconv(.c) void,
+            ring: ?*const fn (*Grab, u32, f64, bool, u32) callconv(.c) void,
+            leave: ?*const fn (*Grab, *wlr.Surface) callconv(.c) u32,
+            mode: ?*const fn (*Grab, usize, u32, u32) callconv(.c) u32,
+            cancel: ?*const fn (*Grab) callconv(.c) void,
         };
 
         interface: *const Interface,

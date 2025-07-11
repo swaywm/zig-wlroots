@@ -86,15 +86,15 @@ pub const Seat = extern struct {
                 surface: *wlr.Surface,
                 sx: f64,
                 sy: f64,
-            ) callconv(.C) void,
-            clear_focus: *const fn (grab: *PointerGrab) callconv(.C) void,
-            motion: *const fn (grab: *PointerGrab, time_msec: u32, sx: f64, sy: f64) callconv(.C) void,
+            ) callconv(.c) void,
+            clear_focus: *const fn (grab: *PointerGrab) callconv(.c) void,
+            motion: *const fn (grab: *PointerGrab, time_msec: u32, sx: f64, sy: f64) callconv(.c) void,
             button: *const fn (
                 grab: *PointerGrab,
                 time_msec: u32,
                 button: u32,
                 state: wl.Pointer.ButtonState,
-            ) callconv(.C) u32,
+            ) callconv(.c) u32,
             axis: *const fn (
                 grab: *PointerGrab,
                 time_msec: u32,
@@ -103,9 +103,9 @@ pub const Seat = extern struct {
                 value_discrete: i32,
                 source: wl.Pointer.AxisSource,
                 source: wl.Pointer.AxisRelativeDirection,
-            ) callconv(.C) void,
-            frame: ?*const fn (grab: *PointerGrab) callconv(.C) void,
-            cancel: ?*const fn (grab: *PointerGrab) callconv(.C) void,
+            ) callconv(.c) void,
+            frame: ?*const fn (grab: *PointerGrab) callconv(.c) void,
+            cancel: ?*const fn (grab: *PointerGrab) callconv(.c) void,
         };
 
         interface: *const Interface,
@@ -121,11 +121,11 @@ pub const Seat = extern struct {
                 keycodes: ?[*]const u32,
                 num_keycodes: usize,
                 modifiers: ?*const wlr.Keyboard.Modifiers,
-            ) callconv(.C) void,
-            clear_focus: *const fn (grab: *KeyboardGrab) callconv(.C) void,
-            key: *const fn (grab: *KeyboardGrab, time_msec: u32, key: u32, state: u32) callconv(.C) void,
-            modifiers: *const fn (grab: *KeyboardGrab, modifiers: ?*const wlr.Keyboard.Modifiers) callconv(.C) void,
-            cancel: ?*const fn (grab: *KeyboardGrab) callconv(.C) void,
+            ) callconv(.c) void,
+            clear_focus: *const fn (grab: *KeyboardGrab) callconv(.c) void,
+            key: *const fn (grab: *KeyboardGrab, time_msec: u32, key: u32, state: u32) callconv(.c) void,
+            modifiers: *const fn (grab: *KeyboardGrab, modifiers: ?*const wlr.Keyboard.Modifiers) callconv(.c) void,
+            cancel: ?*const fn (grab: *KeyboardGrab) callconv(.c) void,
         };
 
         interface: *const Interface,
@@ -135,13 +135,13 @@ pub const Seat = extern struct {
 
     pub const TouchGrab = extern struct {
         pub const Interface = extern struct {
-            down: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) u32,
-            up: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) u32,
-            motion: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
-            enter: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.C) void,
-            frame: ?*const fn (grab: *TouchGrab) callconv(.C) void,
-            cancel: ?*const fn (grab: *TouchGrab) callconv(.C) void,
-            wl_cancel: ?*const fn (grab: *TouchGrab, seat_client: *wlr.Seat.Client) callconv(.C) void,
+            down: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.c) u32,
+            up: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.c) u32,
+            motion: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.c) void,
+            enter: *const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.c) void,
+            frame: ?*const fn (grab: *TouchGrab) callconv(.c) void,
+            cancel: ?*const fn (grab: *TouchGrab) callconv(.c) void,
+            wl_cancel: ?*const fn (grab: *TouchGrab, seat_client: *wlr.Seat.Client) callconv(.c) void,
         };
 
         interface: *const Interface,

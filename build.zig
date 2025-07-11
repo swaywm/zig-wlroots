@@ -63,9 +63,11 @@ pub fn build(b: *std.Build) void {
     const pixman = (b.lazyDependency("pixman", .{}) orelse return).module("pixman");
 
     const wlr_test = b.addTest(.{
-        .root_source_file = b.path("src/wlroots.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/wlroots.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     wlr_test.linkLibC();

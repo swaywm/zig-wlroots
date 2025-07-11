@@ -396,7 +396,7 @@ pub const XdgSurface = extern struct {
 
     extern fn wlr_xdg_surface_for_each_surface(
         surface: *wlr.XdgSurface,
-        iterator: *const fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.c) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachSurface(
@@ -408,7 +408,7 @@ pub const XdgSurface = extern struct {
         wlr_xdg_surface_for_each_surface(
             surface,
             struct {
-                fn wrapper(s: *wlr.Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                fn wrapper(s: *wlr.Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.c) void {
                     iterator(s, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,
@@ -418,7 +418,7 @@ pub const XdgSurface = extern struct {
 
     extern fn wlr_xdg_surface_for_each_popup_surface(
         surface: *wlr.XdgSurface,
-        iterator: *const fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (surface: *wlr.Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.c) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachPopupSurface(
@@ -430,7 +430,7 @@ pub const XdgSurface = extern struct {
         wlr_xdg_surface_for_each_popup_surface(
             surface,
             struct {
-                fn wrapper(s: *wlr.Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                fn wrapper(s: *wlr.Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.c) void {
                     iterator(s, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,

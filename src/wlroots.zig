@@ -179,15 +179,13 @@ pub const XcursorTheme = @import("xcursor.zig").XcursorTheme;
 pub const XcursorManager = @import("types/xcursor_manager.zig").XcursorManager;
 pub const XcursorManagerTheme = @import("types/xcursor_manager.zig").XcursorManagerTheme;
 
-pub usingnamespace if (config.has_xwayland) struct {
-    pub const XwaylandServer = @import("xwayland/server.zig").XwaylandServer;
-    pub const Xwayland = @import("xwayland/xwayland.zig").Xwayland;
-    pub const XwaylandSurface = @import("xwayland/xwayland.zig").XwaylandSurface;
-    pub const XwaylandCursor = @import("xwayland/xwayland.zig").XwaylandCursor;
-    pub const Xwm = @import("xwayland/xwayland.zig").Xwm;
-    pub const XwaylandShellV1 = @import("xwayland/shell.zig").XwaylandShellV1;
-    pub const XwaylandSurfaceV1 = @import("xwayland/shell.zig").XwaylandSurfaceV1;
-} else struct {};
+pub const XwaylandServer = @import("xwayland/server.zig").XwaylandServer;
+pub const Xwayland = @import("xwayland/xwayland.zig").Xwayland;
+pub const XwaylandSurface = @import("xwayland/xwayland.zig").XwaylandSurface;
+pub const XwaylandCursor = @import("xwayland/xwayland.zig").XwaylandCursor;
+pub const Xwm = @import("xwayland/xwayland.zig").Xwm;
+pub const XwaylandShellV1 = @import("xwayland/shell.zig").XwaylandShellV1;
+pub const XwaylandSurfaceV1 = @import("xwayland/shell.zig").XwaylandSurfaceV1;
 
 pub const AddonSet = @import("util/addon.zig").AddonSet;
 pub const Addon = @import("util/addon.zig").Addon;

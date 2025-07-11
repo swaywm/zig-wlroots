@@ -88,11 +88,11 @@ pub const Surface = extern struct {
     pub const Role = extern struct {
         name: [*:0]const u8,
         no_object: bool = false,
-        client_commit: ?*const fn (surface: *Surface) callconv(.C) void = null,
-        commit: ?*const fn (surface: *Surface) callconv(.C) void = null,
-        map: ?*const fn (surface: *Surface) callconv(.C) void = null,
-        unmap: ?*const fn (surface: *Surface) callconv(.C) void = null,
-        destroy: ?*const fn (surface: *Surface) callconv(.C) void = null,
+        client_commit: ?*const fn (surface: *Surface) callconv(.c) void = null,
+        commit: ?*const fn (surface: *Surface) callconv(.c) void = null,
+        map: ?*const fn (surface: *Surface) callconv(.c) void = null,
+        unmap: ?*const fn (surface: *Surface) callconv(.c) void = null,
+        destroy: ?*const fn (surface: *Surface) callconv(.c) void = null,
     };
 
     pub const Output = extern struct {
@@ -111,10 +111,10 @@ pub const Surface = extern struct {
     pub const Synced = extern struct {
         pub const Impl = extern struct {
             state_size: usize,
-            init_state: ?*const fn (state: *anyopaque) callconv(.C) void,
-            finish_state: ?*const fn (state: *anyopaque) callconv(.C) void,
-            move_state: ?*const fn (dst: *anyopaque, src: *anyopaque) callconv(.C) void,
-            commit: ?*const fn (synced: *Synced) callconv(.C) void = null,
+            init_state: ?*const fn (state: *anyopaque) callconv(.c) void,
+            finish_state: ?*const fn (state: *anyopaque) callconv(.c) void,
+            move_state: ?*const fn (dst: *anyopaque, src: *anyopaque) callconv(.c) void,
+            commit: ?*const fn (synced: *Synced) callconv(.c) void = null,
         };
 
         surface: *Surface,
@@ -261,7 +261,7 @@ pub const Surface = extern struct {
 
     extern fn wlr_surface_for_each_surface(
         surface: *Surface,
-        iterator: *const fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.C) void,
+        iterator: *const fn (surface: *Surface, sx: c_int, sy: c_int, data: ?*anyopaque) callconv(.c) void,
         user_data: ?*anyopaque,
     ) void;
     pub inline fn forEachSurface(
@@ -273,7 +273,7 @@ pub const Surface = extern struct {
         wlr_surface_for_each_surface(
             surface,
             struct {
-                fn wrapper(s: *Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.C) void {
+                fn wrapper(s: *Surface, sx: c_int, sy: c_int, d: ?*anyopaque) callconv(.c) void {
                     iterator(s, sx, sy, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,

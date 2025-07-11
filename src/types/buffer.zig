@@ -26,17 +26,17 @@ pub const Buffer = extern struct {
     };
 
     pub const Impl = extern struct {
-        destroy: *const fn (buffer: *Buffer) callconv(.C) void,
-        get_dmabuf: ?*const fn (buffer: *Buffer, attribs: *wlr.DmabufAttributes) callconv(.C) bool,
-        get_shm: ?*const fn (buffer: *Buffer, attribs: *wlr.ShmAttributes) callconv(.C) bool,
-        begin_data_ptr_access: ?*const fn (buffer: *Buffer, flags: u32, data: **anyopaque, format: *u32, stride: *usize) callconv(.C) bool,
-        end_data_ptr_access: ?*const fn (buffer: *Buffer) callconv(.C) void,
+        destroy: *const fn (buffer: *Buffer) callconv(.c) void,
+        get_dmabuf: ?*const fn (buffer: *Buffer, attribs: *wlr.DmabufAttributes) callconv(.c) bool,
+        get_shm: ?*const fn (buffer: *Buffer, attribs: *wlr.ShmAttributes) callconv(.c) bool,
+        begin_data_ptr_access: ?*const fn (buffer: *Buffer, flags: u32, data: **anyopaque, format: *u32, stride: *usize) callconv(.c) bool,
+        end_data_ptr_access: ?*const fn (buffer: *Buffer) callconv(.c) void,
     };
 
     pub const ResourceInterface = extern struct {
         name: [*:0]const u8,
-        is_instance: *const fn (resource: *wl.Resource) callconv(.C) bool,
-        from_resource: *const fn (resource: *wl.Resource) callconv(.C) ?*Buffer,
+        is_instance: *const fn (resource: *wl.Resource) callconv(.c) bool,
+        from_resource: *const fn (resource: *wl.Resource) callconv(.c) ?*Buffer,
     };
 
     impl: *const Impl,

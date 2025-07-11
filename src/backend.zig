@@ -110,7 +110,7 @@ pub const Backend = extern struct {
 
     extern fn wlr_multi_for_each_backend(
         backend: *Backend,
-        callback: *const fn (backend: *Backend, data: ?*anyopaque) callconv(.C) void,
+        callback: *const fn (backend: *Backend, data: ?*anyopaque) callconv(.c) void,
         data: ?*anyopaque,
     ) void;
     pub inline fn multiForEachBackend(
@@ -122,7 +122,7 @@ pub const Backend = extern struct {
         wlr_multi_for_each_backend(
             backend,
             struct {
-                fn wrapper(b: *Backend, d: ?*anyopaque) callconv(.C) void {
+                fn wrapper(b: *Backend, d: ?*anyopaque) callconv(.c) void {
                     callback(b, @ptrCast(@alignCast(d)));
                 }
             }.wrapper,
@@ -168,18 +168,16 @@ pub const Backend = extern struct {
 
     // backend/x11.h
 
-    pub usingnamespace if (wlr.config.has_x11_backend) struct {
-        extern fn wlr_x11_backend_create(loop: *wl.EventLoop, x11_display: [*:0]const u8) ?*Backend;
-        pub fn createX11(loop: *wl.EventLoop, x11_display: [*:0]const u8) !*Backend {
-            return wlr_x11_backend_create(loop, x11_display) orelse error.BackendCreateFailed;
-        }
+    extern fn wlr_x11_backend_create(loop: *wl.EventLoop, x11_display: [*:0]const u8) ?*Backend;
+    pub fn createX11(loop: *wl.EventLoop, x11_display: [*:0]const u8) !*Backend {
+        return wlr_x11_backend_create(loop, x11_display) orelse error.BackendCreateFailed;
+    }
 
-        extern fn wlr_x11_output_create(x11: *Backend) ?*wlr.Output;
-        pub fn x11OutputCreate(x11: *Backend) !*wlr.Output {
-            return wlr_x11_output_create(x11) orelse error.OutOfMemory;
-        }
+    extern fn wlr_x11_output_create(x11: *Backend) ?*wlr.Output;
+    pub fn x11OutputCreate(x11: *Backend) !*wlr.Output {
+        return wlr_x11_output_create(x11) orelse error.OutOfMemory;
+    }
 
-        extern fn wlr_backend_is_x11(x11: *Backend) bool;
-        pub const isX11 = wlr_backend_is_x11;
-    } else struct {};
+    extern fn wlr_backend_is_x11(x11: *Backend) bool;
+    pub const isX11 = wlr_backend_is_x11;
 };

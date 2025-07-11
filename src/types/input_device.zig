@@ -43,24 +43,20 @@ pub const InputDevice = extern struct {
     extern fn wlr_input_device_get_virtual_keyboard(wlr_dev: *InputDevice) ?*wlr.VirtualKeyboardV1;
     pub const getVirtualKeyboard = wlr_input_device_get_virtual_keyboard;
 
-    pub usingnamespace if (wlr.config.has_libinput_backend) struct {
-        extern fn wlr_input_device_is_libinput(wlr_dev: *InputDevice) bool;
-        pub const isLibinput = wlr_input_device_is_libinput;
+    extern fn wlr_input_device_is_libinput(wlr_dev: *InputDevice) bool;
+    pub const isLibinput = wlr_input_device_is_libinput;
 
-        extern fn wlr_libinput_get_device_handle(wlr_dev: *InputDevice) *LibinputDevice;
-        pub fn getLibinputDevice(wlr_dev: *InputDevice) ?*LibinputDevice {
-            if (!wlr_input_device_is_libinput(wlr_dev)) return null;
-            return wlr_libinput_get_device_handle(wlr_dev);
-        }
-    } else struct {};
+    extern fn wlr_libinput_get_device_handle(wlr_dev: *InputDevice) *LibinputDevice;
+    pub fn getLibinputDevice(wlr_dev: *InputDevice) ?*LibinputDevice {
+        if (!wlr_input_device_is_libinput(wlr_dev)) return null;
+        return wlr_libinput_get_device_handle(wlr_dev);
+    }
 
     extern fn wlr_input_device_is_wl(wlr_dev: *InputDevice) bool;
     pub const isWl = wlr_input_device_is_wl;
 
-    pub usingnamespace if (wlr.config.has_x11_backend) struct {
-        extern fn wlr_input_device_is_x11(wlr_dev: *InputDevice) bool;
-        pub const isX11 = wlr_input_device_is_x11;
-    } else struct {};
+    extern fn wlr_input_device_is_x11(wlr_dev: *InputDevice) bool;
+    pub const isX11 = wlr_input_device_is_x11;
 };
 
 const LibinputDevice = opaque {};

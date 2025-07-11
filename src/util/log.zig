@@ -10,7 +10,7 @@ pub const Importance = enum(c_int) {
 
 extern fn wlr_log_init(
     verbosity: Importance,
-    callback: ?*const fn (importance: Importance, fmt: [*:0]const u8, args: *std.builtin.VaList) callconv(.C) void,
+    callback: ?*const fn (importance: Importance, fmt: [*:0]const u8, args: *std.builtin.VaList) callconv(.c) void,
 ) void;
 pub const init = wlr_log_init;
 

@@ -116,7 +116,7 @@ pub const Xwayland = extern struct {
         remove_startup_info: wl.Signal(*event.RemoveStartupInfo),
     },
 
-    user_event_handler: ?*const fn (*Xwayland, *xcb.GenericEvent) callconv(.C) bool,
+    user_event_handler: ?*const fn (*Xwayland, *xcb.GenericEvent) callconv(.c) bool,
 
     data: ?*anyopaque,
 

@@ -19,7 +19,7 @@ pub const AddonSet = extern struct {
 pub const Addon = extern struct {
     pub const Interface = extern struct {
         name: [*:0]const u8,
-        destroy: *const fn (*Addon) callconv(.C) void,
+        destroy: *const fn (*Addon) callconv(.c) void,
     };
 
     impl: *const Interface,
