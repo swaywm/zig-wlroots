@@ -42,7 +42,10 @@ pub const Keyboard = extern struct {
         };
     };
 
-    const Impl = opaque {};
+    const Impl = extern struct {
+        name: [*:0]const u8,
+        led_update: ?*const fn (keyboard: *Keyboard, leds: u32) void,
+    };
 
     base: wlr.InputDevice,
 
@@ -76,13 +79,19 @@ pub const Keyboard = extern struct {
 
     data: ?*anyopaque,
 
-    extern fn wlr_keyboard_set_keymap(kb: *Keyboard, keymap: ?*xkb.Keymap) bool;
+    extern fn wlr_keyboard_init(keyboard: *Keyboard, impl: *const Impl, name: *[:0]const u8) void;
+    pub const init = wlr_keyboard_init;
+
+    extern fn wlr_keyboard_finish(keyboard: *Keyboard) void;
+    pub const finish = wlr_keyboard_finish;
+
+    extern fn wlr_keyboard_set_keymap(keyboard: *Keyboard, keymap: ?*xkb.Keymap) bool;
     pub const setKeymap = wlr_keyboard_set_keymap;
 
     extern fn wlr_keyboard_keymaps_match(km1: ?*xkb.Keymap, km2: ?*xkb.Keymap) bool;
     pub const keymapsMatch = wlr_keyboard_keymaps_match;
 
-    extern fn wlr_keyboard_set_repeat_info(kb: *Keyboard, rate: i32, delay: i32) void;
+    extern fn wlr_keyboard_set_repeat_info(keyboard: *Keyboard, rate: i32, delay: i32) void;
     pub const setRepeatInfo = wlr_keyboard_set_repeat_info;
 
     extern fn wlr_keyboard_led_update(keyboard: *Keyboard, leds: u32) void;
@@ -92,6 +101,9 @@ pub const Keyboard = extern struct {
     pub fn getModifiers(keyboard: *Keyboard) ModifierMask {
         return @as(ModifierMask, @bitCast(wlr_keyboard_get_modifiers(keyboard)));
     }
+
+    extern fn wlr_keyboard_notify_key(keyboard: *Keyboard, event: *event.Key) void;
+    pub const notifyKey = wlr_keyboard_notify_key;
 
     extern fn wlr_keyboard_notify_modifiers(
         keyboard: *Keyboard,
