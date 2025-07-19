@@ -79,7 +79,7 @@ pub const Keyboard = extern struct {
 
     data: ?*anyopaque,
 
-    extern fn wlr_keyboard_init(keyboard: *Keyboard, impl: *const Impl, name: *[:0]const u8) void;
+    extern fn wlr_keyboard_init(keyboard: *Keyboard, impl: *const Impl, name: [*:0]const u8) void;
     pub const init = wlr_keyboard_init;
 
     extern fn wlr_keyboard_finish(keyboard: *Keyboard) void;
