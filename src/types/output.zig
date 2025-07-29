@@ -84,13 +84,13 @@ pub const Output = extern struct {
         gamma_lut_size: usize,
 
         // TODO: Bind wlr_output_layer and related structs
-        layers: ?*anyopaque,
+        layers: ?*opaque {},
         layers_len: usize,
 
-        wait_timeline: *wlr.DrmSyncobjTimeline,
+        wait_timeline: ?*wlr.DrmSyncobjTimeline,
         wait_point: u64,
 
-        signal_timeline: *wlr.DrmSyncobjTimeline,
+        signal_timeline: ?*wlr.DrmSyncobjTimeline,
         signal_point: u64,
 
         extern fn wlr_output_state_init(state: *State) void;
@@ -194,7 +194,7 @@ pub const Output = extern struct {
 
         pub const RequestState = extern struct {
             output: *wlr.Output,
-            state: *wlr.Output.State,
+            state: *const wlr.Output.State,
         };
     };
 
@@ -250,8 +250,8 @@ pub const Output = extern struct {
         destroy: wl.Signal(*Output),
     },
 
-    idle_frame: *wl.EventSource,
-    idle_done: *wl.EventSource,
+    idle_frame: ?*wl.EventSource,
+    idle_done: ?*wl.EventSource,
 
     attach_render_locks: c_int,
 
