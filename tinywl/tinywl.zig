@@ -195,7 +195,7 @@ const Server = struct {
         // These asserts are fine since tinywl.zig doesn't support anything else that can
         // make xdg popups (e.g. layer shell).
         const parent = wlr.XdgSurface.tryFromWlrSurface(xdg_popup.parent.?) orelse return;
-        const parent_tree = @as(?*wlr.SceneTree, @alignCast(@ptrCast(parent.data))) orelse {
+        const parent_tree = @as(?*wlr.SceneTree, @ptrCast(@alignCast(parent.data))) orelse {
             // The xdg surface user data could be left null due to allocation failure.
             return;
         };
@@ -234,7 +234,7 @@ const Server = struct {
 
             var it: ?*wlr.SceneTree = node.parent;
             while (it) |n| : (it = n.node.parent) {
-                if (@as(?*Toplevel, @alignCast(@ptrCast(n.node.data)))) |toplevel| {
+                if (@as(?*Toplevel, @ptrCast(@alignCast(n.node.data)))) |toplevel| {
                     return ViewAtResult{
                         .toplevel = toplevel,
                         .surface = scene_surface.surface,
