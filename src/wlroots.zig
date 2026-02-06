@@ -12,7 +12,7 @@ pub const RenderTimer = @import("render/renderer.zig").RenderTimer;
 pub const RenderPass = @import("render/renderer.zig").RenderPass;
 pub const Texture = @import("render/texture.zig").Texture;
 pub const Allocator = @import("render/allocator.zig").Allocator;
-pub const Swapchain = opaque {}; // TODO
+pub const Swapchain = @import("render/swapchain.zig").Swapchain;
 pub const DrmFormat = @import("render/drm_format_set.zig").DrmFormat;
 pub const DrmFormatSet = @import("render/drm_format_set.zig").DrmFormatSet;
 
