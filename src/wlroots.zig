@@ -139,6 +139,9 @@ pub const Drag = @import("types/data_device.zig").Drag;
 pub const DataControlManagerV1 = @import("types/data_control_v1.zig").DataControlManagerV1;
 pub const DataControlDeviceV1 = @import("types/data_control_v1.zig").DataControlDeviceV1;
 
+pub const ExtDataControlManagerV1 = @import("types/ext_data_control_v1.zig").ExtDataControlManagerV1;
+pub const ExtDataControlDeviceV1 = @import("types/ext_data_control_v1.zig").ExtDataControlDeviceV1;
+
 pub const PrimarySelectionSource = @import("types/primary_selection.zig").PrimarySelectionSource;
 
 pub const PrimarySelectionDeviceManagerV1 = @import("types/primary_selection_v1.zig").PrimarySelectionDeviceManagerV1;
