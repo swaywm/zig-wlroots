@@ -14,6 +14,8 @@ pub const GammaControlManagerV1 = extern struct {
     global: *wl.Global,
     controls: wl.list.Head(GammaControlV1, .link),
 
+    fallback_gamma_size: usize,
+
     events: extern struct {
         destroy: wl.Signal(*GammaControlManagerV1),
         set_gamma: wl.Signal(*event.SetGamma),

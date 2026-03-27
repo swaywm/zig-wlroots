@@ -33,6 +33,18 @@ pub const Output = extern struct {
         enabled,
     };
 
+    pub const ImageDescription = extern struct {
+        primaries: wlr.color.NamedPrimaries,
+        transfer_function: wlr.color.TransferFunction,
+        mastering_display_primaries: wlr.color.Primaries,
+        mastering_luminance: extern struct {
+            min: f64,
+            max: f64,
+        },
+        max_cll: f64,
+        max_fall: f64,
+    };
+
     pub const State = extern struct {
         pub const Fields = packed struct(u32) {
             buffer: bool = false,
@@ -42,13 +54,14 @@ pub const Output = extern struct {
             scale: bool = false,
             transform: bool = false,
             adaptive_sync_enabled: bool = false,
-            gamma_lut: bool = false,
             render_format: bool = false,
             subpixel: bool = false,
             layers: bool = false,
             wait_timeline: bool = false,
             signal_timeline: bool = false,
-            _: u19 = 0,
+            color_transform: bool = false,
+            image_description: bool = false,
+            _: u18 = 0,
         };
 
         pub const ModeType = enum(c_int) {
@@ -80,9 +93,6 @@ pub const Output = extern struct {
             refresh: i32,
         },
 
-        gamma_lut: ?[*]u16,
-        gamma_lut_size: usize,
-
         // TODO: Bind wlr_output_layer and related structs
         layers: ?*opaque {},
         layers_len: usize,
@@ -92,6 +102,10 @@ pub const Output = extern struct {
 
         signal_timeline: ?*wlr.DrmSyncobjTimeline,
         signal_point: u64,
+
+        color_transform: ?*wlr.ColorTransform,
+
+        image_description: ?*ImageDescription,
 
         extern fn wlr_output_state_init(state: *State) void;
         pub fn init() State {
@@ -130,19 +144,6 @@ pub const Output = extern struct {
         extern fn wlr_output_state_set_buffer(state: *State, buffer: *wlr.Buffer) void;
         pub const setBuffer = wlr_output_state_set_buffer;
 
-        extern fn wlr_output_state_set_gamma_lut(state: *State, ramp_size: usize, r: *const u16, g: *const u16, b: *const u16) bool;
-        pub const setGammaLut = wlr_output_state_set_gamma_lut;
-
-        /// Clearing the gamma lut can't fail. Furthermore, a separate function for this
-        /// allows using non-optional pointers for the r/b/g parameters of setGammaLut.
-        pub fn clearGammaLut(state: *State) void {
-            state.committed.gamma_lut = true;
-
-            std.c.free(state.gamma_lut);
-            state.gamma_lut = null;
-            state.gamma_lut_size = 0;
-        }
-
         extern fn wlr_output_state_set_damage(state: *State, damage: *const pixman.Region32) void;
         pub const setDamage = wlr_output_state_set_damage;
 
@@ -159,13 +160,13 @@ pub const Output = extern struct {
 
         pub const Precommit = extern struct {
             output: *wlr.Output,
-            when: *posix.timespec,
+            when: posix.timespec,
             state: *const State,
         };
 
         pub const Commit = extern struct {
             output: *wlr.Output,
-            when: *posix.timespec,
+            when: posix.timespec,
             state: *const Output.State,
         };
 
@@ -214,6 +215,7 @@ pub const Output = extern struct {
     serial: ?[*:0]u8,
     phys_width: i32,
     phys_height: i32,
+    default_primaries: ?*wlr.color.Primaries,
 
     modes: wl.list.Head(Output.Mode, .link),
     current_mode: ?*Output.Mode,
@@ -221,12 +223,18 @@ pub const Output = extern struct {
     height: i32,
     refresh: i32,
 
+    /// Bitfield of wlr.ColorNamedPrimaries
+    supported_primaries: u32,
+    /// Bitfield of wlr.ColorTransferFunction
+    supported_transfer_functions: u32,
+
     enabled: bool,
     scale: f32,
     subpixel: wl.Output.Subpixel,
     transform: wl.Output.Transform,
     adaptive_sync_status: AdaptiveSyncStatus,
     render_format: u32,
+    image_description: ?*const ImageDescription,
 
     adaptive_sync_supported: bool,
 
@@ -275,6 +283,9 @@ pub const Output = extern struct {
 
     private: extern struct {
         server_destroy: wl.Listener(void),
+        image_description_value: ImageDescription,
+        color_transform: ?*wlr.ColorTransform,
+        default_primaries_value: wlr.color.Primaries,
     },
 
     extern fn wlr_output_create_global(output: *Output, server: *wl.Server) void;

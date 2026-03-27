@@ -32,9 +32,11 @@ pub const ExtDataControlDeviceV1 = extern struct {
     selection_offer_resource: ?*wl.Resource,
     primary_selection_offer_resource: ?*wl.Resource,
 
-    seat_destroy: wl.Listener(void),
-    seat_set_selection: wl.Listener(void),
-    seat_set_primary_selection: wl.Listener(void),
+    private: extern struct {
+        seat_destroy: wl.Listener(void),
+        seat_set_selection: wl.Listener(void),
+        seat_set_primary_selection: wl.Listener(void),
+    },
 
     extern fn wlr_ext_data_control_device_v1_destroy(device: *ExtDataControlDeviceV1) void;
     pub const destroy = wlr_ext_data_control_device_v1_destroy;

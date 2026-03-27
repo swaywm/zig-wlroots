@@ -8,8 +8,8 @@ pub const TextInputManagerV3 = extern struct {
     text_inputs: wl.list.Head(TextInputV3, .link),
 
     events: extern struct {
-        text_input: wl.Signal(*wlr.TextInputV3),
-        destroy: wl.Signal(*wlr.TextInputManagerV3),
+        new_text_input: wl.Signal(*wlr.TextInputV3),
+        destroy: wl.Signal(void),
     },
 
     private: extern struct {
@@ -62,10 +62,10 @@ pub const TextInputV3 = extern struct {
     link: wl.list.Link,
 
     events: extern struct {
-        enable: wl.Signal(*wlr.TextInputV3),
-        commit: wl.Signal(*wlr.TextInputV3),
-        disable: wl.Signal(*wlr.TextInputV3),
-        destroy: wl.Signal(*wlr.TextInputV3),
+        enable: wl.Signal(void),
+        commit: wl.Signal(void),
+        disable: wl.Signal(void),
+        destroy: wl.Signal(void),
     },
 
     private: extern struct {

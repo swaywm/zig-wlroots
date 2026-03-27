@@ -142,6 +142,7 @@ pub const Seat = extern struct {
             frame: ?*const fn (grab: *TouchGrab) callconv(.c) void,
             cancel: ?*const fn (grab: *TouchGrab) callconv(.c) void,
             wl_cancel: ?*const fn (grab: *TouchGrab, seat_client: *wlr.Seat.Client) callconv(.c) void,
+            clear_focus: ?*const fn (grab: *TouchGrab, time_msec: u32, point: *TouchPoint) callconv(.c) void,
         };
 
         interface: *const Interface,
@@ -485,6 +486,9 @@ pub const Seat = extern struct {
 
     extern fn wlr_seat_touch_notify_cancel(seat: *Seat, seat_client: *wlr.Seat.Client) void;
     pub const touchNotifyCancel = wlr_seat_touch_notify_cancel;
+
+    extern fn wlr_seat_touch_notify_clear_focus(seat: *Seat, seat_client: *wlr.Seat.Client) void;
+    pub const touchNotifyClearFocus = wlr_seat_touch_notify_clear_focus;
 
     extern fn wlr_seat_touch_num_points(seat: *Seat) c_int;
     pub const touchNumPoints = wlr_seat_touch_num_points;

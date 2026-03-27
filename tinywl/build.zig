@@ -37,7 +37,7 @@ pub fn build(b: *std.Build) void {
     // exposed to the wlroots module for @cImport() to work. This seems to be
     // the best way to do so with the current std.Build API.
     wlroots.resolved_target = target;
-    wlroots.linkSystemLibrary("wlroots-0.19", .{});
+    wlroots.linkSystemLibrary("wlroots-0.20", .{});
 
     const tinywl = b.addExecutable(.{
         .name = "tinywl",

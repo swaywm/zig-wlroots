@@ -31,6 +31,7 @@ pub fn build(b: *std.Build) void {
 
     scanner.addCustomProtocol(b.path("protocol/wlr-layer-shell-unstable-v1.xml"));
     scanner.addCustomProtocol(b.path("protocol/wlr-output-power-management-unstable-v1.xml"));
+    scanner.addCustomProtocol(b.path("protocol/virtual-keyboard-unstable-v1.xml"));
 
     // These must be manually kept in sync with the versions wlroots supports
     // until wlroots gives the option to request a specific version.
@@ -51,6 +52,7 @@ pub fn build(b: *std.Build) void {
     scanner.generate("zxdg_decoration_manager_v1", 1);
     scanner.generate("zwp_tablet_manager_v2", 1);
     scanner.generate("zwp_linux_dmabuf_v1", 4);
+    scanner.generate("zwp_virtual_keyboard_manager_v1", 1);
     scanner.generate("wp_cursor_shape_manager_v1", 1);
     scanner.generate("wp_tearing_control_manager_v1", 1);
     scanner.generate("wp_content_type_manager_v1", 1);
@@ -81,7 +83,7 @@ pub fn build(b: *std.Build) void {
     wlr_test.root_module.addImport("pixman", pixman);
     wlr_test.linkSystemLibrary("pixman-1");
 
-    wlr_test.linkSystemLibrary("wlroots-0.19");
+    wlr_test.linkSystemLibrary("wlroots-0.20");
 
     const test_step = b.step("test", "Run the tests");
     test_step.dependOn(&wlr_test.step);

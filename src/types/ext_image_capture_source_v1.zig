@@ -11,7 +11,7 @@ pub const ExtImageCaptureSourceV1 = extern struct {
     pub const Interface = extern struct {
         start: ?*const fn (source: *ExtImageCaptureSourceV1, with_cursors: bool) callconv(.c) void,
         stop: ?*const fn (source: *ExtImageCaptureSourceV1) callconv(.c) void,
-        schedule_frame: ?*const fn (source: *ExtImageCaptureSourceV1) callconv(.c) void,
+        request_frame: ?*const fn (source: *ExtImageCaptureSourceV1, schedule_frame: bool) callconv(.c) void,
         copy_frame: *const fn (
             source: *ExtImageCaptureSourceV1,
             dst_frame: *wlr.ExtImageCopyCaptureFrameV1,

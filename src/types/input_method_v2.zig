@@ -8,8 +8,8 @@ pub const InputMethodManagerV2 = extern struct {
     input_methods: wl.list.Head(InputMethodV2, .link),
 
     events: extern struct {
-        input_method: wl.Signal(*wlr.InputMethodV2),
-        destroy: wl.Signal(*wlr.InputMethodManagerV2),
+        new_input_method: wl.Signal(*wlr.InputMethodV2),
+        destroy: wl.Signal(void),
     },
 
     private: extern struct {
@@ -86,10 +86,10 @@ pub const InputMethodV2 = extern struct {
     link: wl.list.Link,
 
     events: extern struct {
-        commit: wl.Signal(*wlr.InputMethodV2),
+        commit: wl.Signal(void),
         new_popup_surface: wl.Signal(*wlr.InputPopupSurfaceV2),
         grab_keyboard: wl.Signal(*wlr.InputMethodV2.KeyboardGrab),
-        destroy: wl.Signal(*wlr.InputMethodV2),
+        destroy: wl.Signal(void),
     },
 
     private: extern struct {

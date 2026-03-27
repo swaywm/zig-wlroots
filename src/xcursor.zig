@@ -7,6 +7,13 @@ pub const XcursorImage = extern struct {
     hotspot_y: u32,
     delay: u32,
     buffer: [*]u8,
+
+    private: extern struct {
+        readonly_buffer: ?*wlr.ReadonlyDataBuffer,
+    },
+
+    extern fn wlr_xcursor_image_get_buffer(image: *XcursorImage) *wlr.Buffer;
+    pub const getBuffer = wlr_xcursor_image_get_buffer;
 };
 
 pub const Xcursor = extern struct {

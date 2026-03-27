@@ -8,12 +8,16 @@ const wl = wayland.server.wl;
 const xkb = @import("xkbcommon");
 
 pub const Keyboard = extern struct {
+    pub const led_count = 5;
     pub const led = struct {
         pub const num_lock = 1 << 0;
         pub const caps_lock = 1 << 1;
         pub const scroll_lock = 1 << 2;
+        pub const compose = 1 << 3;
+        pub const kana = 1 << 4;
     };
 
+    pub const modifier_count = 8;
     pub const ModifierMask = packed struct(u32) {
         shift: bool = false,
         caps: bool = false,
@@ -57,8 +61,8 @@ pub const Keyboard = extern struct {
     keymap_fd: c_int,
     keymap: ?*xkb.Keymap,
     xkb_state: ?*xkb.State,
-    led_indexes: [3]xkb.LED_Index,
-    mod_indexes: [8]xkb.ModIndex,
+    led_indexes: [led_count]xkb.LED_Index,
+    mod_indexes: [modifier_count]xkb.ModIndex,
 
     leds: u32,
     keycodes: [32]u32,

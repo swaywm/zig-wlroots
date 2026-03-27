@@ -11,6 +11,10 @@ const pixman = @import("pixman");
 pub const ExtImageCopyCaptureManagerV1 = extern struct {
     global: *wl.Global,
 
+    events: extern struct {
+        new_session: wl.Signal(*ExtImageCopyCaptureSessionV1),
+    },
+
     private: extern struct {
         server_destroy: wl.Listener(void),
     },
@@ -25,6 +29,24 @@ pub const ExtImageCopyCaptureManagerV1 = extern struct {
     ) !*ExtImageCopyCaptureManagerV1 {
         return wlr_ext_image_copy_capture_manager_v1_create(display, version) orelse error.OutOfMemory;
     }
+};
+
+pub const ExtImageCopyCaptureSessionV1 = extern struct {
+    resource: *wl.Resource,
+    source: *wlr.ExtImageCaptureSourceV1,
+    frame: *ExtImageCopyCaptureFrameV1,
+
+    events: extern struct {
+        destroy: wl.Signal(void),
+    },
+
+    private: extern struct {
+        source_destroy: wl.Listener(void),
+        source_constraints_update: wl.Listener(void),
+        source_frame: wl.Listener(void),
+
+        damage: pixman.Region32,
+    },
 };
 
 pub const ExtImageCopyCaptureFrameV1 = extern struct {

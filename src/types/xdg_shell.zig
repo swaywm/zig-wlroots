@@ -161,6 +161,7 @@ pub const XdgToplevel = extern struct {
         activated: bool,
         suspended: bool,
         tiled: wlr.Edges,
+        constrained: wlr.Edges,
         width: i32,
         height: i32,
         max_width: i32,
@@ -191,6 +192,7 @@ pub const XdgToplevel = extern struct {
         activated: bool,
         suspended: bool,
         tiled: wlr.Edges,
+        constrained: wlr.Edges,
         width: i32,
         height: i32,
         bounds: extern struct {
@@ -287,7 +289,12 @@ pub const XdgToplevel = extern struct {
 
     extern fn wlr_xdg_toplevel_set_tiled(toplevel: *wlr.XdgToplevel, tiled_edges: u32) u32;
     pub fn setTiled(toplevel: *wlr.XdgToplevel, tiled_edges: wlr.Edges) u32 {
-        return wlr_xdg_toplevel_set_tiled(toplevel, @as(u32, @bitCast(tiled_edges)));
+        return wlr_xdg_toplevel_set_tiled(toplevel, @bitCast(tiled_edges));
+    }
+
+    extern fn wlr_xdg_toplevel_set_constrained(toplevel: *wlr.XdgToplevel, constrained_edges: u32) u32;
+    pub fn setConstrained(toplevel: *wlr.XdgToplevel, constrained_edges: wlr.Edges) u32 {
+        return wlr_xdg_toplevel_set_constrained(toplevel, @bitCast(constrained_edges));
     }
 
     extern fn wlr_xdg_toplevel_set_bounds(toplevel: *wlr.XdgToplevel, width: i32, height: i32) u32;

@@ -16,7 +16,10 @@ pub const Swapchain = @import("render/swapchain.zig").Swapchain;
 pub const DrmFormat = @import("render/drm_format_set.zig").DrmFormat;
 pub const DrmFormatSet = @import("render/drm_format_set.zig").DrmFormatSet;
 
+pub const color = @import("render/color.zig");
+
 pub const ColorTransform = opaque {}; // TODO
+pub const ColorManagerV1 = opaque {}; // TODO
 
 pub const Drm = @import("types/drm.zig").Drm;
 
@@ -34,6 +37,7 @@ pub const ShmAttributes = @import("types/buffer.zig").ShmAttributes;
 pub const BufferCap = @import("types/buffer.zig").BufferCap;
 pub const Buffer = @import("types/buffer.zig").Buffer;
 pub const ClientBuffer = @import("types/buffer.zig").ClientBuffer;
+pub const ReadonlyDataBuffer = opaque {};
 
 pub const SinglePixelBufferManagerV1 = @import("types/single_pixel_buffer_v1.zig").SinglePixelBufferManagerV1;
 
@@ -185,7 +189,6 @@ pub const XcursorManagerTheme = @import("types/xcursor_manager.zig").XcursorMana
 pub const XwaylandServer = @import("xwayland/server.zig").XwaylandServer;
 pub const Xwayland = @import("xwayland/xwayland.zig").Xwayland;
 pub const XwaylandSurface = @import("xwayland/xwayland.zig").XwaylandSurface;
-pub const XwaylandCursor = @import("xwayland/xwayland.zig").XwaylandCursor;
 pub const Xwm = @import("xwayland/xwayland.zig").Xwm;
 pub const XwaylandShellV1 = @import("xwayland/shell.zig").XwaylandShellV1;
 pub const XwaylandSurfaceV1 = @import("xwayland/shell.zig").XwaylandSurfaceV1;
@@ -234,8 +237,8 @@ pub const config = @import("config.zig");
 pub const version = @import("version.zig");
 
 comptime {
-    if (version.major != 0 or version.minor != 19) {
-        @compileError("zig-wlroots requires wlroots version 0.19, found version " ++ version.str);
+    if (version.major != 0 or version.minor != 20) {
+        @compileError("zig-wlroots requires wlroots version 0.20, found version " ++ version.str);
     }
 }
 test {

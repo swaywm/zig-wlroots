@@ -86,7 +86,6 @@ const xcb = struct {
 };
 
 pub const Xwm = opaque {};
-pub const XwaylandCursor = opaque {};
 
 pub const Xwayland = extern struct {
     pub const event = struct {
@@ -101,7 +100,6 @@ pub const Xwayland = extern struct {
     own_server: bool,
     xwm: ?*Xwm,
     shell_v1: *wlr.XwaylandShellV1,
-    cursor: ?*XwaylandCursor,
 
     display_name: [*:0]const u8,
 
@@ -121,6 +119,12 @@ pub const Xwayland = extern struct {
     data: ?*anyopaque,
 
     private: extern struct {
+        cursor_buffer: ?*wlr.Buffer,
+        cursor_hotspot: extern struct {
+            x: i32,
+            y: i32,
+        },
+
         server_start: wl.Listener(void),
         server_ready: wl.Listener(void),
         server_destroy: wl.Listener(void),
@@ -141,7 +145,7 @@ pub const Xwayland = extern struct {
     extern fn wlr_xwayland_destroy(wlr_xwayland: *Xwayland) void;
     pub const destroy = wlr_xwayland_destroy;
 
-    extern fn wlr_xwayland_set_cursor(wlr_xwayland: *Xwayland, pixels: [*]u8, stride: u32, width: u32, height: u32, hotspot_x: i32, hotspot_y: i32) void;
+    extern fn wlr_xwayland_set_cursor(wlr_xwayland: *Xwayland, buffer: *wlr.Buffer, hotspot_x: i32, hotspot_y: i32) void;
     pub const setCursor = wlr_xwayland_set_cursor;
 
     extern fn wlr_xwayland_set_seat(xwayland: *Xwayland, seat: *wlr.Seat) void;
@@ -209,7 +213,6 @@ pub const XwaylandSurface = extern struct {
     role: ?[*:0]u8,
     startup_id: ?[*:0]u8,
     pid: posix.pid_t,
-    has_utf8_title: bool,
 
     children: wl.list.Head(XwaylandSurface, .parent_link),
     parent: ?*XwaylandSurface,
@@ -274,11 +277,13 @@ pub const XwaylandSurface = extern struct {
         set_startup_id: wl.Signal(void),
         set_window_type: wl.Signal(void),
         set_hints: wl.Signal(void),
+        set_size_hints: wl.Signal(void),
         set_decorations: wl.Signal(void),
         set_strut_partial: wl.Signal(void),
         set_override_redirect: wl.Signal(void),
         set_geometry: wl.Signal(void),
         set_opacity: wl.Signal(void),
+        set_icon: wl.Signal(void),
         focus_in: wl.Signal(void),
         grab_focus: wl.Signal(void),
 

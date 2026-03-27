@@ -10,6 +10,8 @@ pub const Renderer = extern struct {
 
     /// Bitmask of wlr.BufferCap
     render_buffer_caps: u32,
+    /// Bitmask of wlr.ColorEncoding
+    color_encodings: u32,
 
     events: extern struct {
         destroy: wl.Signal(*Renderer),
@@ -17,6 +19,7 @@ pub const Renderer = extern struct {
     },
 
     features: extern struct {
+        input_color_transform: bool,
         output_color_transform: bool,
         timeline: bool,
     },
@@ -120,6 +123,14 @@ pub const RenderPass = opaque {
         transform: wl.Output.Transform,
         filter_mode: ScaleFilterMode,
         blend_mode: BlendMode,
+
+        transfer_function: wlr.color.TransferFunction,
+        primaries: *const wlr.color.Primaries,
+        color_encoding: wlr.color.Encoding,
+        color_range: wlr.color.Range,
+        /// Default 1.0
+        luminance_multiplier: *const f32,
+
         wait_timeline: ?*wlr.DrmSyncobjTimeline = null,
         wait_point: u64,
     };

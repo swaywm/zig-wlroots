@@ -2,6 +2,7 @@ const wlr = @import("../wlroots.zig");
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
+const zwp = wayland.server.zwp;
 
 pub const VirtualKeyboardManagerV1 = extern struct {
     global: *wl.Global,
@@ -24,10 +25,17 @@ pub const VirtualKeyboardManagerV1 = extern struct {
 
 pub const VirtualKeyboardV1 = extern struct {
     keyboard: wlr.Keyboard,
-    resource: *wl.Resource,
+    resource: *zwp.VirtualKeyboardV1,
     seat: *wlr.Seat,
     has_keymap: bool,
 
     /// VirtualKeyboardManagerV1.virtual_keyboards
     link: wl.list.Link,
+
+    private: extern struct {
+        seat_destroy: wl.Listener(void),
+    },
+
+    extern fn wlr_virtual_keyboard_v1_from_resource(resource: *zwp.VirtualKeyboardV1) ?*VirtualKeyboardV1;
+    pub const fromResource = wlr_virtual_keyboard_v1_from_resource;
 };

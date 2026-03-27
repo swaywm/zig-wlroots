@@ -148,11 +148,15 @@ pub const Scene = extern struct {
 
     linux_dmabuf_v1: ?*wlr.LinuxDmabufV1,
     gamma_control_manager_v1: ?*wlr.GammaControlManagerV1,
+    color_manager: ?*wlr.ColorManagerV1,
+
+    restack_xwayland_surfaces: bool,
 
     private: extern struct {
         linux_dmabuf_v1_destroy: wl.Listener(void),
         gamma_control_manager_v1_destroy: wl.Listener(void),
         gamma_control_manager_v1_set_gamma: wl.Listener(void),
+        color_manager_v1_destroy: wl.Listener(void),
 
         debug_damage_option: c_int,
         direct_scanout: bool,
@@ -199,8 +203,6 @@ pub const SceneSurface = extern struct {
         addon: wlr.Addon,
 
         outputs_update: wl.Listener(void),
-        output_enter: wl.Listener(void),
-        output_leave: wl.Listener(void),
         output_sample: wl.Listener(void),
         frame_done: wl.Listener(void),
         surface_destroy: wl.Listener(void),
@@ -236,6 +238,12 @@ pub const SceneBuffer = extern struct {
         pub const OutputSample = extern struct {
             output: *SceneOutput,
             direct_scanout: bool,
+            release_timeline: *wlr.DrmSyncobjTimeline,
+            release_point: u64,
+        };
+        pub const FrameDone = extern struct {
+            output: *wlr.SceneOutput,
+            when: posix.timespec,
         };
     };
 
@@ -247,7 +255,7 @@ pub const SceneBuffer = extern struct {
         output_enter: wl.Signal(*SceneOutput),
         output_leave: wl.Signal(*SceneOutput),
         output_sample: wl.Signal(*event.OutputSample),
-        frame_done: wl.Signal(*posix.timespec),
+        frame_done: wl.Signal(*event.FrameDone),
     },
 
     point_accepts_input: ?*const fn (buffer: *SceneBuffer, sx: *f64, sy: *f64) callconv(.c) bool,
@@ -261,6 +269,10 @@ pub const SceneBuffer = extern struct {
     dst_height: c_int,
     transform: wl.Output.Transform,
     opaque_region: pixman.Region32,
+    transfer_function: wlr.color.TransferFunction,
+    primaries: wlr.color.NamedPrimaries,
+    color_encoding: wlr.color.Encoding,
+    color_range: wlr.color.Range,
 
     private: extern struct {
         active_outputs: u64,
@@ -309,7 +321,7 @@ pub const SceneBuffer = extern struct {
     extern fn wlr_scene_buffer_set_filter_mode(scene_buffer: *SceneBuffer, filter_mode: wlr.RenderPass.ScaleFilterMode) void;
     pub const setFilterMode = wlr_scene_buffer_set_filter_mode;
 
-    extern fn wlr_scene_buffer_send_frame_done(scene_buffer: *SceneBuffer, now: *posix.timespec) void;
+    extern fn wlr_scene_buffer_send_frame_done(scene_buffer: *SceneBuffer, event: *event.FrameDone) void;
     pub const sendFrameDone = wlr_scene_buffer_send_frame_done;
 };
 
@@ -339,6 +351,11 @@ pub const SceneOutput = extern struct {
 
         gamma_lut_changed: bool,
         gamma_lut: ?*wlr.GammaControlV1,
+        gamma_lut_color_transform: ?*wlr.ColorTransform,
+
+        prev_gamma_lut_color_transform: ?*wlr.ColorTransform,
+        prev_supplied_color_transform: ?*wlr.ColorTransform,
+        combined_color_transform: ?*wlr.ColorTransform,
 
         output_commit: wl.Listener(void),
         output_damage: wl.Listener(void),
@@ -350,6 +367,8 @@ pub const SceneOutput = extern struct {
 
         in_timeline: ?*wlr.DrmSyncobjTimeline,
         in_point: u64,
+        out_timeline: ?*wlr.DrmSyncobjTimeline,
+        out_point: u64,
     },
 
     pub const StateOptions = extern struct {
