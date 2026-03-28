@@ -88,6 +88,9 @@ pub const ExtImageCaptureSourceV1 = extern struct {
         extern fn wlr_ext_image_capture_source_v1_cursor_finish(source_cursor: *Cursor) void;
         pub const finish = wlr_ext_image_capture_source_v1_cursor_finish;
     };
+
+    extern fn wlr_output_try_from_ext_image_capture_source_v1(source: *ExtImageCaptureSourceV1) ?*wlr.Output;
+    pub const toOutput = wlr_output_try_from_ext_image_capture_source_v1;
 };
 
 pub const ExtOutputImageCaptureSourceManagerV1 = extern struct {
