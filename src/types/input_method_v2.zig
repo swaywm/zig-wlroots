@@ -46,7 +46,7 @@ pub const InputMethodV2 = extern struct {
         keyboard: ?*wlr.Keyboard,
 
         events: extern struct {
-            destroy: wl.Signal(*wlr.InputMethodV2.KeyboardGrab),
+            destroy: wl.Signal(void),
         },
 
         private: extern struct {
