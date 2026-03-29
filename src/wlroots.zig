@@ -19,8 +19,8 @@ pub const DrmFormatSet = @import("render/drm_format_set.zig").DrmFormatSet;
 pub const color = @import("render/color.zig");
 
 pub const ColorTransform = opaque {};
-pub const ColorManagerV1 = @import("types/color_management_v1.zig");
-pub const ColorRepresentationManagerV1 = @import("types/color_representation_v1.zig");
+pub const ColorManagerV1 = @import("types/color_management_v1.zig").ColorManagerV1;
+pub const ColorRepresentationManagerV1 = @import("types/color_representation_v1.zig").ColorRepresentationManagerV1;
 
 pub const Drm = @import("types/drm.zig").Drm;
 
