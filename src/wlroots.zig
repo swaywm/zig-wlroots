@@ -20,6 +20,7 @@ pub const color = @import("render/color.zig");
 
 pub const ColorTransform = opaque {};
 pub const ColorManagerV1 = @import("types/color_management_v1.zig");
+pub const ColorRepresentationManagerV1 = @import("types/color_representation_v1.zig");
 
 pub const Drm = @import("types/drm.zig").Drm;
 
