@@ -89,10 +89,20 @@ pub const Renderer = extern struct {
     pub const gles2GetBufferFbo = wlr_gles2_renderer_get_buffer_fbo;
 
     extern fn wlr_color_manager_v1_transfer_function_list_from_renderer(renderer: *Renderer, len: *usize) ?[*]wp.ColorManagerV1.TransferFunction;
-    pub const transferFunctionList = wlr_color_manager_v1_transfer_function_list_from_renderer;
+    /// Caller must free returned slice with std.c.free()
+    pub fn transferFunctionList(renderer: *Renderer) []wp.ColorManagerV1.TransferFunction {
+        var len: usize = 0;
+        const ptr = wlr_color_manager_v1_transfer_function_list_from_renderer(renderer, &len) orelse return &.{};
+        return ptr[0..len];
+    }
 
     extern fn wlr_color_manager_v1_primaries_list_from_renderer(renderer: *Renderer, len: *usize) ?[*]wp.ColorManagerV1.Primaries;
-    pub const primariesList = wlr_color_manager_v1_primaries_list_from_renderer;
+    /// Caller must free returned slice with std.c.free()
+    pub fn primariesList(renderer: *Renderer) []wp.ColorManagerV1.Primaries {
+        var len: usize = 0;
+        const ptr = wlr_color_manager_v1_primaries_list_from_renderer(renderer, &len) orelse return &.{};
+        return ptr[0..len];
+    }
 };
 
 pub const RenderTimer = opaque {
