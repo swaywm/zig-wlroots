@@ -28,6 +28,7 @@ pub fn build(b: *std.Build) void {
     scanner.addSystemProtocol("staging/tearing-control/tearing-control-v1.xml");
     scanner.addSystemProtocol("staging/content-type/content-type-v1.xml");
     scanner.addSystemProtocol("staging/ext-image-copy-capture/ext-image-copy-capture-v1.xml");
+    scanner.addSystemProtocol("staging/color-management/color-management-v1.xml");
 
     scanner.addCustomProtocol(b.path("protocol/wlr-layer-shell-unstable-v1.xml"));
     scanner.addCustomProtocol(b.path("protocol/wlr-output-power-management-unstable-v1.xml"));
@@ -56,6 +57,7 @@ pub fn build(b: *std.Build) void {
     scanner.generate("wp_cursor_shape_manager_v1", 1);
     scanner.generate("wp_tearing_control_manager_v1", 1);
     scanner.generate("wp_content_type_manager_v1", 1);
+    scanner.generate("wp_color_manager_v1", 2);
 
     scanner.generate("zwlr_layer_shell_v1", 4);
     scanner.generate("zwlr_output_power_manager_v1", 1);

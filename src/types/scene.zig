@@ -183,6 +183,9 @@ pub const Scene = extern struct {
     extern fn wlr_scene_set_gamma_control_manager_v1(scene: *Scene, gamma_control: *wlr.GammaControlManagerV1) void;
     pub const setGammaControlManagerV1 = wlr_scene_set_gamma_control_manager_v1;
 
+    extern fn wlr_scene_set_color_manager_v1(scene: *Scene, manager: *wlr.ColorManagerV1) void;
+    pub const setColorManagerV1 = wlr_scene_set_color_manager_v1;
+
     extern fn wlr_scene_output_create(scene: *Scene, output: *wlr.Output) ?*SceneOutput;
     pub fn createSceneOutput(scene: *Scene, output: *wlr.Output) !*SceneOutput {
         return wlr_scene_output_create(scene, output) orelse error.OutOfMemory;

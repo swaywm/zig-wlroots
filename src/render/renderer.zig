@@ -2,6 +2,7 @@ const wlr = @import("../wlroots.zig");
 
 const wayland = @import("wayland");
 const wl = wayland.server.wl;
+const wp = wayland.server.wp;
 
 const pixman = @import("pixman");
 
@@ -86,6 +87,12 @@ pub const Renderer = extern struct {
 
     extern fn wlr_gles2_renderer_get_buffer_fbo(renderer: *Renderer, buffer: *wlr.Buffer) c_uint;
     pub const gles2GetBufferFbo = wlr_gles2_renderer_get_buffer_fbo;
+
+    extern fn wlr_color_manager_v1_transfer_function_list_from_renderer(renderer: *Renderer, len: *usize) ?[*]wp.ColorManagerV1.TransferFunction;
+    pub const transferFunctionList = wlr_color_manager_v1_transfer_function_list_from_renderer;
+
+    extern fn wlr_color_manager_v1_primaries_list_from_renderer(renderer: *Renderer, len: *usize) ?[*]wp.ColorManagerV1.Primaries;
+    pub const primariesList = wlr_color_manager_v1_primaries_list_from_renderer;
 };
 
 pub const RenderTimer = opaque {
