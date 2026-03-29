@@ -54,8 +54,21 @@ pub const ColorManagerV1 = extern struct {
     pub fn create(
         server: *wl.Server,
         version: u32,
-        options: *const Options,
+        options: struct {
+            features: Features,
+            render_intents: []const wp.ColorManagerV1.RenderIntent,
+            transfer_functions: []const wp.ColorManagerV1.TransferFunction,
+            primaries: []const wp.ColorManagerV1.Primaries,
+        },
     ) error{ColorManagerV1CreateFailed}!*ColorManagerV1 {
-        return wlr_color_manager_v1_create(server, version, options) orelse error.ColorManagerV1CreateFailed;
+        return wlr_color_manager_v1_create(server, version, &.{
+            .features = options.features,
+            .render_intents = options.render_intents.ptr,
+            .render_intents_len = options.render_intents.len,
+            .transfer_functions = options.transfer_functions.ptr,
+            .transfer_functions_len = options.transfer_functions.len,
+            .primaries = options.primaries.ptr,
+            .primaries_len = options.primaries.len,
+        }) orelse error.ColorManagerV1CreateFailed;
     }
 };
