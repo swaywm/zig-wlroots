@@ -36,8 +36,8 @@ pub const ColorRepresentationManagerV1 = extern struct {
         return wlr_color_representation_manager_v1_create(server, version, options) orelse error.ColorRepresentationManagerV1CreateFailed;
     }
 
-    extern fn wlr_color_representation_manager_v1_create_with_renderer(server: *wl.Server, version: u32, renderer: wlr.Renderer) ?*ColorRepresentationManagerV1;
-    pub fn createWithRenderer(server: *wl.Server, version: u32, renderer: wlr.Renderer) error{ColorRepresentationManagerV1CreateFailed}!*ColorRepresentationManagerV1 {
+    extern fn wlr_color_representation_manager_v1_create_with_renderer(server: *wl.Server, version: u32, renderer: *wlr.Renderer) ?*ColorRepresentationManagerV1;
+    pub fn createWithRenderer(server: *wl.Server, version: u32, renderer: *wlr.Renderer) error{ColorRepresentationManagerV1CreateFailed}!*ColorRepresentationManagerV1 {
         return wlr_color_representation_manager_v1_create_with_renderer(server, version, renderer) orelse error.ColorRepresentationManagerV1CreateFailed;
     }
 };
