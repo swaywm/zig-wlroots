@@ -234,6 +234,8 @@ pub const SceneOutputLayout = @import("types/scene.zig").SceneOutputLayout;
 pub const SceneTimer = @import("types/scene.zig").SceneTimer;
 pub const SceneLayerSurfaceV1 = @import("types/scene.zig").SceneLayerSurfaceV1;
 
+pub const Fixes = @import("types/fixes.zig").Fixes;
+
 pub const config = @import("config.zig");
 pub const version = @import("version.zig");
 
