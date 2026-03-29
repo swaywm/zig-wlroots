@@ -6,14 +6,14 @@ const wp = wayland.server.wp;
 
 pub const ColorManagerV1 = extern struct {
     pub const Features = extern struct {
-        icc_v2_v4: bool,
-        parametric: bool,
-        set_primaries: bool,
-        set_tf_power: bool,
-        set_luminances: bool,
-        set_mastering_display_primaries: bool,
-        extended_target_volume: bool,
-        windows_scrgb: bool,
+        icc_v2_v4: bool = false,
+        parametric: bool = false,
+        set_primaries: bool = false,
+        set_tf_power: bool = false,
+        set_luminances: bool = false,
+        set_mastering_display_primaries: bool = false,
+        extended_target_volume: bool = false,
+        windows_scrgb: bool = false,
     };
 
     pub const Options = extern struct {
