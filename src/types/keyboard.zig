@@ -48,7 +48,7 @@ pub const Keyboard = extern struct {
 
     const Impl = extern struct {
         name: [*:0]const u8,
-        led_update: ?*const fn (keyboard: *Keyboard, leds: u32) void,
+        led_update: ?*const fn (keyboard: *Keyboard, leds: u32) callconv(.c) void,
     };
 
     base: wlr.InputDevice,
