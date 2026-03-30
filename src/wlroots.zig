@@ -218,6 +218,7 @@ pub const ExtForeignToplevelImageCaptureSourceManagerV1 = @import("types/ext_ima
 
 pub const ExtImageCopyCaptureManagerV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureManagerV1;
 pub const ExtImageCopyCaptureFrameV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureFrameV1;
+pub const ExtImageCopyCaptureSessionV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureSessionV1;
 
 pub const SecurityContextManagerV1 = @import("types/security_context_v1.zig").SecurityContextManagerV1;
 pub const SecurityContextV1State = @import("types/security_context_v1.zig").SecurityContextV1State;
