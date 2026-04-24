@@ -75,6 +75,14 @@ pub const XdgToplevelDecorationV1 = @import("types/xdg_decoration_v1.zig").XdgTo
 pub const XdgActivationV1 = @import("types/xdg_activation_v1.zig").XdgActivationV1;
 pub const XdgActivationTokenV1 = @import("types/xdg_activation_v1.zig").XdgActivationTokenV1;
 
+pub const XdgForeignRegistry = @import("types/xdg_foreign_registry.zig").XdgForeignRegistry;
+pub const XdgForeignExported = @import("types/xdg_foreign_registry.zig").XdgForeignExported;
+
+pub const XdgForeignV2 = @import("types/xdg_foreign_v2.zig").XdgForeignV2;
+pub const XdgExportedV2 = @import("types/xdg_foreign_v2.zig").XdgExportedV2;
+pub const XdgImportedV2 = @import("types/xdg_foreign_v2.zig").XdgImportedV2;
+pub const XdgImportedChildV2 = @import("types/xdg_foreign_v2.zig").XdgImportedChildV2;
+
 pub const LayerShellV1 = @import("types/layer_shell_v1.zig").LayerShellV1;
 pub const LayerSurfaceV1 = @import("types/layer_shell_v1.zig").LayerSurfaceV1;
 
