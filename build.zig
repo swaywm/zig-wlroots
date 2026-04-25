@@ -73,21 +73,20 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/wlroots.zig"),
             .target = target,
             .optimize = optimize,
+            .link_libc = true,
         }),
     });
 
-    wlr_test.linkLibC();
-
     wlr_test.root_module.addImport("wayland", wayland);
-    wlr_test.linkSystemLibrary("wayland-server");
+    wlr_test.root_module.linkSystemLibrary("wayland-server", .{});
 
     wlr_test.root_module.addImport("xkbcommon", xkbcommon);
-    wlr_test.linkSystemLibrary("xkbcommon");
+    wlr_test.root_module.linkSystemLibrary("xkbcommon", .{});
 
     wlr_test.root_module.addImport("pixman", pixman);
-    wlr_test.linkSystemLibrary("pixman-1");
+    wlr_test.root_module.linkSystemLibrary("pixman-1", .{});
 
-    wlr_test.linkSystemLibrary("wlroots-0.20");
+    wlr_test.root_module.linkSystemLibrary("wlroots-0.20", .{});
 
     const test_step = b.step("test", "Run the tests");
     test_step.dependOn(&wlr_test.step);

@@ -8,7 +8,7 @@ const xkb = @import("xkbcommon");
 
 const gpa = std.heap.c_allocator;
 
-pub fn main() anyerror!void {
+pub fn main(init: std.process.Init) anyerror!void {
     wlr.log.init(.debug, null);
 
     var server: Server = undefined;
@@ -18,14 +18,17 @@ pub fn main() anyerror!void {
     var buf: [11]u8 = undefined;
     const socket = try server.wl_server.addSocketAuto(&buf);
 
-    if (std.os.argv.len >= 2) {
-        const cmd = std.mem.span(std.os.argv[1]);
-        var child = std.process.Child.init(&[_][]const u8{ "/bin/sh", "-c", cmd }, gpa);
-        var env_map = try std.process.getEnvMap(gpa);
+    const argv = init.minimal.args.vector;
+    if (argv.len >= 2) {
+        var env_map = try init.minimal.environ.createMap(gpa);
         defer env_map.deinit();
         try env_map.put("WAYLAND_DISPLAY", socket);
-        child.env_map = &env_map;
-        try child.spawn();
+
+        const cmd = std.mem.span(argv[1]);
+        _ = try std.process.spawn(init.io, .{
+            .argv = &.{ "/bin/sh", "-c", cmd },
+            .environ_map = &env_map,
+        });
     }
 
     try server.backend.start();
@@ -460,7 +463,7 @@ const Output = struct {
         const scene_output = output.server.scene.getSceneOutput(output.wlr_output).?;
         _ = scene_output.commit(null);
 
-        var now = posix.clock_gettime(posix.CLOCK.MONOTONIC) catch @panic("CLOCK_MONOTONIC not supported");
+        var now = timestamp();
         scene_output.sendFrameDone(&now);
     }
 
@@ -666,3 +669,11 @@ const Keyboard = struct {
         gpa.destroy(keyboard);
     }
 };
+
+fn timestamp() posix.timespec {
+    var timespec: posix.timespec = undefined;
+    switch (posix.errno(posix.system.clock_gettime(posix.CLOCK.MONOTONIC, &timespec))) {
+        .SUCCESS => return timespec,
+        else => @panic("CLOCK_MONOTONIC not supported"),
+    }
+}

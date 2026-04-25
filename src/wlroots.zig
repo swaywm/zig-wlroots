@@ -246,8 +246,21 @@ comptime {
         @compileError("zig-wlroots requires wlroots version 0.20, found version " ++ version.str);
     }
 }
+
 test {
-    const std = @import("std");
     @setEvalBranchQuota(100000);
-    std.testing.refAllDeclsRecursive(@This());
+    refAllDeclsRecursive(@This());
+}
+
+fn refAllDeclsRecursive(comptime T: type) void {
+    const std = @import("std");
+    inline for (comptime std.meta.declarations(T)) |decl| {
+        if (@TypeOf(@field(T, decl.name)) == type) {
+            switch (@typeInfo(@field(T, decl.name))) {
+                .@"struct", .@"enum", .@"union", .@"opaque" => refAllDeclsRecursive(@field(T, decl.name)),
+                else => {},
+            }
+        }
+        _ = &@field(T, decl.name);
+    }
 }

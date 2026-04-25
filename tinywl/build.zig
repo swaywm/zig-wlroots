@@ -47,18 +47,17 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("tinywl.zig"),
             .target = target,
             .optimize = optimize,
+            .link_libc = true,
         }),
     });
-
-    tinywl.linkLibC();
 
     tinywl.root_module.addImport("wayland", wayland);
     tinywl.root_module.addImport("xkbcommon", xkbcommon);
     tinywl.root_module.addImport("wlroots", wlroots);
 
-    tinywl.linkSystemLibrary("wayland-server");
-    tinywl.linkSystemLibrary("xkbcommon");
-    tinywl.linkSystemLibrary("pixman-1");
+    tinywl.root_module.linkSystemLibrary("wayland-server", .{});
+    tinywl.root_module.linkSystemLibrary("xkbcommon", .{});
+    tinywl.root_module.linkSystemLibrary("pixman-1", .{});
 
     b.installArtifact(tinywl);
 }
