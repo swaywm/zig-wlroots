@@ -6,6 +6,7 @@ pub fn build(b: *std.Build) void {
     });
 
     const enable_tests = b.option(bool, "enable-tests", "allow running tests") orelse false;
+    const use_llvm = b.option(bool, "llvm", "force usage of LLVM and LLD") orelse false;
 
     // Hack to allow making all dependencies required for tests lazy.
     if (!enable_tests) return;
@@ -75,6 +76,8 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
             .link_libc = true,
         }),
+        .use_llvm = use_llvm,
+        .use_lld = use_llvm,
     });
 
     wlr_test.root_module.addImport("wayland", wayland);

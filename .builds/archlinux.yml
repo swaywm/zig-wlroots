@@ -40,10 +40,12 @@ tasks:
       sudo mv zig-x86_64-linux-0.16.0/lib /usr/lib/zig
   - test: |
       cd zig-wlroots
-      zig build -Denable-tests test --summary all
+      # Arch's glibc version has SFrame sections in crt objects, force llvm/lld usage as a workaround
+      # https://codeberg.org/ziglang/zig/issues/31272
+      zig build -Denable-tests -Dllvm test --summary all
   - tinywl: |
       cd zig-wlroots/tinywl
-      zig build --summary all
+      zig build -Dllvm --summary all
   - fmt: |
       cd zig-wlroots
       zig fmt --check src/
