@@ -32,6 +32,7 @@ pub fn build(b: *std.Build) void {
     scanner.addSystemProtocol("staging/ext-image-copy-capture/ext-image-copy-capture-v1.xml");
     scanner.addSystemProtocol("staging/color-management/color-management-v1.xml");
     scanner.addSystemProtocol("staging/color-representation/color-representation-v1.xml");
+    scanner.addSystemProtocol("staging/ext-workspace/ext-workspace-v1.xml");
 
     scanner.addCustomProtocol(b.path("protocol/wlr-layer-shell-unstable-v1.xml"));
     scanner.addCustomProtocol(b.path("protocol/wlr-output-power-management-unstable-v1.xml"));
@@ -50,6 +51,7 @@ pub fn build(b: *std.Build) void {
 
     scanner.generate("ext_session_lock_manager_v1", 1);
     scanner.generate("ext_image_copy_capture_manager_v1", 1);
+    scanner.generate("ext_workspace_manager_v1", 1);
 
     scanner.generate("zwp_pointer_gestures_v1", 3);
     scanner.generate("zwp_pointer_constraints_v1", 1);

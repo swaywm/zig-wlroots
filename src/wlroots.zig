@@ -228,6 +228,11 @@ pub const ExtImageCopyCaptureManagerV1 = @import("types/ext_image_copy_capture_v
 pub const ExtImageCopyCaptureFrameV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureFrameV1;
 pub const ExtImageCopyCaptureSessionV1 = @import("types/ext_image_copy_capture_v1.zig").ExtImageCopyCaptureSessionV1;
 
+pub const ExtWorkspaceManagerV1 = @import("types/ext_workspace_v1.zig").ExtWorkspaceManagerV1;
+pub const ExtWorkspaceV1Request = @import("types/ext_workspace_v1.zig").ExtWorkspaceV1Request;
+pub const ExtWorkspaceGroupHandleV1 = @import("types/ext_workspace_v1.zig").ExtWorkspaceGroupHandleV1;
+pub const ExtWorkspaceHandleV1 = @import("types/ext_workspace_v1.zig").ExtWorkspaceHandleV1;
+
 pub const SecurityContextManagerV1 = @import("types/security_context_v1.zig").SecurityContextManagerV1;
 pub const SecurityContextV1State = @import("types/security_context_v1.zig").SecurityContextV1State;
 
