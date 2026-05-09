@@ -38,8 +38,8 @@ pub const ExtWorkspaceManagerV1 = extern struct {
         return wlr_ext_workspace_group_handle_v1_create(manager, caps) orelse error.OutOfMemory;
     }
 
-    extern fn wlr_ext_workspace_handle_v1_create(manager: *ExtWorkspaceManagerV1, id: [*:0]const u8, caps: ext.WorkspaceHandleV1.WorkspaceCapabilities) ?*ExtWorkspaceHandleV1;
-    pub fn createWorkspace(manager: *ExtWorkspaceManagerV1, id: [*:0]const u8, caps: ext.WorkspaceHandleV1.WorkspaceCapabilities) !*ExtWorkspaceHandleV1 {
+    extern fn wlr_ext_workspace_handle_v1_create(manager: *ExtWorkspaceManagerV1, id: ?[*:0]const u8, caps: ext.WorkspaceHandleV1.WorkspaceCapabilities) ?*ExtWorkspaceHandleV1;
+    pub fn createWorkspace(manager: *ExtWorkspaceManagerV1, id: ?[*:0]const u8, caps: ext.WorkspaceHandleV1.WorkspaceCapabilities) !*ExtWorkspaceHandleV1 {
         return wlr_ext_workspace_handle_v1_create(manager, id, caps) orelse error.OutOfMemory;
     }
 };
