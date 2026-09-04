@@ -71,6 +71,7 @@ pub const XdgPopup = @import("types/xdg_shell.zig").XdgPopup;
 
 pub const XdgDecorationManagerV1 = @import("types/xdg_decoration_v1.zig").XdgDecorationManagerV1;
 pub const XdgToplevelDecorationV1 = @import("types/xdg_decoration_v1.zig").XdgToplevelDecorationV1;
+pub const XdgToplevelTagManagerV1 = @import("types/xdg_toplevel_tag_manager_v1.zig").XdgToplevelTagManagerV1;
 
 pub const XdgActivationV1 = @import("types/xdg_activation_v1.zig").XdgActivationV1;
 pub const XdgActivationTokenV1 = @import("types/xdg_activation_v1.zig").XdgActivationTokenV1;
