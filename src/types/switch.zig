@@ -6,6 +6,7 @@ const wl = wayland.server.wl;
 pub const SwitchType = enum(c_int) {
     lid,
     tablet_mode,
+    keypad_slide,
 };
 
 pub const SwitchState = enum(c_int) {
