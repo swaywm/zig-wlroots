@@ -64,7 +64,7 @@ pub const ForeignToplevelHandleV1 = extern struct {
         pub const Fullscreen = extern struct {
             toplevel: *ForeignToplevelHandleV1,
             fullscreen: bool,
-            output: *wlr.Output,
+            output: ?*wlr.Output,
         };
 
         pub const SetRectangle = extern struct {
