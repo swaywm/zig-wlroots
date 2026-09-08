@@ -263,8 +263,8 @@ pub const Seat = extern struct {
 
     name: [*:0]u8,
 
-    capabilities: u32,
-    accumulated_capabilities: u32,
+    capabilities: wl.Seat.Capability,
+    accumulated_capabilities: wl.Seat.Capability,
 
     selection_source: ?*wlr.DataSource,
     selection_serial: u32,
