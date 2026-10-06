@@ -37,10 +37,10 @@ tasks:
       cd ..
 
       # Eat Github's resources rather than the Zig Software Foundation's resources!
-      wget -nv https://github.com/ifreund/zig-tarball-mirror/releases/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz
-      tar xf zig-x86_64-linux-0.16.0.tar.xz
-      sudo mv zig-x86_64-linux-0.16.0/zig /usr/bin/
-      sudo mv zig-x86_64-linux-0.16.0/lib /usr/lib/zig
+      wget -nv https://github.com/ifreund/zig-tarball-mirror/releases/download/0.17.0/zig-x86_64-linux-0.17.0.tar.xz
+      tar xf zig-x86_64-linux-0.17.0.tar.xz
+      sudo mv zig-x86_64-linux-0.17.0/zig /usr/bin/
+      sudo mv zig-x86_64-linux-0.17.0/lib /usr/lib/zig
   - test: |
       cd zig-wlroots
       zig build -Denable-tests test --summary all
@@ -50,6 +50,8 @@ tasks:
   - fmt: |
       cd zig-wlroots
       zig fmt --check src/
-      zig fmt --check tinywl/
       zig fmt --check build.zig
       zig fmt --check build.zig.zon
+      zig fmt --check tinywl/tinywl.zig
+      zig fmt --check tinywl/build.zig
+      zig fmt --check tinywl/build.zig.zon

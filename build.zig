@@ -1,18 +1,26 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    _ = b.addModule("wlroots", .{
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const translate_c = b.addTranslateC(.{
+        .root_source_file = b.path("src/c.h"),
+        .target = target,
+        .optimize = optimize,
+    });
+    translate_c.linkSystemLibrary("wlroots-0.20", .{});
+    const wlroots = b.addModule("wlroots", .{
         .root_source_file = b.path("src/wlroots.zig"),
     });
+    const translate_c_mod = translate_c.createModule();
+    wlroots.addImport("c", translate_c_mod);
 
     const enable_tests = b.option(bool, "enable-tests", "allow running tests") orelse false;
     const use_llvm = b.option(bool, "llvm", "force usage of LLVM and LLD") orelse false;
 
     // Hack to allow making all dependencies required for tests lazy.
     if (!enable_tests) return;
-
-    const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
 
     const Scanner = (b.lazyImport(@This(), "wayland") orelse return).Scanner;
 
@@ -85,6 +93,7 @@ pub fn build(b: *std.Build) void {
         .use_lld = use_llvm,
     });
 
+    wlr_test.root_module.addImport("c", translate_c_mod);
     wlr_test.root_module.addImport("wayland", wayland);
     wlr_test.root_module.linkSystemLibrary("wayland-server", .{});
 

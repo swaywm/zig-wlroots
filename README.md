@@ -21,7 +21,7 @@ request on [codeberg](https://codeberg.org/ifreund/zig-wlroots).
 
 ## Dependencies
 
-- [zig](https://ziglang.org/) 0.16
+- [zig](https://ziglang.org/) 0.17
 - [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots) 0.20
 - [zig-wayland](https://codeberg.org/ifreund/zig-wayland)
 - [zig-xkbcommon](https://codeberg.org/ifreund/zig-xkbcommon)

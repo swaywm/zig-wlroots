@@ -425,7 +425,7 @@ pub const Seat = extern struct {
 
     extern fn wlr_seat_keyboard_notify_key(seat: *Seat, time_msec: u32, key: u32, state: u32) void;
     pub fn keyboardNotifyKey(seat: *Seat, time_msec: u32, key: u32, state: wl.Keyboard.KeyState) void {
-        wlr_seat_keyboard_notify_key(seat, time_msec, key, @as(u32, @intCast(@intFromEnum(state))));
+        wlr_seat_keyboard_notify_key(seat, time_msec, key, @intCast(@backingInt(state)));
     }
 
     extern fn wlr_seat_keyboard_notify_modifiers(seat: *Seat, modifiers: ?*const wlr.Keyboard.Modifiers) void;

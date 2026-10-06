@@ -1,4 +1,4 @@
-const c = @cImport(@cInclude("wlr/config.h"));
+const c = @import("c");
 
 pub const has_drm_backend = c.WLR_HAS_DRM_BACKEND != 0;
 pub const has_libinput_backend = c.WLR_HAS_LIBINPUT_BACKEND != 0;

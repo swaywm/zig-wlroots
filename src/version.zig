@@ -1,4 +1,4 @@
-const c = @cImport(@cInclude("wlr/version.h"));
+const c = @import("c");
 
 pub const str = c.WLR_VERSION_STR;
 

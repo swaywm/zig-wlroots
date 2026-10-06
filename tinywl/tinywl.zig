@@ -416,11 +416,11 @@ const Server = struct {
     /// Assumes the modifier used for compositor keybinds is pressed
     /// Returns true if the key was handled
     fn handleKeybind(server: *Server, key: xkb.Keysym) bool {
-        switch (@intFromEnum(key)) {
+        switch (key) {
             // Exit the compositor
-            xkb.Keysym.Escape => server.wl_server.terminate(),
+            .Escape => server.wl_server.terminate(),
             // Focus the next toplevel in the stack, pushing the current top to the back
-            xkb.Keysym.F1 => {
+            .F1 => {
                 if (server.toplevels.length() < 2) return true;
                 const toplevel: *Toplevel = @fieldParentPtr("link", server.toplevels.link.prev.?);
                 server.focusView(toplevel, toplevel.xdg_toplevel.base.surface);

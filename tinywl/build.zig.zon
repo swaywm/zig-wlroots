@@ -4,19 +4,19 @@
     .paths = .{""},
     .dependencies = .{
         .pixman = .{
-            .url = "https://codeberg.org/ifreund/zig-pixman/archive/v0.3.0.tar.gz",
-            .hash = "pixman-0.3.0-LClMnz2VAAAs7QSCGwLimV5VUYx0JFnX5xWU6HwtMuDX",
+            .url = "https://codeberg.org/ifreund/zig-pixman/archive/v0.4.0.tar.gz",
+            .hash = "pixman-0.4.0-LClMn_eWAAAa2zACATDpPwjuI5fWlO5cBp_F_M33hnNZ",
         },
         .wayland = .{
-            .url = "https://codeberg.org/ifreund/zig-wayland/archive/v0.6.0.tar.gz",
-            .hash = "wayland-0.6.0-lQa1kqz8AQADQmdNJsNhLoNHcnEGEUjrOaPV-dtEnEmX",
+            .url = "https://codeberg.org/ifreund/zig-wayland/archive/v0.7.0.tar.gz",
+            .hash = "wayland-0.7.0-lQa1kuP8AQD5dW7_o-VKLVD_QbqXe7Zob78r2su7Pyex",
         },
         .wlroots = .{
             .path = "..",
         },
         .xkbcommon = .{
-            .url = "https://codeberg.org/ifreund/zig-xkbcommon/archive/v0.3.0.tar.gz",
-            .hash = "xkbcommon-0.3.0-VDqIe3K9AQB2fG5ZeRcMC9i7kfrp5m2rWgLrmdNn9azr",
+            .url = "https://codeberg.org/ifreund/zig-xkbcommon/archive/v0.5.0.tar.gz",
+            .hash = "xkbcommon-0.5.0-VDqIe8y3AgDU-cGL02xZplwABH3WbpTimrrgbgTgD_3g",
         },
     },
     .fingerprint = 0x11f0eae53700be85,
