@@ -13,6 +13,10 @@ pub const XdgToplevelTagManagerV1 = extern struct {
         destroy: wl.Signal(void),
     },
 
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
+
     pub const event = struct {
         pub const SetTag = struct {
             toplevel: *wlr.XdgToplevel,
