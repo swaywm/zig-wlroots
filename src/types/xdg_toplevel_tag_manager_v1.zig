@@ -5,18 +5,6 @@ const wl = wayland.server.wl;
 const xdg = wayland.server.xdg;
 
 pub const XdgToplevelTagManagerV1 = extern struct {
-    global: *wl.Global,
-
-    events: extern struct {
-        set_tag: wl.Signal(*XdgToplevelTagManagerV1.event.SetTag),
-        set_description: wl.Signal(*XdgToplevelTagManagerV1.event.SetDescription),
-        destroy: wl.Signal(void),
-    },
-
-    private: extern struct {
-        server_destroy: wl.Listener(void),
-    },
-
     pub const event = struct {
         pub const SetTag = struct {
             toplevel: *wlr.XdgToplevel,
@@ -28,6 +16,18 @@ pub const XdgToplevelTagManagerV1 = extern struct {
             description: [*:0]const u8,
         };
     };
+
+    global: *wl.Global,
+
+    events: extern struct {
+        set_tag: wl.Signal(*XdgToplevelTagManagerV1.event.SetTag),
+        set_description: wl.Signal(*XdgToplevelTagManagerV1.event.SetDescription),
+        destroy: wl.Signal(void),
+    },
+
+    private: extern struct {
+        server_destroy: wl.Listener(void),
+    },
 
     extern fn wlr_xdg_toplevel_tag_manager_v1_create(server: *wl.Server, version: u32) ?*XdgToplevelTagManagerV1;
     pub fn create(server: *wl.Server, version: u32) !*XdgToplevelTagManagerV1 {
